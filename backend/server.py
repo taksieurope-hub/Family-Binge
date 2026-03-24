@@ -13,10 +13,10 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    return {"message": "? Family Binge Backend is running!", "status": "ok"}
+    return {"message": "? Backend is working now!", "status": "ok"}
 
 @app.get("/live/channels")
-async def get_live_channels():
-    return {"message": "Live channels endpoint works", "channels": 0}
+async def live_channels():
+    return {"channels": [], "message": "Live TV ready"}
 
-print("? Simple routes loaded - backend should work now")
+print("Simple backend loaded - no routers")
