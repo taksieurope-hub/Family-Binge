@@ -18,18 +18,33 @@ TMDB_BASE_URL = "https://api.themoviedb.org/3"
 
 @app.get("/")
 async def root():
-    return {"message": "? Backend is running with TMDB!", "status": "ok"}
+    return {"message": "? Backend is running!", "has_tmdb_key": bool(TMDB_API_KEY)}
 
 @app.get("/api/content/movies/popular")
-async def get_popular_movies(page: int = 1):
+@app.get("/api/content/movies/now-playing")
+async def get_movies(page: int = 1):
     if not TMDB_API_KEY:
-        return {"results": [], "error": "No TMDB API key"}
+        return {"results": [], "error": "No TMDB API key set"}
     async with httpx.AsyncClient() as client:
-        resp = await client.get(f"{TMDB_BASE_URL}/movie/popular", params={"api_key": TMDB_API_KEY, "page": page})
+        resp = await client.get(
+            f"{TMDB_BASE_URL}/movie/popular", 
+            params={"api_key": TMDB_API_KEY, "page": page}
+        )
+        return resp.json()
+
+@app.get("/api/content/series/popular")
+async def get_series(page: int = 1):
+    if not TMDB_API_KEY:
+        return {"results": [], "error": "No TMDB API key set"}
+    async with httpx.AsyncClient() as client:
+        resp = await client.get(
+            f"{TMDB_BASE_URL}/tv/popular", 
+            params={"api_key": TMDB_API_KEY, "page": page}
+        )
         return resp.json()
 
 @app.get("/api/content/livetv/channels")
 async def get_live_channels():
-    return {"channels": []}  # keep simple for now
+    return {"channels": []}
 
-print("? Backend ready with TMDB support")
+print("? Backend with real TMDB integration loaded")
