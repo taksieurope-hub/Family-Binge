@@ -40,7 +40,7 @@ const Footer = () => {
               <div className="bg-gradient-to-r from-purple-600 to-pink-500 p-2 rounded-lg">
                 <Tv className="w-6 h-6 text-white" />
               </div>
-              <span className="text-2xl font-bold text-white">Waka<span className="text-purple-500">TV</span></span>
+              <span className="text-2xl font-bold text-white">Family-Binge<span className="text-purple-500">TV</span></span>
             </div>
             <p className="text-gray-400 mb-6 max-w-sm">
               The ultimate streaming experience. 220+ live channels, 60,000+ movies & series. Available on all your favorite devices.
@@ -52,9 +52,9 @@ const Footer = () => {
                 <MessageCircle className="w-5 h-5 text-green-500" />
                 <span>WhatsApp Support</span>
               </a>
-              <a href="mailto:support@wakatv.com" className="flex items-center gap-3 text-gray-400 hover:text-white transition-colors">
+              <a href="mailto:support@familybinge.tv.com" className="flex items-center gap-3 text-gray-400 hover:text-white transition-colors">
                 <Mail className="w-5 h-5 text-purple-400" />
-                <span>support@wakatv.com</span>
+                <span>support@familybinge.tv.com</span>
               </a>
             </div>
 

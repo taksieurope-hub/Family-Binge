@@ -108,7 +108,7 @@ const PricingSection = () => {
             Want to Become a Reseller?
           </h3>
           <p className="text-gray-300 mb-6 max-w-xl mx-auto">
-            Operate from the convenience of your home. Write to us and start your venture with Waka TV!
+            Operate from the convenience of your home. Write to us and start your venture with Family Binge TV!
           </p>
           <Button
             className="bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white border-0 px-8 py-6 text-lg"

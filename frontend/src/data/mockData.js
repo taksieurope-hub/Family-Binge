@@ -1,5 +1,3 @@
-// Mock data for Waka TV Clone
-
 export const liveChannels = [
   { id: 1, name: "Sports HD", category: "Sports", logo: "https://images.unsplash.com/photo-1461896836934- voices?w=100&h=100&fit=crop", number: "101" },
   { id: 2, name: "ESPN Africa", category: "Sports", logo: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=100&h=100&fit=crop", number: "102" },
@@ -161,33 +159,33 @@ export const pricingPlans = [
   {
     id: 1,
     name: "1 Month",
-    price: 9.99,
-    currency: "USD",
-    features: ["220+ Live Channels", "60,000+ Movies & Series", "HD Quality", "1 Device"],
+    price: 60.00,
+    currency: "Rand",
+    features: ["60,000+ Movies & Series", "HD Quality", "1 Device", "Search any movie or series your heart desires"],
     popular: false
   },
   {
     id: 2,
     name: "3 Months",
-    price: 24.99,
-    currency: "USD",
-    features: ["220+ Live Channels", "60,000+ Movies & Series", "HD Quality", "2 Devices", "Save 17%"],
+    price: 150.00,
+    currency: "Rand",
+    features: ["60,000+ Movies & Series", "HD Quality", "2 Devices", "Save 17%", "Search any movie or series your heart desires"],
     popular: true
   },
   {
     id: 3,
     name: "6 Months",
-    price: 44.99,
-    currency: "USD",
-    features: ["220+ Live Channels", "60,000+ Movies & Series", "Full HD Quality", "3 Devices", "Save 25%"],
+    price: 280.00,
+    currency: "Rand",
+    features: ["60,000+ Movies & Series", "Full HD Quality", "3 Devices", "Save 25%", "Search any movie or series your heart desires"],
     popular: false
   },
   {
     id: 4,
     name: "12 Months",
-    price: 79.99,
-    currency: "USD",
-    features: ["220+ Live Channels", "60,000+ Movies & Series", "4K Quality", "5 Devices", "Save 33%"],
+    price: 600.00,
+    currency: "Rand",
+    features: ["60,000+ Movies & Series", "4K Quality", "5 Devices", "Save 33%", "Search any movie or series your heart desires"],
     popular: false
   }
 ];
@@ -197,16 +195,16 @@ export const faqData = [
     category: "Getting Started",
     questions: [
       {
-        q: "What is Waka TV?",
-        a: "Waka TV is a Live TV & VOD app available for Android devices, with more than 60,000 movies & series and 220+ live channels, including the best in sports, news, and entertainment."
+        q: "What is Family Binge TV?",
+        a: "Family Binge TV is a Live TV & VOD app available for Android devices, with more than 60,000 movies & series and 220+ live channels, including the best in sports, news, and entertainment."
       },
       {
-        q: "How do I download and install Waka TV?",
+        q: "How do I download and install Family Binge TV?",
         a: "For mobile, download directly from our website. For TV devices, use the Downloader app with code 664118. The app is compatible with Android smartphones, TV Box, Smart TV, and TV Stick."
       },
       {
         q: "Is there a free trial?",
-        a: "Yes! We offer a 7-day free trial so you can explore our entire library of content before subscribing."
+        a: "Yes! We offer a 3-day free trial so you can explore our entire library of content before subscribing."
       }
     ]
   },
