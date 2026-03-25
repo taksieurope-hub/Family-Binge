@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://family-binge-backend.onrender.com";
+const API_BASE_URL = "https://family-binger-1.onrender.com";   // Change this if your backend URL is different
 
 export const movieAPI = {
   getPopular: () => fetch(`${API_BASE_URL}/movies/popular`).then(r => r.json()),
@@ -14,7 +14,6 @@ export const liveTVAPI = {
   getChannels: () => fetch(`${API_BASE_URL}/live/channels`).then(r => r.json()),
 };
 
-// Add the missing searchAPI that Navbar is trying to import
 export const searchAPI = {
   search: (query) => fetch(`${API_BASE_URL}/search?q=${encodeURIComponent(query)}`).then(r => r.json()),
 };
