@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://family-binger-1.onrender.com";
+const API_BASE_URL = "https://family-binge-backend.onrender.com";
 
 export const movieAPI = {
   getPopular: () => fetch(`${API_BASE_URL}/api/content/movies/popular`).then(r => r.json()),

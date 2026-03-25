@@ -20,22 +20,41 @@ async def root():
     return {"message": "Backend running", "tmdb_key_set": bool(TMDB_KEY)}
 
 @app.get("/api/content/movies/popular")
-@app.get("/api/content/movies/now-playing")
-async def movies(page: int = 1):
+async def movies_popular(page: int = 1):
     if not TMDB_KEY:
         return {"results": []}
     async with httpx.AsyncClient() as client:
-        r = await client.get(f"https://api.themoviedb.org/3/movie/popular", params={"api_key": TMDB_KEY, "page": page})
+        r = await client.get("https://api.themoviedb.org/3/movie/popular", params={"api_key": TMDB_KEY, "page": page})
+        return r.json()
+
+@app.get("/api/content/movies/{movie_id}")
+async def movie_details(movie_id: int):
+    if not TMDB_KEY:
+        return {}
+    async with httpx.AsyncClient() as client:
+        r = await client.get(f"https://api.themoviedb.org/3/movie/{movie_id}", params={"api_key": TMDB_KEY})
         return r.json()
 
 @app.get("/api/content/series/popular")
-async def series(page: int = 1):
+async def series_popular(page: int = 1):
     if not TMDB_KEY:
         return {"results": []}
     async with httpx.AsyncClient() as client:
-        r = await client.get(f"https://api.themoviedb.org/3/tv/popular", params={"api_key": TMDB_KEY, "page": page})
+        r = await client.get("https://api.themoviedb.org/3/tv/popular", params={"api_key": TMDB_KEY, "page": page})
         return r.json()
 
-@app.get("/api/content/livetv/channels")
-async def channels():
-    return {"channels": []}
+@app.get("/api/content/series/{series_id}")
+async def series_details(series_id: int):
+    if not TMDB_KEY:
+        return {}
+    async with httpx.AsyncClient() as client:
+        r = await client.get(f"https://api.themoviedb.org/3/tv/{series_id}", params={"api_key": TMDB_KEY})
+        return r.json()
+
+@app.get("/api/content/search")
+async def search(q: str, page: int = 1):
+    if not TMDB_KEY:
+        return {"results": []}
+    async with httpx.AsyncClient() as client:
+        r = await client.get("https://api.themoviedb.org/3/search/multi", params={"api_key": TMDB_KEY, "query": q, "page": page})
+        return r.json()
