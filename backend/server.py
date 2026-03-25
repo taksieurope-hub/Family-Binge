@@ -1,5 +1,7 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import httpx
 
 app = FastAPI(title="Family Binge API")
 
@@ -11,26 +13,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+TMDB_API_KEY = os.getenv("TMDB_API_KEY")
+TMDB_BASE_URL = "https://api.themoviedb.org/3"
+
 @app.get("/")
 async def root():
-    return {"message": "? Backend is running!", "status": "ok"}
+    return {"message": "? Backend is running with TMDB!", "status": "ok"}
 
-# Routes the frontend is actually calling
 @app.get("/api/content/movies/popular")
-@app.get("/api/content/movies/now-playing")
-async def get_movies(page: int = 1):
-    return {"results": [], "page": page, "total_pages": 10}
-
-@app.get("/api/content/series/popular")
-async def get_series(page: int = 1):
-    return {"results": [], "page": page, "total_pages": 10}
+async def get_popular_movies(page: int = 1):
+    if not TMDB_API_KEY:
+        return {"results": [], "error": "No TMDB API key"}
+    async with httpx.AsyncClient() as client:
+        resp = await client.get(f"{TMDB_BASE_URL}/movie/popular", params={"api_key": TMDB_API_KEY, "page": page})
+        return resp.json()
 
 @app.get("/api/content/livetv/channels")
-async def get_live_channels(category: str = "all"):
-    return {"channels": [], "category": category}
+async def get_live_channels():
+    return {"channels": []}  # keep simple for now
 
-@app.get("/api/content/livetv/categories")
-async def get_live_categories():
-    return {"categories": ["all", "news", "sports", "entertainment"]}
-
-print("? All frontend-expected routes added")
+print("? Backend ready with TMDB support")
