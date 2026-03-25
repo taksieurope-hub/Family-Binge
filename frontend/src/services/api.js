@@ -41,5 +41,6 @@ export const seriesAPI = {
 };
 
 export const searchAPI = {
+  searchAll: (query) => fetch(`${API_BASE_URL}/api/content/search?q=${encodeURIComponent(query)}`).then(r => r.json()),
   search: (query) => fetch(`${API_BASE_URL}/api/content/search?q=${encodeURIComponent(query)}`).then(r => r.json()),
 };
