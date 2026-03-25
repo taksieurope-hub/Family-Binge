@@ -11,20 +11,27 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Import the actual router you have
-try:
-    from routers.content import router as content_router
-    app.include_router(content_router, prefix="/api/content", tags=["content"])
-    print("? Loaded content router")
-except Exception as e:
-    print("Content router failed:", e)
-
+# Root
 @app.get("/")
 async def root():
     return {"message": "? Backend is running!", "status": "ok"}
 
-@app.get("/live/channels")
-async def get_live_channels():
-    return {"message": "Live channels endpoint ready", "channels": []}
+# Mock the routes the frontend is calling
+@app.get("/api/content/movies/popular")
+@app.get("/api/content/movies/now-playing")
+async def get_movies(page: int = 1):
+    return {"results": [], "page": page, "total_pages": 1}
 
-print("? Server started successfully")
+@app.get("/api/content/series/popular")
+async def get_series(page: int = 1):
+    return {"results": [], "page": page, "total_pages": 1}
+
+@app.get("/api/content/livetv/channels")
+async def get_live_channels(category: str = "all"):
+    return {"channels": [], "category": category}
+
+@app.get("/api/content/livetv/categories")
+async def get_live_categories():
+    return {"categories": ["all", "news", "sports", "movies"]}
+
+print("? Backend with frontend-expected routes loaded")
