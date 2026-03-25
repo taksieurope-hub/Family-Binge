@@ -11,20 +11,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Root
 @app.get("/")
 async def root():
     return {"message": "? Backend is running!", "status": "ok"}
 
-# Mock the routes the frontend is calling
+# Routes the frontend is actually calling
 @app.get("/api/content/movies/popular")
 @app.get("/api/content/movies/now-playing")
 async def get_movies(page: int = 1):
-    return {"results": [], "page": page, "total_pages": 1}
+    return {"results": [], "page": page, "total_pages": 10}
 
 @app.get("/api/content/series/popular")
 async def get_series(page: int = 1):
-    return {"results": [], "page": page, "total_pages": 1}
+    return {"results": [], "page": page, "total_pages": 10}
 
 @app.get("/api/content/livetv/channels")
 async def get_live_channels(category: str = "all"):
@@ -32,6 +31,6 @@ async def get_live_channels(category: str = "all"):
 
 @app.get("/api/content/livetv/categories")
 async def get_live_categories():
-    return {"categories": ["all", "news", "sports", "movies"]}
+    return {"categories": ["all", "news", "sports", "entertainment"]}
 
-print("? Backend with frontend-expected routes loaded")
+print("? All frontend-expected routes added")
