@@ -6,10 +6,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 # TMDB API Configuration
-TMDB_API_KEYS = [
-    "c8dea14dc917687ac631a52620e4f7ad",
-    "3cb41ecea3bf606c56552db3d17adefd"
-]
+TMDB_API_KEYS = [os.getenv("TMDB_API_KEY", "c83d3380bc5b34c940a447a375581533")]
 TMDB_BASE_URL = "https://api.themoviedb.org/3"
 TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p"
 
@@ -296,3 +293,4 @@ def format_series_details(series: dict) -> dict:
         "similar": similar,
         "type": "series"
     }
+
