@@ -3,54 +3,44 @@
 @tailwind utilities;
 
 :root {
-  --luminous-green: #00ff9f;
-  --electric-blue: #00d4ff;
-  --vibrant-orange: #ff9500;
+  --green: #00ff9f;
+  --blue: #00d4ff;
+  --orange: #ff9500;
 }
 
-/* Force base dark theme */
-body, .App, .bg-black, .bg-zinc-900 {
+/* FORCE DARK BACKGROUND */
+body, .App, nav, .bg-black, .bg-zinc-900, .bg-gray-900 {
   background: #0a0a12 !important;
-  color: #e0f8ff !important;
 }
 
-/* Override ALL purple/red buttons and accents */
-.bg-purple-600, .bg-purple-500, .bg-purple-700, 
-button.bg-purple-600, .text-purple-600, .border-purple-600,
-.bg-red-600, .text-red-500 {
-  background-color: var(--luminous-green) !important;
+/* FORCE GREEN BUTTONS */
+.bg-purple-600, .bg-purple-500, .bg-purple-700, button, .Button {
+  background-color: var(--green) !important;
   color: #0a0a12 !important;
-  border-color: var(--luminous-green) !important;
 }
 
-button:hover.bg-purple-600, button:hover {
+button:hover {
   background-color: #00cc7a !important;
 }
 
-/* Blue accents */
-.text-purple-400, .text-purple-500, .border-purple-500 {
-  color: var(--electric-blue) !important;
+/* FORCE BLUE ACCENTS */
+.text-purple-400, .text-purple-500, .border-purple-500, .text-purple-600 {
+  color: var(--blue) !important;
 }
 
-/* Orange for active genres and highlights */
-.bg-orange-500, .text-orange-500, button[active] {
-  background-color: var(--vibrant-orange) !important;
+/* FORCE ORANGE FOR ACTIVE GENRES */
+.bg-orange-500, button[active], .active {
+  background-color: var(--orange) !important;
   color: white !important;
 }
 
-/* Movie card hover - Green glow */
-.movie-card:hover, .group:hover .movie-card {
-  box-shadow: 0 0 35px rgba(0, 255, 159, 0.6) !important;
-  transform: scale(1.08) !important;
+/* Movie card hover glow */
+.movie-card:hover {
+  box-shadow: 0 0 40px rgba(0, 255, 159, 0.6) !important;
 }
 
-/* Play button */
-button .fill-white, .bg-purple-600 .fill-white {
-  fill: #0a0a12 !important;
-}
-
-/* Navbar */
-nav {
-  background: rgba(10, 15, 30, 0.98) !important;
-  border-bottom: 1px solid rgba(0, 212, 255, 0.4) !important;
+/* Clean up any remaining red */
+.bg-red-600, .text-red-500, .border-red-500 {
+  background-color: var(--green) !important;
+  color: #0a0a12 !important;
 }
