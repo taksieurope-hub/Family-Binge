@@ -44,7 +44,6 @@ const ContentDetailModal = ({ content, onClose }) => {
   const [loading, setLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  // Fetch full details (fixes blank screen after search)
   useEffect(() => {
     const fetchDetails = async () => {
       if (!content?.id) return;
@@ -59,7 +58,7 @@ const ContentDetailModal = ({ content, onClose }) => {
         setDetails(data);
       } catch (err) {
         console.error(err);
-        setDetails(content); // fallback
+        setDetails(content);
       } finally {
         setLoading(false);
       }
@@ -67,7 +66,6 @@ const ContentDetailModal = ({ content, onClose }) => {
     fetchDetails();
   }, [content]);
 
-  // AUTO START full-screen player INSIDE the app the moment details load
   useEffect(() => {
     if (!loading && details && !isPlaying) {
       setIsPlaying(true);
@@ -76,8 +74,8 @@ const ContentDetailModal = ({ content, onClose }) => {
 
   const streamUrl = details ? (
     (details.type === 'series' || details.media_type === 'tv')
-      ? `https://vidsrc.cc/v2/embed/tv/${details.id}/1/1`
-      : `https://vidsrc.cc/v2/embed/movie/${details.id}`
+      ? `https://vidsrc.to/embed/tv/${details.id}/1/1`
+      : `https://vidsrc.to/embed/movie/${details.id}`
   ) : '';
 
   if (loading) {
@@ -88,14 +86,13 @@ const ContentDetailModal = ({ content, onClose }) => {
     );
   }
 
-  // FULL-SCREEN PLAYER INSIDE YOUR APP
   if (isPlaying && details) {
     return (
       <div className="fixed inset-0 bg-black z-[10000] flex flex-col">
-        <div className="flex justify-end p-4">
+        <div className="flex justify-end p-4 bg-black">
           <button 
             onClick={() => { setIsPlaying(false); onClose(); }}
-            className="text-white hover:text-red-500 transition-colors"
+            className="text-white hover:text-red-500"
           >
             <X className="w-8 h-8" />
           </button>
@@ -111,7 +108,6 @@ const ContentDetailModal = ({ content, onClose }) => {
     );
   }
 
-  // Details view (fallback if needed)
   return (
     <div className="fixed inset-0 bg-black/95 z-[9999] flex items-center justify-center p-4">
       <div className="max-w-4xl w-full bg-zinc-900 rounded-3xl overflow-hidden">
