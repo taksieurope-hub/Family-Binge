@@ -1,7 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import os
 import httpx
+from pymongo import MongoClient
+import bcrypt
+from datetime import datetime
 
 app = FastAPI(title="Family Binge API")
 
@@ -13,54 +16,66 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# MongoDB connection
+MONGO_URL = os.getenv("MONGO_URL", "mongodb://localhost:27017")
+client = MongoClient(MONGO_URL)
+db = client["familybinge"]
+users = db["users"]
+
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")
 TMDB_BASE_URL = "https://api.themoviedb.org/3"
 
 @app.get("/")
 async def root():
-    return {"status": "ok", "tmdb_key": bool(TMDB_API_KEY)}
+    return {"status": "ok", "users_collection": "ready"}
 
-@app.get("/api/content/movies/popular")
-async def get_popular_movies(page: int = 1):
-    if not TMDB_API_KEY:
-        return {"results": []}
-    async with httpx.AsyncClient() as client:
-        r = await client.get(f"{TMDB_BASE_URL}/movie/popular", params={"api_key": TMDB_API_KEY, "page": page})
-        return r.json()
+# Register
+@app.post("/api/auth/register")
+async def register(data: dict):
+    email = data.get("email")
+    password = data.get("password")
+    name = data.get("name", "")
 
-@app.get("/api/content/movies")
-async def get_movies(with_genres: str = None, page: int = 1):
-    if not TMDB_API_KEY:
-        return {"results": []}
-    params = {"api_key": TMDB_API_KEY, "page": page}
-    if with_genres:
-        params["with_genres"] = with_genres
-    async with httpx.AsyncClient() as client:
-        r = await client.get(f"{TMDB_BASE_URL}/discover/movie", params=params)
-        return r.json()
+    if not email or not password:
+        raise HTTPException(status_code=400, detail="Email and password required")
 
-@app.get("/api/content/movies/{movie_id}")
-async def get_movie_details(movie_id: int):
-    if not TMDB_API_KEY:
-        return {}
-    async with httpx.AsyncClient() as client:
-        r = await client.get(f"{TMDB_BASE_URL}/movie/{movie_id}", params={"api_key": TMDB_API_KEY})
-        return r.json()
+    # Check if user exists
+    if users.find_one({"email": email}):
+        raise HTTPException(status_code=400, detail="Email already registered")
 
-@app.get("/api/content/series/popular")
-async def get_popular_series(page: int = 1):
-    if not TMDB_API_KEY:
-        return {"results": []}
-    async with httpx.AsyncClient() as client:
-        r = await client.get(f"{TMDB_BASE_URL}/tv/popular", params={"api_key": TMDB_API_KEY, "page": page})
-        return r.json()
+    # Hash password
+    hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
 
-@app.get("/api/content/search")
-async def search(q: str):
-    if not TMDB_API_KEY:
-        return {"results": []}
-    async with httpx.AsyncClient() as client:
-        r = await client.get(f"{TMDB_BASE_URL}/search/multi", params={"api_key": TMDB_API_KEY, "query": q})
-        return r.json()
+    user = {
+        "email": email,
+        "password": hashed,
+        "name": name,
+        "created_at": datetime.utcnow(),
+        "subscription": None,           # will be added later when they pay
+        "role": "user"
+    }
 
-print("Backend with genre support started")
+    users.insert_one(user)
+    return {"message": "Account created successfully", "email": email}
+
+# Login
+@app.post("/api/auth/login")
+async def login(data: dict):
+    email = data.get("email")
+    password = data.get("password")
+
+    user = users.find_one({"email": email})
+    if not user:
+        raise HTTPException(status_code=400, detail="Invalid email or password")
+
+    if not bcrypt.checkpw(password.encode(), user["password"]):
+        raise HTTPException(status_code=400, detail="Invalid email or password")
+
+    return {
+        "message": "Login successful",
+        "user": {
+            "email": user["email"],
+            "name": user.get("name", ""),
+            "subscription": user.get("subscription")
+        }
+    }
