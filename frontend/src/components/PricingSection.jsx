@@ -11,40 +11,36 @@ const PricingSection = () => {
       id: "basic",
       name: "Basic",
       price: 99,
-      billingText: "R99 / 1 month",
+      billing: "R99 / 1 month",
       devices: "1 TV + 1 Phone",
       quality: "HD Quality",
-      extra: "+R20/month per extra device",
       popular: false
     },
     {
       id: "standard",
       name: "Standard",
       price: 249,
-      billingText: "R249 / 3 months (≈ R83/month)",
+      billing: "R249 / 3 months (≈ R83/month)",
       devices: "1 TV + 1 Phone (Upgraded)",
       quality: "Full HD Quality",
-      extra: "+R20/month per extra device",
       popular: true
     },
     {
       id: "premium",
       name: "Premium (The High Roller)",
       price: 399,
-      billingText: "R399 / 6 months (≈ R66/month)",
+      billing: "R399 / 6 months (≈ R66/month)",
       devices: "2 TV + 2 Phones (Upgraded)",
       quality: "4K Quality",
-      extra: "+R20/month per extra device",
       popular: false
     },
     {
       id: "annual",
       name: "Annual (The Best Value) Family",
       price: 599,
-      billingText: "R599 / 12 months (≈ R50/month)",
+      billing: "R599 / 12 months (≈ R50/month)",
       devices: "5 TV + 5 Phones",
       quality: "4K Quality",
-      extra: "+R20/month per extra device",
       popular: false,
       bestValue: true
     }
@@ -66,7 +62,8 @@ const PricingSection = () => {
     });
     if (res.ok) {
       localStorage.setItem('familybinge_paid', 'true');
-      alert('✅ Payment successful! You now have full access.');
+      localStorage.setItem('familybinge_subscription_plan', data.plan || 'Premium');
+      alert('✅ Payment successful! Full access unlocked.');
       navigate('/app');
     }
   };
@@ -79,34 +76,24 @@ const PricingSection = () => {
           <p className="text-center text-gray-400 mb-12">3-day free trial • Cancel anytime</p>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {plans.map((plan) => (
+            {plans.map(plan => (
               <div
                 key={plan.id}
-                className={`bg-black rounded-3xl p-8 border transition-all relative ${
-                  plan.popular ? 'border-purple-500 shadow-2xl scale-105' : 'border-white/10'
-                }`}
+                className={`bg-black rounded-3xl p-8 border transition-all relative ${plan.popular ? 'border-purple-500 shadow-2xl scale-105' : 'border-white/10'} ${plan.bestValue ? 'border-emerald-500' : ''}`}
               >
-                {plan.popular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-600 text-white text-xs font-bold px-6 py-1 rounded-full">
-                    MOST POPULAR
-                  </div>
-                )}
-                {plan.bestValue && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-emerald-600 text-white text-xs font-bold px-6 py-1 rounded-full">
-                    BEST VALUE
-                  </div>
-                )}
+                {plan.popular && <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-600 text-white text-xs font-bold px-6 py-1 rounded-full">MOST POPULAR</div>}
+                {plan.bestValue && <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-emerald-600 text-white text-xs font-bold px-6 py-1 rounded-full">BEST VALUE</div>}
 
                 <h3 className="text-2xl font-semibold">{plan.name}</h3>
-                <div className="mt-4 flex items-baseline">
-                  <span className="text-6xl font-bold">{plan.billingText.split('/')[0]}</span>
+                <div className="mt-4">
+                  <span className="text-6xl font-bold">{plan.billing.split('/')[0]}</span>
                 </div>
-                <p className="text-gray-400 text-sm">{plan.billingText}</p>
+                <p className="text-gray-400 text-sm">{plan.billing}</p>
 
-                <div className="my-8 space-y-4 text-sm">
-                  <p><span className="font-medium">Devices:</span> {plan.devices}</p>
-                  <p><span className="font-medium">Quality:</span> {plan.quality}</p>
-                  <p className="text-purple-400">{plan.extra}</p>
+                <div className="my-8 space-y-3 text-sm">
+                  <p><strong>Devices:</strong> {plan.devices}</p>
+                  <p><strong>Quality:</strong> {plan.quality}</p>
+                  <p className="text-purple-400">+R20/month per extra device</p>
                 </div>
 
                 <PayPalButtons
