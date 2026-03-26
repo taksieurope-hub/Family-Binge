@@ -12,7 +12,7 @@ export const getWatchHistory = () => {
   } catch { return []; }
 };
 
-export const saveToWatchHistory = (content, season = 1, episode = 1, progress = 0) => {
+export const saveToWatchHistory = (content) => {
   try {
     const history = getWatchHistory();
     const existingIndex = history.findIndex(h => h.id === content.id && h.type === content.type);
@@ -23,10 +23,7 @@ export const saveToWatchHistory = (content, season = 1, episode = 1, progress = 
       backdrop: content.backdrop,
       type: content.type,
       year: content.year,
-      rating: content.rating,
-      season,
-      episode,
-      progress,
+      rating: content.rating || 0,
       lastWatched: Date.now(),
     };
     if (existingIndex >= 0) history[existingIndex] = historyItem;
@@ -35,32 +32,29 @@ export const saveToWatchHistory = (content, season = 1, episode = 1, progress = 
   } catch (e) { console.error('Error saving watch history:', e); }
 };
 
-export const removeFromWatchHistory = (id, type) => {
-  try {
-    const history = getWatchHistory().filter(h => !(h.id === id && h.type === type));
-    localStorage.setItem(WATCH_HISTORY_KEY, JSON.stringify(history));
-  } catch (e) { console.error('Error removing from watch history:', e); }
-};
-
 const ContentDetailModal = ({ content, onClose }) => {
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [playError, setPlayError] = useState(false);
 
   useEffect(() => {
     const fetchDetails = async () => {
-      if (!content?.id) return;
+      if (!content?.id) {
+        setDetails(content); // fallback if no id (from search)
+        setLoading(false);
+        return;
+      }
       setLoading(true);
-      setPlayError(false);
       try {
         const api = content.type === 'series' ? seriesAPI : movieAPI;
         const res = await api.getDetails(content.id);
         const data = res?.data || res;
-        setDetails(data);
-        saveToWatchHistory(data);
+        const fullDetails = { ...content, ...data };
+        setDetails(fullDetails);
+        saveToWatchHistory(fullDetails);
       } catch (error) {
         console.error('Error fetching details:', error);
+        setDetails(content); // fallback
       } finally {
         setLoading(false);
       }
@@ -69,11 +63,9 @@ const ContentDetailModal = ({ content, onClose }) => {
   }, [content]);
 
   const handleWatchNow = () => {
-    if (!details?.id) {
-      setPlayError(true);
-      return;
-    }
+    if (!details?.id) return;
     setIsPlaying(true);
+    saveToWatchHistory(details);
   };
 
   if (isPlaying && details) {
@@ -84,22 +76,19 @@ const ContentDetailModal = ({ content, onClose }) => {
     return (
       <div className="fixed inset-0 z-[100] bg-black flex flex-col">
         <div className="flex items-center justify-between px-4 py-3 bg-black/90">
-          <h2 className="text-white font-semibold truncate">{details.title}</h2>
-          <button 
-            onClick={() => { setIsPlaying(false); setPlayError(false); }} 
-            className="p-2 hover:bg-red-600 rounded text-white"
-          >
-            <X className="w-5 h-5" />
+          <h2 className="text-white font-semibold truncate pr-4">{details.title}</h2>
+          <button onClick={() => setIsPlaying(false)} className="p-2 hover:bg-red-600 rounded">
+            <X className="w-5 h-5 text-white" />
           </button>
         </div>
-        <div className="flex-1 bg-black relative">
+        <div className="flex-1 bg-black">
           <iframe
             src={streamUrl}
             className="w-full h-full"
             allowFullScreen
             allow="autoplay; fullscreen"
-            referrerPolicy="no-referrer"
             sandbox="allow-scripts allow-same-origin"
+            referrerPolicy="no-referrer"
             title={details.title}
           />
         </div>
@@ -116,34 +105,47 @@ const ContentDetailModal = ({ content, onClose }) => {
           </div>
         ) : details ? (
           <div>
+            {/* Backdrop + Title */}
             <div className="relative h-80 bg-black">
-              {details.backdrop && <img src={details.backdrop} alt={details.title} className="w-full h-full object-cover" />}
+              {details.backdrop && (
+                <img 
+                  src={details.backdrop} 
+                  alt={details.title} 
+                  className="w-full h-full object-cover" 
+                />
+              )}
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent" />
-              <button onClick={onClose} className="absolute top-4 right-4 p-3 bg-black/50 hover:bg-black rounded-full">
+              <button 
+                onClick={onClose} 
+                className="absolute top-4 right-4 p-3 bg-black/60 hover:bg-black rounded-full"
+              >
                 <X className="w-6 h-6 text-white" />
               </button>
             </div>
 
             <div className="p-8">
-              <h1 className="text-4xl font-bold text-white mb-4">{details.title}</h1>
+              <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">{details.title}</h1>
+              
               <div className="flex gap-4 text-sm text-gray-400 mb-6">
-                <span>{details.year}</span>
-                <span>? {details.rating}</span>
+                {details.year && <span>{details.year}</span>}
+                {details.rating > 0 && <span>? {details.rating}</span>}
               </div>
 
               <Button 
-                onClick={handleWatchNow} 
-                className="bg-purple-600 hover:bg-purple-700 text-white px-10 py-6 text-lg mb-6"
+                onClick={handleWatchNow}
+                className="bg-purple-600 hover:bg-purple-700 text-white px-10 py-6 text-lg mb-8 flex items-center gap-3"
               >
-                <Play className="w-6 h-6 mr-2 fill-white" /> Watch Now
+                <Play className="w-6 h-6 fill-white" /> Watch Now
               </Button>
 
-              <p className="text-gray-300 leading-relaxed">{details.overview || "No overview available."}</p>
+              {details.overview && (
+                <p className="text-gray-300 leading-relaxed text-lg">{details.overview}</p>
+              )}
             </div>
           </div>
         ) : (
-          <div className="p-12 text-center">
-            <p className="text-red-400">Failed to load movie details</p>
+          <div className="p-12 text-center text-gray-400">
+            Could not load movie details
           </div>
         )}
       </div>
