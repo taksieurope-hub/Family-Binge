@@ -3,37 +3,40 @@
 @tailwind utilities;
 
 :root {
-  --green: #39FF14;
   --purple: #C724FF;
   --blue: #00D4FF;
+  --white: #ffffff;
 }
 
-/* Softer bubble text - less shine */
+/* Soft bubble text - purple + blue + white, much less shine */
 h1, h2, h3, .font-bold, .font-semibold, button, .text-white {
   font-weight: 900;
   letter-spacing: -0.02em;
   text-shadow: 
-    0 0 8px var(--green),
-    0 0 16px var(--purple),
-    0 0 20px var(--blue) !important;
-  color: #ffffff !important;
+    0 0 6px var(--purple),
+    0 0 12px var(--blue),
+    0 0 18px var(--white) !important;
+  color: var(--white) !important;
 }
 
-/* Even softer on normal text */
-p, span, div {
+/* Normal text - almost no glow */
+p, span, div, .text-gray-300 {
   text-shadow: none !important;
+  color: #e0f8ff !important;
 }
 
-/* Buttons get a bit of glow */
+/* Buttons */
 button {
-  text-shadow: 0 0 12px var(--green) !important;
+  background: linear-gradient(90deg, var(--purple), var(--blue)) !important;
+  color: white !important;
+  text-shadow: 0 0 10px var(--white) !important;
 }
 
 button:hover {
-  text-shadow: 0 0 18px var(--purple) !important;
+  background: linear-gradient(90deg, #a31cff, #00b8e6) !important;
 }
 
-/* Keep background dark */
+/* Dark background */
 body, .App {
   background: #0a0a12 !important;
 }
