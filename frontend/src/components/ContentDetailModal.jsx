@@ -76,11 +76,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
 
         saveToWatchHistory(data, saved?.season || 1, saved?.episode || 1, 0);
         window.dispatchEvent(new Event('watchHistoryUpdated'));
-
-        // Auto-start playing immediately
-        setCurrentSourceIndex(0);
-        setPlayerReady(false);
-        setIsPlaying(true);
+        // Show info page - user clicks Watch Now to play
       } catch (error) {
         console.error('Error fetching details:', error);
       } finally {
