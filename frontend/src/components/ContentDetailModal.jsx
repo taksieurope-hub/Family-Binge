@@ -35,6 +35,13 @@ export const saveToWatchHistory = (content, season = 1, episode = 1, progress = 
   } catch (e) { console.error('Error saving watch history:', e); }
 };
 
+export const removeFromWatchHistory = (id, type) => {
+  try {
+    const history = getWatchHistory().filter(h => !(h.id === id && h.type === type));
+    localStorage.setItem(WATCH_HISTORY_KEY, JSON.stringify(history));
+  } catch (e) { console.error('Error removing from watch history:', e); }
+};
+
 const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -74,13 +81,13 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
             <X className="w-5 h-5 text-white" />
           </button>
         </div>
-        <div className="flex-1 bg-black relative">
+        <div className="flex-1 bg-black">
           <iframe
             src={streamUrl}
             className="w-full h-full"
             allowFullScreen
             allow="autoplay; fullscreen"
-            sandbox="allow-scripts allow-same-origin allow-popups-to-escape-sandbox"
+            sandbox="allow-scripts allow-same-origin"
             referrerPolicy="no-referrer"
           />
         </div>
