@@ -42,6 +42,7 @@ export const removeFromWatchHistory = (id, type) => {
 const ContentDetailModal = ({ content, onClose }) => {
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -68,27 +69,42 @@ const ContentDetailModal = ({ content, onClose }) => {
 
   const handleWatchNow = () => {
     if (!details?.id) return;
+    setIsPlaying(true);   // This triggers the full-screen player inside the app
+  };
 
+  if (isPlaying && details) {
     const streamUrl = details.type === 'series'
       ? `https://vidsrc.cc/v2/embed/tv/${details.id}/1/1`
       : `https://vidsrc.cc/v2/embed/movie/${details.id}`;
 
-    // Strong anti-popup approach: open in new tab with minimal permissions
-    const playerWindow = window.open(
-      streamUrl, 
-      '_blank',
-      'noopener,noreferrer,fullscreen=yes'
+    return (
+      <div className="fixed inset-0 z-[100] bg-black flex flex-col">
+        {/* Top Bar */}
+        <div className="flex items-center justify-between px-4 py-3 bg-black/90 z-10">
+          <h2 className="text-white font-semibold truncate pr-8">{details.title}</h2>
+          <button 
+            onClick={() => setIsPlaying(false)} 
+            className="p-2 hover:bg-red-600 rounded text-white"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Full Screen Video Player */}
+        <div className="flex-1 bg-black relative">
+          <iframe
+            src={streamUrl}
+            className="w-full h-full"
+            allowFullScreen
+            allow="autoplay; fullscreen; encrypted-media"
+            sandbox="allow-scripts allow-same-origin"
+            referrerPolicy="no-referrer"
+            title={details.title}
+          />
+        </div>
+      </div>
     );
-
-    if (playerWindow) {
-      playerWindow.focus();
-    } else {
-      // Last resort fallback
-      window.open(streamUrl, '_blank');
-    }
-
-    onClose();
-  };
+  }
 
   return (
     <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4" onClick={onClose}>
