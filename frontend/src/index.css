@@ -3,44 +3,38 @@
 @tailwind utilities;
 
 :root {
-  --green: #00ff9f;
-  --blue: #00d4ff;
-  --orange: #ff9500;
+  --luminous-green: #39FF14;   /* Bright true luminous green */
+  --electric-blue: #00D4FF;
+  --vibrant-orange: #FF9500;
 }
 
-/* FORCE DARK BACKGROUND */
+/* Force everything */
 body, .App, nav, .bg-black, .bg-zinc-900, .bg-gray-900 {
   background: #0a0a12 !important;
 }
 
-/* FORCE GREEN BUTTONS */
+/* Main buttons & accents = Luminous Green */
 .bg-purple-600, .bg-purple-500, .bg-purple-700, button, .Button {
-  background-color: var(--green) !important;
+  background-color: var(--luminous-green) !important;
   color: #0a0a12 !important;
 }
 
 button:hover {
-  background-color: #00cc7a !important;
+  background-color: #2be300 !important;
 }
 
-/* FORCE BLUE ACCENTS */
-.text-purple-400, .text-purple-500, .border-purple-500, .text-purple-600 {
-  color: var(--blue) !important;
+/* Blue accents */
+.text-purple-400, .text-purple-500, .border-purple-500 {
+  color: var(--electric-blue) !important;
 }
 
-/* FORCE ORANGE FOR ACTIVE GENRES */
-.bg-orange-500, button[active], .active {
-  background-color: var(--orange) !important;
+/* Orange for active genre buttons */
+button[active], .active, .bg-orange-500 {
+  background-color: var(--vibrant-orange) !important;
   color: white !important;
 }
 
-/* Movie card hover glow */
+/* Hover glow on cards */
 .movie-card:hover {
-  box-shadow: 0 0 40px rgba(0, 255, 159, 0.6) !important;
-}
-
-/* Clean up any remaining red */
-.bg-red-600, .text-red-500, .border-red-500 {
-  background-color: var(--green) !important;
-  color: #0a0a12 !important;
+  box-shadow: 0 0 40px rgba(57, 255, 20, 0.7) !important;
 }
