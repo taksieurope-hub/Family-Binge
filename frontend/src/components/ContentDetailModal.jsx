@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Play, Loader2, Tv, Film } from 'lucide-react';
+import { X, Play, Loader2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { movieAPI, seriesAPI } from '../services/api';
 
@@ -42,19 +42,23 @@ export const removeFromWatchHistory = (id, type) => {
   } catch (e) { console.error('Error removing from watch history:', e); }
 };
 
-const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
+const ContentDetailModal = ({ content, onClose }) => {
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [playError, setPlayError] = useState(false);
 
   useEffect(() => {
     const fetchDetails = async () => {
-      if (!content) return;
+      if (!content?.id) return;
       setLoading(true);
+      setPlayError(false);
       try {
         const api = content.type === 'series' ? seriesAPI : movieAPI;
         const res = await api.getDetails(content.id);
-        setDetails(res);
+        const data = res?.data || res;
+        setDetails(data);
+        saveToWatchHistory(data);
       } catch (error) {
         console.error('Error fetching details:', error);
       } finally {
@@ -65,6 +69,10 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
   }, [content]);
 
   const handleWatchNow = () => {
+    if (!details?.id) {
+      setPlayError(true);
+      return;
+    }
     setIsPlaying(true);
   };
 
@@ -76,19 +84,23 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
     return (
       <div className="fixed inset-0 z-[100] bg-black flex flex-col">
         <div className="flex items-center justify-between px-4 py-3 bg-black/90">
-          <h2 className="text-white font-semibold">{details.title}</h2>
-          <button onClick={() => setIsPlaying(false)} className="p-2 hover:bg-red-500 rounded">
-            <X className="w-5 h-5 text-white" />
+          <h2 className="text-white font-semibold truncate">{details.title}</h2>
+          <button 
+            onClick={() => { setIsPlaying(false); setPlayError(false); }} 
+            className="p-2 hover:bg-red-600 rounded text-white"
+          >
+            <X className="w-5 h-5" />
           </button>
         </div>
-        <div className="flex-1 bg-black">
+        <div className="flex-1 bg-black relative">
           <iframe
             src={streamUrl}
             className="w-full h-full"
             allowFullScreen
             allow="autoplay; fullscreen"
-            sandbox="allow-scripts allow-same-origin"
             referrerPolicy="no-referrer"
+            sandbox="allow-scripts allow-same-origin"
+            title={details.title}
           />
         </div>
       </div>
@@ -102,12 +114,12 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
           <div className="h-96 flex items-center justify-center">
             <Loader2 className="w-12 h-12 animate-spin text-purple-500" />
           </div>
-        ) : details && (
+        ) : details ? (
           <div>
             <div className="relative h-80 bg-black">
               {details.backdrop && <img src={details.backdrop} alt={details.title} className="w-full h-full object-cover" />}
-              <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent" />
-              <button onClick={onClose} className="absolute top-4 right-4 p-3 bg-black/50 rounded-full hover:bg-black">
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent" />
+              <button onClick={onClose} className="absolute top-4 right-4 p-3 bg-black/50 hover:bg-black rounded-full">
                 <X className="w-6 h-6 text-white" />
               </button>
             </div>
@@ -119,14 +131,19 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
                 <span>? {details.rating}</span>
               </div>
 
-              <div className="flex gap-4 mb-8">
-                <Button onClick={handleWatchNow} className="bg-white text-black px-10 py-3 text-lg flex items-center gap-2 hover:bg-white/90">
-                  <Play className="w-6 h-6 fill-black" /> Watch Now
-                </Button>
-              </div>
+              <Button 
+                onClick={handleWatchNow} 
+                className="bg-purple-600 hover:bg-purple-700 text-white px-10 py-6 text-lg mb-6"
+              >
+                <Play className="w-6 h-6 mr-2 fill-white" /> Watch Now
+              </Button>
 
-              <p className="text-gray-300 leading-relaxed">{details.overview}</p>
+              <p className="text-gray-300 leading-relaxed">{details.overview || "No overview available."}</p>
             </div>
+          </div>
+        ) : (
+          <div className="p-12 text-center">
+            <p className="text-red-400">Failed to load movie details</p>
           </div>
         )}
       </div>
