@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Loader2, Play } from 'lucide-react';
+import { X, Loader2, Play, ChevronLeft, ChevronRight } from 'lucide-react';
 import { movieAPI, seriesAPI } from '../services/api';
 
 const WATCH_HISTORY_KEY = 'familybinge_watch_history';
@@ -14,17 +14,7 @@ export const getWatchHistory = () => {
 export const saveToWatchHistory = (content, season = 1, episode = 1, progress = 0) => {
   try {
     const history = getWatchHistory();
-    const historyItem = {
-      id: content.id,
-      title: content.title || content.name,
-      poster: content.poster,
-      backdrop: content.backdrop,
-      type: content.type || 'movie',
-      season,
-      episode,
-      progress,
-      timestamp: Date.now()
-    };
+    const historyItem = { id: content.id, title: content.title || content.name, poster: content.poster, backdrop: content.backdrop, type: content.type || 'movie', season, episode, progress, timestamp: Date.now() };
     const existingIndex = history.findIndex(h => h.id === content.id && h.type === content.type);
     if (existingIndex > -1) history[existingIndex] = historyItem;
     else history.unshift(historyItem);
@@ -43,13 +33,11 @@ const ContentDetailModal = ({ content, onClose }) => {
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [selectedSeason, setSelectedSeason] = useState(1);
+  const [selectedEpisode, setSelectedEpisode] = useState(1);
   const [serverIndex, setServerIndex] = useState(0);
 
-  const servers = [
-    "https://vidsrc.cc",   // your favourite - first
-    "https://vidsrc.to",   // automatic fallback
-    "https://vidsrc.me"    // last resort
-  ];
+  const servers = ["https://vidsrc.cc", "https://vidsrc.to", "https://vidsrc.me"];
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -63,6 +51,9 @@ const ContentDetailModal = ({ content, onClose }) => {
           data = await movieAPI.getDetails(content.id);
         }
         setDetails(data);
+        if (data.seasons && data.seasons.length > 0) {
+          setSelectedSeason(data.seasons[0].season_number || 1);
+        }
       } catch (err) {
         console.error(err);
         setDetails(content);
@@ -73,30 +64,28 @@ const ContentDetailModal = ({ content, onClose }) => {
     fetchDetails();
   }, [content]);
 
-  // Auto-play inside app
-  useEffect(() => {
-    if (!loading && details && !isPlaying) {
-      setIsPlaying(true);
-    }
-  }, [loading, details, isPlaying]);
-
-  const base = servers[serverIndex];
   const streamUrl = details ? (
     (details.type === 'series' || details.media_type === 'tv')
-      ? `${base}/v2/embed/tv/${details.id}/1/1`
-      : `${base}/v2/embed/movie/${details.id}`
+      ? `${servers[serverIndex]}/v2/embed/tv/${details.id}/${selectedSeason}/${selectedEpisode}`
+      : `${servers[serverIndex]}/v2/embed/movie/${details.id}`
   ) : '';
 
-  // Silent auto-switch to next server after 6 seconds if nothing loaded
+  // Silent auto-fallback if 404 after 6 seconds
   useEffect(() => {
     if (!isPlaying || !streamUrl) return;
     const timer = setTimeout(() => {
-      if (serverIndex < servers.length - 1) {
-        setServerIndex(serverIndex + 1);
-      }
+      if (serverIndex < servers.length - 1) setServerIndex(serverIndex + 1);
     }, 6000);
     return () => clearTimeout(timer);
   }, [isPlaying, serverIndex, streamUrl]);
+
+  const handleNext = () => {
+    setSelectedEpisode(prev => prev + 1);
+  };
+
+  const handlePrev = () => {
+    if (selectedEpisode > 1) setSelectedEpisode(prev => prev - 1);
+  };
 
   if (loading) {
     return (
@@ -110,15 +99,33 @@ const ContentDetailModal = ({ content, onClose }) => {
     return (
       <div className="fixed inset-0 bg-black z-[10000] flex flex-col">
         <div className="flex justify-end p-4 bg-black">
-          <button 
-            onClick={() => { setIsPlaying(false); onClose(); }}
-            className="text-white hover:text-red-500"
-          >
+          <button onClick={() => { setIsPlaying(false); onClose(); }} className="text-white hover:text-red-500">
             <X className="w-8 h-8" />
           </button>
         </div>
+
+        {/* Series controls */}
+        {(details.type === 'series' || details.media_type === 'tv') && (
+          <div className="bg-zinc-900 p-3 flex items-center gap-4 justify-center border-b border-zinc-800">
+            <select value={selectedSeason} onChange={e => { setSelectedSeason(Number(e.target.value)); setSelectedEpisode(1); }} className="bg-zinc-800 text-white px-4 py-2 rounded-lg">
+              {details.seasons?.map(s => (
+                <option key={s.season_number} value={s.season_number}>Season {s.season_number}</option>
+              )) || <option>Season 1</option>}
+            </select>
+
+            <select value={selectedEpisode} onChange={e => setSelectedEpisode(Number(e.target.value))} className="bg-zinc-800 text-white px-4 py-2 rounded-lg">
+              {Array.from({ length: 30 }, (_, i) => i + 1).map(ep => (
+                <option key={ep} value={ep}>Episode {ep}</option>
+              ))}
+            </select>
+
+            <button onClick={handlePrev} className="text-white hover:text-purple-400"><ChevronLeft className="w-6 h-6" /></button>
+            <button onClick={handleNext} className="text-white hover:text-purple-400"><ChevronRight className="w-6 h-6" /></button>
+          </div>
+        )}
+
         <iframe
-          key={streamUrl}   // forces reload when server changes
+          key={streamUrl}
           src={streamUrl}
           className="flex-1 w-full border-0"
           allowFullScreen
