@@ -3,38 +3,47 @@
 @tailwind utilities;
 
 :root {
-  --green: #39FF14;
-  --blue: #00E5FF;
-  --orange: #FF9500;
+  --bubble-green: #39FF14;
+  --bubble-purple: #C724FF;
+  --bubble-white: #ffffff;
 }
 
-body, .App, nav, .bg-black, .bg-zinc-900, .bg-gray-900 {
+/* Bubble + Luminous Text Effect */
+h1, h2, h3, .text-white, button, .font-bold, .font-semibold {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  text-shadow: 
+    0 0 10px var(--bubble-green),
+    0 0 20px var(--bubble-green),
+    0 0 30px var(--bubble-purple),
+    0 0 40px var(--bubble-purple),
+    0 0 50px var(--bubble-white),
+    3px 3px 0 #000,
+    -3px -3px 0 #000,
+    3px -3px 0 #000,
+    -3px 3px 0 #000 !important;
+  color: var(--bubble-white) !important;
+}
+
+/* Extra shine on headings */
+h1, h2 {
+  text-shadow: 
+    0 0 15px var(--bubble-green),
+    0 0 30px var(--bubble-green),
+    0 0 45px var(--bubble-purple),
+    0 0 60px var(--bubble-purple),
+    0 0 75px var(--bubble-white) !important;
+}
+
+/* Buttons get the bubble shine too */
+button {
+  text-shadow: 
+    0 0 15px var(--bubble-green),
+    0 0 25px var(--bubble-purple) !important;
+}
+
+/* Background remains dark space */
+body, .App {
   background: #0a0a12 !important;
-  color: #f0f8ff !important;
-}
-
-/* Green buttons */
-.bg-purple-600, .bg-purple-500, .bg-purple-700, button, .Button {
-  background-color: var(--green) !important;
-  color: #0a0a12 !important;
-}
-
-button:hover {
-  background-color: #2be300 !important;
-}
-
-/* Blue accents */
-.text-purple-400, .text-purple-500, .border-purple-500 {
-  color: var(--blue) !important;
-}
-
-/* Orange for active genres */
-button[active], .active {
-  background-color: var(--orange) !important;
-  color: white !important;
-}
-
-/* Fix highlighted/shit text */
-* {
-  color: #f0f8ff !important;
 }
