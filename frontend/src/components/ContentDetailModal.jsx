@@ -104,6 +104,7 @@ const ContentDetailModal = ({ content, onClose }) => {
           allow="autoplay; encrypted-media"
           sandbox="allow-scripts allow-same-origin"
           referrerPolicy="no-referrer"
+          title="Family Binge Player"
         />
       </div>
     );
