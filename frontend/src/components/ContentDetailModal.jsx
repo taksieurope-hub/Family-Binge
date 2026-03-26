@@ -154,6 +154,17 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
     }
   };
 
+  const getStreamUrl = () => {
+    if (!details) return null;
+    const source = VIDEO_SOURCES[currentSourceIndex];
+    return source.getUrl(details.type, details.id, selectedSeason, selectedEpisode);
+  };
+
+  const handleIframeLoad = () => {
+    setPlayerReady(true);
+    setIsAutoSwitching(false);
+  };
+
     // ==================== FULLY AUTOMATIC CLEAN PLAYER ====================
   if (isPlaying) {
     return (
