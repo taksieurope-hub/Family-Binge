@@ -12,7 +12,7 @@ export const getWatchHistory = () => {
   } catch { return []; }
 };
 
-export const saveToWatchHistory = (content, season = 1, episode = 1, progress = 0) => {
+export const saveToWatchHistory = (content) => {
   try {
     const history = getWatchHistory();
     const existingIndex = history.findIndex(h => h.id === content.id && h.type === content.type);
@@ -24,9 +24,6 @@ export const saveToWatchHistory = (content, season = 1, episode = 1, progress = 
       type: content.type,
       year: content.year,
       rating: content.rating || 0,
-      season,
-      episode,
-      progress,
       lastWatched: Date.now(),
     };
     if (existingIndex >= 0) history[existingIndex] = historyItem;
@@ -45,7 +42,6 @@ export const removeFromWatchHistory = (id, type) => {
 const ContentDetailModal = ({ content, onClose }) => {
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -72,36 +68,22 @@ const ContentDetailModal = ({ content, onClose }) => {
 
   const handleWatchNow = () => {
     if (!details?.id) return;
-    setIsPlaying(true);
-  };
 
-  if (isPlaying && details) {
     const streamUrl = details.type === 'series'
       ? `https://vidsrc.cc/v2/embed/tv/${details.id}/1/1`
       : `https://vidsrc.cc/v2/embed/movie/${details.id}`;
 
-    return (
-      <div className="fixed inset-0 z-[100] bg-black flex flex-col">
-        <div className="flex items-center justify-between px-4 py-3 bg-black/90">
-          <h2 className="text-white font-semibold truncate">{details.title}</h2>
-          <button onClick={() => setIsPlaying(false)} className="p-2 hover:bg-red-600 rounded">
-            <X className="w-5 h-5 text-white" />
-          </button>
-        </div>
-        <div className="flex-1 bg-black">
-          <iframe
-            src={streamUrl}
-            className="w-full h-full"
-            allowFullScreen
-            allow="autoplay; fullscreen"
-            sandbox="allow-scripts allow-same-origin"
-            referrerPolicy="no-referrer"
-            title={details.title}
-          />
-        </div>
-      </div>
-    );
-  }
+    // Auto open in new tab with full screen attempt
+    const playerWindow = window.open(streamUrl, '_blank');
+    if (playerWindow) {
+      playerWindow.focus();
+    } else {
+      // Fallback: open in same window
+      window.location.href = streamUrl;
+    }
+
+    onClose(); // close modal
+  };
 
   return (
     <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4" onClick={onClose}>
@@ -129,9 +111,9 @@ const ContentDetailModal = ({ content, onClose }) => {
 
               <Button 
                 onClick={handleWatchNow}
-                className="bg-purple-600 hover:bg-purple-700 text-white px-10 py-6 text-lg mb-8"
+                className="bg-purple-600 hover:bg-purple-700 text-white px-10 py-6 text-lg mb-8 w-full"
               >
-                <Play className="w-6 h-6 mr-2 fill-white" /> Watch Now
+                <Play className="w-6 h-6 mr-2 fill-white" /> Watch Now - Open Full Screen
               </Button>
 
               {details.overview && <p className="text-gray-300 leading-relaxed">{details.overview}</p>}
