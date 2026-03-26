@@ -96,26 +96,29 @@ const ContentRow = ({ title, icon: Icon, items, onSelectContent, loading }) => {
   );
 };
 
-// Continue Watching Row with remove functionality
+// Continue Watching Row - Newest first + easy permanent delete
 const ContinueWatchingRow = ({ onSelectContent }) => {
   const [history, setHistory] = useState([]);
-  const scrollRef = useRef(null);
+
+  const loadHistory = () => {
+    let items = getWatchHistory();
+    // Sort by last watched (newest first)
+    items.sort((a, b) => b.lastWatched - a.lastWatched);
+    setHistory(items);
+  };
 
   useEffect(() => {
-    setHistory(getWatchHistory());
-  }, []);
+    loadHistory();
 
-  const scroll = (direction) => {
-    if (scrollRef.current) {
-      const scrollAmount = direction === 'left' ? -300 : 300;
-      scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-    }
-  };
+    const handleUpdate = () => loadHistory();
+    window.addEventListener('watchHistoryUpdated', handleUpdate);
+    return () => window.removeEventListener('watchHistoryUpdated', handleUpdate);
+  }, []);
 
   const handleRemove = (e, item) => {
     e.stopPropagation();
     removeFromWatchHistory(item.id, item.type);
-    setHistory(getWatchHistory());
+    loadHistory(); // refresh list immediately
   };
 
   if (history.length === 0) return null;
@@ -129,59 +132,60 @@ const ContinueWatchingRow = ({ onSelectContent }) => {
           </div>
           <h3 className="text-xl sm:text-2xl font-bold text-white">Continue Watching</h3>
         </div>
-        <div className="hidden sm:flex gap-2">
-          <button onClick={() => scroll('left')} className="p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors">
-            <ChevronLeft className="w-5 h-5 text-white" />
-          </button>
-          <button onClick={() => scroll('right')} className="p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors">
-            <ChevronRight className="w-5 h-5 text-white" />
-          </button>
-        </div>
       </div>
 
-      <div ref={scrollRef} className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-4">
+      <div className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-4">
         {history.map((item) => (
           <div
             key={`continue-${item.type}-${item.id}`}
             onClick={() => onSelectContent(item)}
-            className="flex-shrink-0 w-64 sm:w-80 group cursor-pointer"
+            className="flex-shrink-0 w-64 sm:w-80 group cursor-pointer relative"
           >
             <div className="relative rounded-xl overflow-hidden transition-transform duration-300 group-hover:scale-105">
               {item.backdrop || item.poster ? (
-                <img src={item.backdrop || item.poster} alt={item.title} className="w-full h-36 sm:h-44 object-cover bg-gray-800" loading="lazy" />
+                <img
+                  src={item.backdrop || item.poster}
+                  alt={item.title}
+                  className="w-full h-36 sm:h-44 object-cover bg-gray-800"
+                  loading="lazy"
+                />
               ) : (
                 <div className="w-full h-36 sm:h-44 bg-gray-800 flex items-center justify-center">
                   <Film className="w-12 h-12 text-gray-600" />
                 </div>
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
-              
-              {/* Remove button */}
+
+              {/* Remove Button - Always visible */}
               <button
                 onClick={(e) => handleRemove(e, item)}
-                className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-red-600 rounded-full transition-colors opacity-0 group-hover:opacity-100"
+                className="absolute top-3 right-3 p-2 bg-black/80 hover:bg-red-600 rounded-full transition-colors z-20 shadow-lg"
               >
-                <X className="w-4 h-4 text-white" />
+                <X className="w-5 h-5 text-white" />
               </button>
 
-              {/* Play button */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center transform scale-90 group-hover:scale-100 transition-transform">
+              {/* Play overlay */}
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/30">
+                <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center">
                   <Play className="w-6 h-6 text-black fill-black ml-0.5" />
                 </div>
               </div>
 
               {/* Info overlay */}
-              <div className="absolute bottom-0 left-0 right-0 p-3">
-                <h4 className="text-white font-semibold truncate">{item.title}</h4>
-                <p className="text-gray-300 text-sm">
-                  {item.type === 'series' ? `S${item.season} E${item.episode}` : item.year}
+              <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 to-transparent">
+                <h4 className="text-white font-semibold truncate text-sm">{item.title}</h4>
+                <p className="text-gray-300 text-xs">
+                  {item.type === 'series' 
+                    ? `S${item.season} E${item.episode}` 
+                    : item.year}
                 </p>
               </div>
 
               {/* Progress bar */}
               <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-700">
-                <div className="h-full bg-purple-600" style={{ width: `${item.progress || 10}%` }} />
+                <div
+                  className="h-full bg-purple-600 transition-all"
+                  style={{ width: `${item.progress || 30}%` }}
+                />
               </div>
             </div>
           </div>
@@ -190,7 +194,6 @@ const ContinueWatchingRow = ({ onSelectContent }) => {
     </div>
   );
 };
-
 const ContentSection = ({ type = 'movies', onSelectContent }) => {
   const [trending, setTrending] = useState([]);
   const [popular, setPopular] = useState([]);
