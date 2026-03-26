@@ -35,18 +35,9 @@ export const saveToWatchHistory = (content, season = 1, episode = 1, progress = 
   } catch (e) { console.error('Error saving watch history:', e); }
 };
 
-export const removeFromWatchHistory = (id, type) => {
-  try {
-    const history = getWatchHistory().filter(h => !(h.id === id && h.type === type));
-    localStorage.setItem(WATCH_HISTORY_KEY, JSON.stringify(history));
-  } catch (e) { console.error('Error removing from watch history:', e); }
-};
-
 const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [selectedSeason, setSelectedSeason] = useState(1);
-  const [selectedEpisode, setSelectedEpisode] = useState(1);
   const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
@@ -72,7 +63,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
 
   if (isPlaying && details) {
     const streamUrl = details.type === 'series'
-      ? `https://vidsrc.cc/v2/embed/tv/${details.id}/${selectedSeason}/${selectedEpisode}`
+      ? `https://vidsrc.cc/v2/embed/tv/${details.id}/1/1`
       : `https://vidsrc.cc/v2/embed/movie/${details.id}`;
 
     return (
@@ -83,12 +74,14 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
             <X className="w-5 h-5 text-white" />
           </button>
         </div>
-        <div className="flex-1 bg-black">
+        <div className="flex-1 bg-black relative">
           <iframe
             src={streamUrl}
             className="w-full h-full"
             allowFullScreen
             allow="autoplay; fullscreen"
+            sandbox="allow-scripts allow-same-origin allow-popups-to-escape-sandbox"
+            referrerPolicy="no-referrer"
           />
         </div>
       </div>
