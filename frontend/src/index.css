@@ -3,47 +3,47 @@
 @tailwind utilities;
 
 :root {
-  --bubble-green: #39FF14;
-  --bubble-purple: #C724FF;
-  --bubble-white: #ffffff;
+  --purple: #C724FF;
+  --blue: #00D4FF;
+  --soft-green: #39FF14;
 }
 
-/* Bubble + Luminous Text Effect */
-h1, h2, h3, .text-white, button, .font-bold, .font-semibold {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+/* Softer bubble writing with more purple and blue */
+h1, h2, h3, .font-bold, .font-semibold, button, .text-white {
   font-weight: 900;
   letter-spacing: -0.02em;
   text-shadow: 
-    0 0 10px var(--bubble-green),
-    0 0 20px var(--bubble-green),
-    0 0 30px var(--bubble-purple),
-    0 0 40px var(--bubble-purple),
-    0 0 50px var(--bubble-white),
-    3px 3px 0 #000,
-    -3px -3px 0 #000,
-    3px -3px 0 #000,
-    -3px 3px 0 #000 !important;
-  color: var(--bubble-white) !important;
+    0 0 8px var(--purple),
+    0 0 16px var(--purple),
+    0 0 24px var(--blue),
+    2px 2px 0 #000,
+    -2px -2px 0 #000,
+    2px -2px 0 #000,
+    -2px 2px 0 #000 !important;
+  color: #ffffff !important;
 }
 
-/* Extra shine on headings */
+/* Reduce the extreme glow */
 h1, h2 {
   text-shadow: 
-    0 0 15px var(--bubble-green),
-    0 0 30px var(--bubble-green),
-    0 0 45px var(--bubble-purple),
-    0 0 60px var(--bubble-purple),
-    0 0 75px var(--bubble-white) !important;
+    0 0 10px var(--purple),
+    0 0 20px var(--blue),
+    3px 3px 0 #000,
+    -3px -3px 0 #000 !important;
 }
 
-/* Buttons get the bubble shine too */
+/* Buttons get purple/blue mix */
 button {
-  text-shadow: 
-    0 0 15px var(--bubble-green),
-    0 0 25px var(--bubble-purple) !important;
+  background: linear-gradient(90deg, var(--purple), var(--blue)) !important;
+  color: white !important;
+  text-shadow: 0 0 12px var(--blue) !important;
 }
 
-/* Background remains dark space */
+button:hover {
+  background: linear-gradient(90deg, #a31cff, #00b8e6) !important;
+}
+
+/* Keep background dark */
 body, .App {
   background: #0a0a12 !important;
 }
