@@ -73,16 +73,21 @@ const ContentDetailModal = ({ content, onClose }) => {
       ? `https://vidsrc.cc/v2/embed/tv/${details.id}/1/1`
       : `https://vidsrc.cc/v2/embed/movie/${details.id}`;
 
-    // Auto open in new tab with full screen attempt
-    const playerWindow = window.open(streamUrl, '_blank');
+    // Strong anti-popup approach: open in new tab with minimal permissions
+    const playerWindow = window.open(
+      streamUrl, 
+      '_blank',
+      'noopener,noreferrer,fullscreen=yes'
+    );
+
     if (playerWindow) {
       playerWindow.focus();
     } else {
-      // Fallback: open in same window
-      window.location.href = streamUrl;
+      // Last resort fallback
+      window.open(streamUrl, '_blank');
     }
 
-    onClose(); // close modal
+    onClose();
   };
 
   return (
@@ -113,7 +118,7 @@ const ContentDetailModal = ({ content, onClose }) => {
                 onClick={handleWatchNow}
                 className="bg-purple-600 hover:bg-purple-700 text-white px-10 py-6 text-lg mb-8 w-full"
               >
-                <Play className="w-6 h-6 mr-2 fill-white" /> Watch Now - Open Full Screen
+                <Play className="w-6 h-6 mr-2 fill-white" /> Watch Now (Full Screen)
               </Button>
 
               {details.overview && <p className="text-gray-300 leading-relaxed">{details.overview}</p>}
