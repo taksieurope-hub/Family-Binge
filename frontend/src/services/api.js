@@ -18,9 +18,6 @@ export const movieAPI = {
   getPopular: () => fetch(`${API_BASE_URL}/api/content/movies/popular`).then(r => r.json()).then(wrapResults),
   getNowPlaying: () => fetch(`${API_BASE_URL}/api/content/movies/popular`).then(r => r.json()).then(wrapResults),
   getTrending: () => fetch(`${API_BASE_URL}/api/content/movies/popular`).then(r => r.json()).then(wrapResults),
-  getNowPlayingInCinemas: () => fetch(`${API_BASE_URL}/api/content/movies/popular`).then(r => r.json()).then(wrapResults),
-  getMostWatched: () => fetch(`${API_BASE_URL}/api/content/movies/popular`).then(r => r.json()).then(wrapResults),
-  getByGenre: (genreId) => fetch(`${API_BASE_URL}/api/content/movies?with_genres=${genreId}`).then(r => r.json()).then(wrapResults),
   getDetails: (id) => fetch(`${API_BASE_URL}/api/content/movies/${id}`).then(r => r.json()),
 };
 
@@ -31,4 +28,5 @@ export const seriesAPI = {
 
 export const searchAPI = {
   search: (query) => fetch(`${API_BASE_URL}/api/content/search?q=${encodeURIComponent(query)}`).then(r => r.json()).then(wrapResults),
+  searchAll: (query) => fetch(`${API_BASE_URL}/api/content/search?q=${encodeURIComponent(query)}`).then(r => r.json()).then(wrapResults),
 };
