@@ -1,30 +1,41 @@
-const API_BASE_URL = "https://family-binge-backend.onrender.com";
+import axios from 'axios';
 
-const wrapResults = (data) => ({
-  data: {
-    items: (data.results || []).map(item => ({
-      id: item.id,
-      title: item.title || item.name || "Unknown",
-      poster: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : null,
-      year: (item.release_date || item.first_air_date || "").slice(0, 4) || "",
-      rating: item.vote_average ? Math.round(item.vote_average * 10) / 10 : 0,
-      type: "movie"
-    }))
-  }
-});
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
 
+// Movies API
 export const movieAPI = {
-  getPopular: () => fetch(`${API_BASE_URL}/api/content/movies/popular`).then(r => r.json()).then(wrapResults),
-  getNowPlaying: () => fetch(`${API_BASE_URL}/api/content/movies/popular`).then(r => r.json()).then(wrapResults),
-  getByGenre: (genreId) => fetch(`${API_BASE_URL}/api/content/movies?with_genres=${genreId}`).then(r => r.json()).then(wrapResults),
-  getDetails: (id) => fetch(`${API_BASE_URL}/api/content/movies/${id}`).then(r => r.json()),
+  getTrending: (page = 1) => axios.get(`${API}/content/movies/trending?page=${page}`),
+  getPopular: (page = 1) => axios.get(`${API}/content/movies/popular?page=${page}`),
+  getTopRated: (page = 1) => axios.get(`${API}/content/movies/top-rated?page=${page}`),
+  getNowPlaying: (page = 1) => axios.get(`${API}/content/movies/now-playing?page=${page}`),
+  getUpcoming: (page = 1) => axios.get(`${API}/content/movies/upcoming?page=${page}`),
+  getDetails: (id) => axios.get(`${API}/content/movies/${id}`),
+  getGenres: () => axios.get(`${API}/content/movies/genres`),
+  getByGenre: (genreId, page = 1) => axios.get(`${API}/content/movies/genre/${genreId}?page=${page}`),
+  search: (query, page = 1) => axios.get(`${API}/content/movies/search/${encodeURIComponent(query)}?page=${page}`),
 };
 
+// Series API
 export const seriesAPI = {
-  getPopular: () => fetch(`${API_BASE_URL}/api/content/series/popular`).then(r => r.json()).then(wrapResults),
-  getDetails: (id) => fetch(`${API_BASE_URL}/api/content/series/${id}`).then(r => r.json()),
+  getTrending: (page = 1) => axios.get(`${API}/content/series/trending?page=${page}`),
+  getPopular: (page = 1) => axios.get(`${API}/content/series/popular?page=${page}`),
+  getTopRated: (page = 1) => axios.get(`${API}/content/series/top-rated?page=${page}`),
+  getDetails: (id) => axios.get(`${API}/content/series/${id}`),
+  getGenres: () => axios.get(`${API}/content/series/genres`),
+  getByGenre: (genreId, page = 1) => axios.get(`${API}/content/series/genre/${genreId}?page=${page}`),
+  search: (query, page = 1) => axios.get(`${API}/content/series/search/${encodeURIComponent(query)}?page=${page}`),
 };
 
+// Live TV API
+export const liveTVAPI = {
+  getChannels: (category = 'all') => axios.get(`${API}/content/livetv/channels?category=${category}`),
+  getCategories: () => axios.get(`${API}/content/livetv/categories`),
+  getChannel: (id) => axios.get(`${API}/content/livetv/channel/${id}`),
+  search: (query) => axios.get(`${API}/content/livetv/search?q=${encodeURIComponent(query)}`),
+};
+
+// Unified Search
 export const searchAPI = {
-  search: (query) => fetch(`${API_BASE_URL}/api/content/search?q=${encodeURIComponent(query)}`).then(r => r.json()).then(wrapResults),
+  searchAll: (query, page = 1) => axios.get(`${API}/content/search?q=${encodeURIComponent(query)}&page=${page}`),
 };
