@@ -1,125 +1,125 @@
 import React from 'react';
-import { Check, Star } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
-
-const pricingPlans = [
-  {
-    id: 1,
-    name: "Basic",
-    price: "99",
-    period: "1 month",
-    devices: "1 TV + 1 Phone",
-    popular: false,
-    features: [
-      "3-day free trial",
-      "60,000+ Movies & Series",
-      "HD Quality",
-      "1 TV device + 1 Phone",
-      "+R20/month per extra device"
-    ]
-  },
-  {
-    id: 2,
-    name: "Standard",
-    price: "249",
-    period: "3 months (˜ R83/month)",
-    devices: "1 TV + 1 Phone (Upgraded)",
-    popular: true,
-    features: [
-      "3-day free trial",
-      "60,000+ Movies & Series",
-      "Full HD Quality",
-      "1 TV devices + 1 Phones (Upgraded)",
-      "+R20/month per extra device"
-    ]
-  },
-  {
-    id: 3,
-    name: "Premium (The High Roller)",
-    price: "399",
-    period: "6 months (˜ R66/month)",
-    devices: "2 TV + 2 Phones (Upgraded)",
-    popular: false,
-    features: [
-      "3-day free trial",
-      "60,000+ Movies & Series",
-      "4K Quality",
-      "2 TV devices + 2 Phones (Upgraded)",
-      "+R20/month per extra device"
-    ]
-  },
-  {
-    id: 4,
-    name: "Annual (The Best Value) Family",
-    price: "599",
-    period: "12 months (˜ R50/month)",
-    devices: "5 TV + 5 Phones (Ultimate Family Plan)",
-    popular: false,
-    features: [
-      "3-day free trial",
-      "60,000+ Movies & Series",
-      "4K Quality",
-      "5 TV devices + 5 Phones",
-      "Best value — save R589/yr",
-      "Priority support (Included)"
-    ]
-  }
-];
+import { PayPalButtons, PayPalScriptProvider } from '@paypal/react-paypal-js';
 
 const PricingSection = () => {
+  const navigate = useNavigate();
+
+  const plans = [
+    {
+      id: "basic",
+      name: "Basic",
+      price: 99,
+      billingText: "R99 / 1 month",
+      devices: "1 TV + 1 Phone",
+      quality: "HD Quality",
+      extra: "+R20/month per extra device",
+      popular: false
+    },
+    {
+      id: "standard",
+      name: "Standard",
+      price: 249,
+      billingText: "R249 / 3 months (â‰ˆ R83/month)",
+      devices: "1 TV + 1 Phone (Upgraded)",
+      quality: "Full HD Quality",
+      extra: "+R20/month per extra device",
+      popular: true
+    },
+    {
+      id: "premium",
+      name: "Premium (The High Roller)",
+      price: 399,
+      billingText: "R399 / 6 months (â‰ˆ R66/month)",
+      devices: "2 TV + 2 Phones (Upgraded)",
+      quality: "4K Quality",
+      extra: "+R20/month per extra device",
+      popular: false
+    },
+    {
+      id: "annual",
+      name: "Annual (The Best Value) Family",
+      price: 599,
+      billingText: "R599 / 12 months (â‰ˆ R50/month)",
+      devices: "5 TV + 5 Phones",
+      quality: "4K Quality",
+      extra: "+R20/month per extra device",
+      popular: false,
+      bestValue: true
+    }
+  ];
+
+  const createOrder = async (plan) => {
+    const res = await fetch('https://family-binge-backend.onrender.com/api/payment/create-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ plan: plan.name, amount: plan.price })
+    });
+    const data = await res.json();
+    return data.id;
+  };
+
+  const onApprove = async (data) => {
+    const res = await fetch(`https://family-binge-backend.onrender.com/api/payment/capture-order/${data.orderID}`, {
+      method: 'POST'
+    });
+    if (res.ok) {
+      localStorage.setItem('familybinge_paid', 'true');
+      alert('âœ… Payment successful! You now have full access.');
+      navigate('/app');
+    }
+  };
+
   return (
-    <section id="pricing" className="py-20 bg-black">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <span className="inline-block px-4 py-2 bg-green-600/20 text-green-400 rounded-full text-sm font-medium mb-4">
-            START FREE TRIAL
-          </span>
-          <h2 className="text-4xl font-bold text-white mb-4">
-            Choose Your Plan
-          </h2>
-        </div>
+    <PayPalScriptProvider options={{ "client-id": import.meta.env.VITE_PAYPAL_CLIENT_ID || "YOUR_SANDBOX_CLIENT_ID_HERE" }}>
+      <section id="pricing" className="py-20 bg-zinc-900">
+        <div className="max-w-7xl mx-auto px-6">
+          <h2 className="text-4xl font-bold text-center mb-4">Choose Your Plan</h2>
+          <p className="text-center text-gray-400 mb-12">3-day free trial â€¢ Cancel anytime</p>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {pricingPlans.map((plan) => (
-            <div
-              key={plan.id}
-              className={`relative rounded-2xl p-6 transition-all hover:scale-105 ${
-                plan.popular
-                  ? 'bg-gradient-to-br from-green-500 to-blue-500 shadow-lg shadow-green-500/30'
-                  : 'bg-zinc-900 border border-white/10 hover:border-green-500/50'
-              }`}
-            >
-              {plan.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-orange-500 text-white text-xs font-bold px-4 py-1 rounded-full">
-                  MOST POPULAR
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {plans.map((plan) => (
+              <div
+                key={plan.id}
+                className={`bg-black rounded-3xl p-8 border transition-all relative ${
+                  plan.popular ? 'border-purple-500 shadow-2xl scale-105' : 'border-white/10'
+                }`}
+              >
+                {plan.popular && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-600 text-white text-xs font-bold px-6 py-1 rounded-full">
+                    MOST POPULAR
+                  </div>
+                )}
+                {plan.bestValue && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-emerald-600 text-white text-xs font-bold px-6 py-1 rounded-full">
+                    BEST VALUE
+                  </div>
+                )}
+
+                <h3 className="text-2xl font-semibold">{plan.name}</h3>
+                <div className="mt-4 flex items-baseline">
+                  <span className="text-6xl font-bold">{plan.billingText.split('/')[0]}</span>
                 </div>
-              )}
+                <p className="text-gray-400 text-sm">{plan.billingText}</p>
 
-              <h3 className="text-xl font-bold text-white mb-1">{plan.name}</h3>
-              <div className="mb-6">
-                <span className="text-5xl font-bold text-white">R{plan.price}</span>
-                <span className="text-gray-400 ml-2">/{plan.period}</span>
+                <div className="my-8 space-y-4 text-sm">
+                  <p><span className="font-medium">Devices:</span> {plan.devices}</p>
+                  <p><span className="font-medium">Quality:</span> {plan.quality}</p>
+                  <p className="text-purple-400">{plan.extra}</p>
+                </div>
+
+                <PayPalButtons
+                  style={{ layout: "vertical" }}
+                  createOrder={() => createOrder(plan)}
+                  onApprove={onApprove}
+                />
               </div>
-
-              <p className="text-green-400 mb-6">{plan.devices}</p>
-
-              <ul className="space-y-3 mb-8">
-                {plan.features.map((feature, i) => (
-                  <li key={i} className="flex items-center gap-2 text-gray-300">
-                    <Check className="w-4 h-4 text-green-400" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-
-              <Button className="w-full py-6 text-lg font-semibold bg-white text-black hover:bg-gray-100">
-                Start Free Trial
-              </Button>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </PayPalScriptProvider>
   );
 };
 
