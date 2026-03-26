@@ -1,24 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Tv, Search, X, Loader2, Film, Bell, ChevronDown, User, Settings, LogOut, Menu } from 'lucide-react';
+import { Tv, Menu, X, Search, User, ChevronDown, Loader2, Film, Bell, Settings } from 'lucide-react';
+import { Button } from './ui/button';
 import { searchAPI } from '../services/api';
 
 const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
-  const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const searchRef = useRef(null);
-  const inputRef = useRef(null);
-  const profileRef = useRef(null);
+  const userMenuRef = useRef(null);
 
   const navItems = [
     { id: 'home', label: 'Home' },
+    { id: 'live-tv', label: 'Live TV' },
     { id: 'movies', label: 'Movies' },
     { id: 'series', label: 'Series' },
+    { id: 'download', label: 'Download' },
     { id: 'pricing', label: 'Pricing' },
   ];
 
@@ -29,226 +31,212 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
   }, []);
 
   useEffect(() => {
-    const handleClick = (e) => {
-      if (searchRef.current && !searchRef.current.contains(e.target)) { setShowResults(false); }
-      if (profileRef.current && !profileRef.current.contains(e.target)) { setProfileOpen(false); }
+    const handleClickOutside = (e) => {
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setShowResults(false);
+      }
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
+        setUserMenuOpen(false);
+      }
     };
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   useEffect(() => {
-    if (searchOpen && inputRef.current) inputRef.current.focus();
-  }, [searchOpen]);
-
-  useEffect(() => {
-    if (!searchQuery.trim()) { setSearchResults([]); setShowResults(false); return; }
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      setShowResults(false);
+      return;
+    }
     const timer = setTimeout(async () => {
       setSearching(true);
       try {
         const res = await searchAPI.searchAll(searchQuery);
         setSearchResults(res.data.items || []);
         setShowResults(true);
-      } catch (e) { console.error(e); }
-      finally { setSearching(false); }
+      } catch (error) {
+        console.error('Search error:', error);
+      } finally {
+        setSearching(false);
+      }
     }, 400);
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
   const handleResultClick = (item) => {
     onSelectContent(item);
-    setSearchQuery(''); setSearchResults([]); setShowResults(false); setSearchOpen(false);
+    setSearchQuery('');
+    setSearchResults([]);
+    setShowResults(false);
+    setSearchOpen(false);
   };
 
-  const closeSearch = () => { setSearchOpen(false); setSearchQuery(''); setSearchResults([]); setShowResults(false); };
+  const handleSearchClose = () => {
+    setSearchOpen(false);
+    setSearchQuery('');
+    setSearchResults([]);
+    setShowResults(false);
+  };
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      scrolled
-        ? 'bg-[#0a0a0f]/95 backdrop-blur-md border-b border-purple-500/10 shadow-lg shadow-black/50'
-        : 'bg-gradient-to-b from-black/80 to-transparent'
+      scrolled ? 'bg-black/95 backdrop-blur-md border-b border-white/5 shadow-lg shadow-black/50' : 'bg-gradient-to-b from-black/80 to-transparent backdrop-blur-sm'
     }`}>
-      <div className="flex items-center justify-between px-4 md:px-10 h-16 md:h-[68px]">
-
-        {/* Logo */}
-        <div className="flex items-center gap-8 flex-shrink-0">
-          <button onClick={() => setActiveSection('home')} className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #a855f7, #ec4899)' }}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 md:h-20">
+          {/* Logo */}
+          <div className="flex items-center gap-2.5 cursor-pointer group flex-shrink-0" onClick={() => setActiveSection('home')}>
+            <div className="bg-gradient-to-br from-purple-600 via-purple-500 to-pink-500 p-2 rounded-xl shadow-lg shadow-purple-500/30 group-hover:shadow-purple-500/50 transition-shadow">
               <Tv className="w-5 h-5 text-white" />
             </div>
-            <span className="text-white font-bold text-lg tracking-tight">
-              familybinge<span className="grad-text">TV</span>
-            </span>
-          </button>
+            <span className="text-xl font-black text-white tracking-tight">familybinge<span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">TV</span></span>
+          </div>
 
-          {/* Desktop nav */}
-          <div className="hidden md:flex items-center gap-1">
-            {navItems.map(item => (
+          {/* Desktop Nav */}
+          <div className="hidden md:flex items-center">
+            {navItems.map((item) => (
               <button
                 key={item.id}
                 onClick={() => setActiveSection(item.id)}
-                className={`relative px-4 py-2 text-sm font-medium rounded-lg transition-all ${
-                  activeSection === item.id
-                    ? 'text-white bg-white/5'
-                    : 'text-[#8b8aa0] hover:text-white hover:bg-white/5'
+                className={`relative px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+                  activeSection === item.id ? 'text-white' : 'text-gray-400 hover:text-white'
                 }`}
               >
                 {item.label}
                 {activeSection === item.id && (
-                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full" style={{ background: 'linear-gradient(90deg, #a855f7, #ec4899)' }} />
+                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full" />
                 )}
               </button>
             ))}
           </div>
-        </div>
 
-        {/* Right side */}
-        <div className="flex items-center gap-2">
-          {/* Search */}
-          <div ref={searchRef} className="relative">
-            {searchOpen ? (
-              <div className="flex items-center gap-2 px-3 py-2 rounded-xl border" style={{ background: 'rgba(26,26,36,0.95)', borderColor: 'rgba(168,85,247,0.3)' }}>
-                <Search className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                <input
-                  ref={inputRef}
-                  type="text"
-                  placeholder="Search movies, series..."
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  className="bg-transparent text-white text-sm outline-none w-44 md:w-56 placeholder-[#8b8aa0]"
-                />
-                {searching && <Loader2 className="w-4 h-4 text-purple-400 animate-spin flex-shrink-0" />}
-                <button onClick={closeSearch}><X className="w-4 h-4 text-[#8b8aa0] hover:text-white" /></button>
-              </div>
-            ) : (
-              <button
-                onClick={() => setSearchOpen(true)}
-                className="p-2.5 rounded-xl text-[#8b8aa0] hover:text-white hover:bg-white/5 transition-all"
-              >
+          {/* Right Actions */}
+          <div className="flex items-center gap-1 sm:gap-2">
+            {!searchOpen && (
+              <button onClick={() => setSearchOpen(true)} className="p-2.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-xl transition-all" title="Search">
                 <Search className="w-5 h-5" />
               </button>
             )}
+            <button className="hidden sm:flex p-2.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-xl transition-all relative">
+              <Bell className="w-5 h-5" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
+            </button>
 
-            {/* Dropdown */}
-            {showResults && (
-              <div
-                className="absolute top-full right-0 mt-2 w-80 md:w-[420px] rounded-xl overflow-hidden z-[60]"
-                style={{ background: '#111118', border: '1px solid rgba(168,85,247,0.2)', boxShadow: '0 20px 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(168,85,247,0.1)' }}
-              >
-                {searchResults.length > 0 ? (
-                  <>
-                    <div className="px-4 py-2.5 border-b border-purple-500/10">
-                      <span className="text-[#8b8aa0] text-xs uppercase tracking-widest">{searchResults.length} results</span>
-                    </div>
-                    <div className="max-h-[65vh] overflow-y-auto">
-                      {searchResults.slice(0, 12).map(item => (
-                        <div
-                          key={`${item.type}-${item.id}`}
-                          onClick={() => handleResultClick(item)}
-                          className="flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors border-b border-white/5 last:border-0 hover:bg-purple-500/10"
-                        >
-                          <div className="w-14 h-20 rounded-lg overflow-hidden bg-[#1a1a24] flex-shrink-0 border border-purple-500/10">
-                            {item.poster ? (
-                              <img src={item.poster} alt={item.title} className="w-full h-full object-cover" />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center"><Film className="w-6 h-6 text-[#8b8aa0]" /></div>
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-white text-sm font-semibold truncate">{item.title}</p>
-                            <div className="flex items-center gap-2 mt-1 flex-wrap">
-                              <span className="badge badge-grad text-[10px] px-2 py-0.5">{item.type === 'series' ? 'Series' : 'Movie'}</span>
-                              <span className="text-[#8b8aa0] text-xs">{item.year}</span>
-                              {item.rating > 0 && <span className="text-yellow-400 text-xs font-medium">★ {item.rating}</span>}
-                            </div>
-                            {item.genres?.length > 0 && (
-                              <p className="text-[#8b8aa0] text-xs mt-1 truncate">{item.genres.slice(0,2).join(' · ')}</p>
-                            )}
-                          </div>
+            <div ref={userMenuRef} className="hidden sm:block relative">
+              <button onClick={() => setUserMenuOpen(!userMenuOpen)} className="flex items-center gap-2 px-3 py-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-xl transition-all">
+                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                  <User className="w-4 h-4 text-white" />
+                </div>
+                <ChevronDown className={`w-4 h-4 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {userMenuOpen && (
+                <div className="absolute right-0 top-full mt-2 w-48 bg-gray-900/95 backdrop-blur-md border border-white/10 rounded-xl shadow-2xl overflow-hidden">
+                  {[{ icon: User, label: 'My Account' }, { icon: Settings, label: 'Settings' }].map(({ icon: Icon, label }) => (
+                    <button key={label} className="w-full flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/10 transition-colors text-sm">
+                      <Icon className="w-4 h-4" />{label}
+                    </button>
+                  ))}
+                  <div className="border-t border-white/10" />
+                  <button className="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors text-sm">Sign Out</button>
+                </div>
+              )}
+            </div>
+
+            <Button onClick={() => setActiveSection('pricing')} className="hidden sm:flex bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 text-white border-0 px-4 py-2 text-sm font-semibold rounded-xl shadow-lg shadow-purple-500/20 transition-all">
+              Free Trial
+            </Button>
+
+            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden p-2.5 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all">
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Search Bar */}
+        {searchOpen && (
+          <div ref={searchRef} className="pb-4 relative">
+            <div className="relative flex items-center">
+              <Search className="absolute left-4 w-5 h-5 text-gray-400 pointer-events-none" />
+              <input
+                type="text"
+                placeholder="Search movies, series, channels..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-12 pr-12 py-3 bg-white/8 border border-white/15 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/60 focus:bg-white/10 transition-all text-sm"
+                autoFocus
+              />
+              {searching && <Loader2 className="absolute right-12 w-4 h-4 text-purple-400 animate-spin" />}
+              <button onClick={handleSearchClose} className="absolute right-3 p-1 text-gray-500 hover:text-white transition-colors">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {showResults && searchResults.length > 0 && (
+              <div className="absolute left-0 right-0 mt-2 bg-gray-950/98 border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50 backdrop-blur-md">
+                <div className="px-4 py-2 border-b border-white/5">
+                  <span className="text-gray-500 text-xs font-medium uppercase tracking-wider">{searchResults.length} Results</span>
+                </div>
+                <div className="max-h-96 overflow-y-auto">
+                  {searchResults.slice(0, 10).map((item) => (
+                    <div key={`${item.type}-${item.id}`} onClick={() => handleResultClick(item)} className="flex items-center gap-3 px-4 py-3 hover:bg-white/8 cursor-pointer transition-colors border-b border-white/5 last:border-0 group">
+                      <div className="w-10 h-14 rounded-lg overflow-hidden bg-gray-800 flex-shrink-0 ring-1 ring-white/10">
+                        {item.poster ? (
+                          <img src={item.poster} alt={item.title} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center"><Film className="w-5 h-5 text-gray-600" /></div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white text-sm font-medium truncate group-hover:text-purple-300 transition-colors">{item.title}</p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className="px-1.5 py-0.5 bg-purple-600/20 border border-purple-500/30 rounded text-purple-400 text-xs font-medium">
+                            {item.type === 'series' ? 'Series' : 'Movie'}
+                          </span>
+                          <span className="text-gray-500 text-xs">{item.year}</span>
+                          {item.rating > 0 && <span className="text-yellow-500 text-xs">★ {item.rating}</span>}
                         </div>
-                      ))}
+                      </div>
                     </div>
-                  </>
-                ) : searchQuery.trim() && !searching ? (
-                  <div className="px-4 py-8 text-center">
-                    <p className="text-[#8b8aa0] text-sm">No results for "<span className="text-white">{searchQuery}</span>"</p>
-                  </div>
-                ) : null}
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {showResults && searchResults.length === 0 && searchQuery.trim() && !searching && (
+              <div className="absolute left-0 right-0 mt-2 bg-gray-950/98 border border-white/10 rounded-xl p-8 text-center backdrop-blur-md z-50">
+                <Film className="w-10 h-10 text-gray-700 mx-auto mb-3" />
+                <p className="text-gray-400 text-sm">No results for <span className="text-white">"{searchQuery}"</span></p>
               </div>
             )}
           </div>
+        )}
 
-          {/* Bell */}
-          <button className="hidden sm:flex p-2.5 rounded-xl text-[#8b8aa0] hover:text-white hover:bg-white/5 transition-all relative">
-            <Bell className="w-5 h-5" />
-            <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-pink-500" />
-          </button>
-
-          {/* Profile */}
-          <div ref={profileRef} className="relative">
-            <button
-              onClick={() => setProfileOpen(!profileOpen)}
-              className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-white/5 transition-all"
-            >
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm" style={{ background: 'linear-gradient(135deg, #a855f7, #ec4899)' }}>
-                G
-              </div>
-              <ChevronDown className={`w-3.5 h-3.5 text-[#8b8aa0] transition-transform ${profileOpen ? 'rotate-180' : ''}`} />
-            </button>
-            {profileOpen && (
-              <div className="absolute right-0 top-full mt-2 w-48 rounded-xl overflow-hidden" style={{ background: '#111118', border: '1px solid rgba(168,85,247,0.2)', boxShadow: '0 20px 40px rgba(0,0,0,0.8)' }}>
-                {[{ icon: User, label: 'Account' }, { icon: Settings, label: 'Settings' }].map(({ icon: Icon, label }) => (
-                  <button key={label} className="w-full flex items-center gap-3 px-4 py-3 text-[#8b8aa0] hover:text-white hover:bg-purple-500/10 transition-colors text-sm">
-                    <Icon className="w-4 h-4" />{label}
-                  </button>
-                ))}
-                <div className="border-t border-purple-500/10" />
-                <button className="w-full flex items-center gap-3 px-4 py-3 text-pink-400 hover:text-pink-300 hover:bg-pink-500/10 transition-colors text-sm">
-                  <LogOut className="w-4 h-4" />Sign Out
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden pb-4">
+            <div className="flex flex-col bg-gray-950/95 backdrop-blur-md rounded-2xl border border-white/8 overflow-hidden">
+              {navItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => { setActiveSection(item.id); setMobileMenuOpen(false); }}
+                  className={`flex items-center justify-between px-5 py-3.5 text-left font-medium transition-colors border-b border-white/5 last:border-0 ${
+                    activeSection === item.id ? 'text-white bg-purple-600/20' : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <span>{item.label}</span>
+                  {activeSection === item.id && <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />}
                 </button>
+              ))}
+              <div className="p-4 border-t border-white/5">
+                <Button onClick={() => { setActiveSection('pricing'); setMobileMenuOpen(false); }} className="w-full bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 text-white border-0 font-semibold rounded-xl">
+                  Start Free Trial
+                </Button>
               </div>
-            )}
+            </div>
           </div>
-
-          {/* Free Trial button */}
-          <button
-            onClick={() => setActiveSection('pricing')}
-            className="hidden sm:flex btn-grad px-4 py-2 rounded-xl text-sm text-white font-semibold"
-          >
-            Free Trial
-          </button>
-
-          {/* Mobile menu */}
-          <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 rounded-lg text-[#8b8aa0] hover:text-white">
-            <Menu className="w-5 h-5" />
-          </button>
-        </div>
+        )}
       </div>
-
-      {/* Mobile menu dropdown */}
-      {mobileOpen && (
-        <div className="md:hidden mx-4 mb-3 rounded-xl overflow-hidden" style={{ background: '#111118', border: '1px solid rgba(168,85,247,0.2)' }}>
-          {navItems.map(item => (
-            <button
-              key={item.id}
-              onClick={() => { setActiveSection(item.id); setMobileOpen(false); }}
-              className={`w-full text-left px-5 py-3.5 text-sm font-medium transition-colors border-b border-purple-500/10 last:border-0 ${
-                activeSection === item.id ? 'text-white bg-purple-500/10' : 'text-[#8b8aa0] hover:text-white hover:bg-white/5'
-              }`}
-            >
-              {item.label}
-            </button>
-          ))}
-          <div className="p-4 border-t border-purple-500/10">
-            <button
-              onClick={() => { setActiveSection('pricing'); setMobileOpen(false); }}
-              className="w-full btn-grad py-2.5 rounded-xl text-sm text-white font-semibold"
-            >
-              Start Free Trial
-            </button>
-          </div>
-        </div>
-      )}
     </nav>
   );
 };
