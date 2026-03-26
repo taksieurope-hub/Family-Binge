@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
 import HeroSection from "./components/HeroSection";
@@ -12,10 +13,43 @@ import ContentDetailModal from "./components/ContentDetailModal";
 import DownloadModal from "./components/DownloadModal";
 
 function MainApp() {
+  const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState("home");
   const [activeVideo, setActiveVideo] = useState(null);
   const [selectedContent, setSelectedContent] = useState(null);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
+  const [isTrialExpired, setIsTrialExpired] = useState(false);
+
+  // Check trial status
+  useEffect(() => {
+    const signupDate = localStorage.getItem('familybinge_signup_date');
+    if (!signupDate) {
+      // First time user - set signup date
+      localStorage.setItem('familybinge_signup_date', new Date().toISOString());
+    } else {
+      const daysSinceSignup = (new Date() - new Date(signupDate)) / (1000 * 60 * 60 * 24);
+      if (daysSinceSignup > 3) {
+        setIsTrialExpired(true);
+      }
+    }
+  }, []);
+
+  if (isTrialExpired) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center p-6">
+        <div className="max-w-md text-center">
+          <h1 className="text-4xl font-bold mb-4">Your 3-Day Trial Has Ended</h1>
+          <p className="text-gray-400 mb-8">Please subscribe to continue watching movies and series.</p>
+          <button
+            onClick={() => navigate('/pricing')}
+            className="bg-purple-600 hover:bg-purple-700 text-white px-10 py-6 rounded-2xl text-xl font-semibold"
+          >
+            Subscribe Now
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="App min-h-screen bg-black">
