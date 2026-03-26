@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Play, Loader2 } from 'lucide-react';
+import { X, Play, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from './ui/button';
 import { movieAPI, seriesAPI } from '../services/api';
 
@@ -12,7 +12,7 @@ export const getWatchHistory = () => {
   } catch { return []; }
 };
 
-export const saveToWatchHistory = (content) => {
+export const saveToWatchHistory = (content, season = 1, episode = 1) => {
   try {
     const history = getWatchHistory();
     const existingIndex = history.findIndex(h => h.id === content.id && h.type === content.type);
@@ -24,6 +24,8 @@ export const saveToWatchHistory = (content) => {
       type: content.type,
       year: content.year,
       rating: content.rating || 0,
+      season,
+      episode,
       lastWatched: Date.now(),
     };
     if (existingIndex >= 0) history[existingIndex] = historyItem;
@@ -42,6 +44,8 @@ export const removeFromWatchHistory = (id, type) => {
 const ContentDetailModal = ({ content, onClose }) => {
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [selectedSeason, setSelectedSeason] = useState(1);
+  const [selectedEpisode, setSelectedEpisode] = useState(1);
   const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
@@ -53,7 +57,7 @@ const ContentDetailModal = ({ content, onClose }) => {
         const res = await api.getDetails(content.id);
         const data = res?.data || res;
         setDetails(data);
-        saveToWatchHistory(data);
+        saveToWatchHistory(data, selectedSeason, selectedEpisode);
       } catch (error) {
         console.error('Error fetching details:', error);
         setDetails(content);
@@ -69,19 +73,38 @@ const ContentDetailModal = ({ content, onClose }) => {
     setIsPlaying(true);
   };
 
+  const handleNext = () => setSelectedEpisode(prev => prev + 1);
+  const handlePrev = () => setSelectedEpisode(prev => (prev > 1 ? prev - 1 : 1));
+
   if (isPlaying && details) {
     const streamUrl = details.type === 'series'
-      ? `https://vidsrc.cc/v2/embed/tv/${details.id}/1/1`
+      ? `https://vidsrc.cc/v2/embed/tv/${details.id}/${selectedSeason}/${selectedEpisode}`
       : `https://vidsrc.cc/v2/embed/movie/${details.id}`;
 
     return (
       <div className="fixed inset-0 z-[100] bg-black flex flex-col">
         <div className="flex items-center justify-between px-6 py-4 bg-black/90 z-10">
           <h2 className="text-white font-semibold truncate">{details.title}</h2>
+
+          {details.type === 'series' && (
+            <div className="flex items-center gap-4">
+              <select value={selectedSeason} onChange={e => setSelectedSeason(Number(e.target.value))} className="bg-zinc-800 text-white px-3 py-1 rounded-lg">
+                {Array.from({length: 10}, (_, i) => i+1).map(s => <option key={s} value={s}>S{s}</option>)}
+              </select>
+              <select value={selectedEpisode} onChange={e => setSelectedEpisode(Number(e.target.value))} className="bg-zinc-800 text-white px-3 py-1 rounded-lg">
+                {Array.from({length: 30}, (_, i) => i+1).map(e => <option key={e} value={e}>E{e}</option>)}
+              </select>
+
+              <button onClick={handlePrev} className="p-2 hover:bg-zinc-700 rounded"><ChevronLeft className="w-5 h-5 text-white" /></button>
+              <button onClick={handleNext} className="p-2 hover:bg-zinc-700 rounded"><ChevronRight className="w-5 h-5 text-white" /></button>
+            </div>
+          )}
+
           <button onClick={() => setIsPlaying(false)} className="p-2 hover:bg-red-600 rounded">
             <X className="w-6 h-6 text-white" />
           </button>
         </div>
+
         <div className="flex-1 bg-black">
           <iframe
             src={streamUrl}
@@ -121,10 +144,7 @@ const ContentDetailModal = ({ content, onClose }) => {
                 {details.rating > 0 && <span>? {details.rating}</span>}
               </div>
 
-              <Button 
-                onClick={handleWatchNow}
-                className="bg-green-400 hover:bg-green-500 text-black px-10 py-6 text-lg mb-8 w-full"
-              >
+              <Button onClick={handleWatchNow} className="bg-green-400 hover:bg-green-500 text-black px-10 py-6 text-lg mb-8 w-full">
                 <Play className="w-6 h-6 mr-2 fill-black" /> Watch Now
               </Button>
 
