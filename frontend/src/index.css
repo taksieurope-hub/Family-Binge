@@ -1,79 +1,34 @@
-/* Space Theme - Dark Cosmic */
 body {
-  background: #05050f;
-  color: #e0e0ff;
-  font-family: 'Inter', system-ui, sans-serif;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  background-color: #0a0a0a;
+  color: white;
 }
 
 .App {
-  background: linear-gradient(to bottom, #0a0a1f, #05050f);
   min-height: 100vh;
+  background: #141414;
 }
 
-/* Subtle nebula background */
-.App::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(circle at 30% 20%, rgba(120, 60, 255, 0.08) 0%, transparent 50%),
-              radial-gradient(circle at 70% 80%, rgba(0, 255, 200, 0.06) 0%, transparent 60%);
-  pointer-events: none;
-  z-index: -1;
-}
-
-/* Navbar - Sleek futuristic */
 nav {
-  background: rgba(10, 10, 30, 0.95);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(120, 100, 255, 0.25);
+  background: #000;
+  padding: 1rem 4rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
-/* Movie & Series Cards */
 .movie-card {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border-radius: 16px;
-  overflow: hidden;
-  background: #111;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease;
 }
 
 .movie-card:hover {
-  transform: translateY(-12px) scale(1.04);
-  box-shadow: 0 20px 40px rgba(100, 80, 255, 0.4);
+  transform: scale(1.05);
 }
 
-/* Text styling */
-h1, h2, h3 {
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-.text-white {
-  color: #f0f0ff;
-}
-
-/* Buttons */
 button {
-  transition: all 0.2s ease;
-}
-
-button:hover {
-  transform: translateY(-2px);
-}
-
-/* Lazer beam on click */
-.lazer-beam {
-  position: fixed;
-  height: 4px;
-  background: linear-gradient(90deg, transparent, #66ffff, #ff66ff, transparent);
-  box-shadow: 0 0 30px #66ffff;
-  z-index: 9999;
-  pointer-events: none;
-  animation: lazerShoot 0.7s linear forwards;
-}
-
-@keyframes lazerShoot {
-  0% { width: 0; left: 20%; opacity: 0.9; }
-  50% { opacity: 1; }
-  100% { width: 120%; left: -10%; opacity: 0; }
+  cursor: pointer;
 }
