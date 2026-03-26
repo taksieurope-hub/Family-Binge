@@ -1,191 +1,66 @@
-export const liveChannels = [
-  { id: 1, name: "Sports HD", category: "Sports", logo: "https://images.unsplash.com/photo-1461896836934- voices?w=100&h=100&fit=crop", number: "101" },
-  { id: 2, name: "ESPN Africa", category: "Sports", logo: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=100&h=100&fit=crop", number: "102" },
-  { id: 3, name: "SuperSport", category: "Sports", logo: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=100&h=100&fit=crop", number: "103" },
-  { id: 4, name: "News 24", category: "News", logo: "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=100&h=100&fit=crop", number: "201" },
-  { id: 5, name: "CNN Africa", category: "News", logo: "https://images.unsplash.com/photo-1495020689067-958852a7765e?w=100&h=100&fit=crop", number: "202" },
-  { id: 6, name: "BBC World", category: "News", logo: "https://images.unsplash.com/photo-1586339949216-35c2747cc36d?w=100&h=100&fit=crop", number: "203" },
-  { id: 7, name: "Movies Plus", category: "Movies", logo: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=100&h=100&fit=crop", number: "301" },
-  { id: 8, name: "Action Max", category: "Movies", logo: "https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=100&h=100&fit=crop", number: "302" },
-  { id: 9, name: "Kids Zone", category: "Kids", logo: "https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=100&h=100&fit=crop", number: "401" },
-  { id: 10, name: "Cartoon HD", category: "Kids", logo: "https://images.unsplash.com/photo-1569003339405-ea396a5a8a90?w=100&h=100&fit=crop", number: "402" },
-  { id: 11, name: "Music TV", category: "Entertainment", logo: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=100&h=100&fit=crop", number: "501" },
-  { id: 12, name: "Reality Plus", category: "Entertainment", logo: "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=100&h=100&fit=crop", number: "502" },
-];
-
-export const movies = [
-  {
-    id: 1,
-    title: "The Last Mission",
-    poster: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=300&h=450&fit=crop",
-    year: 2024,
-    rating: 8.5,
-    genre: "Action",
-    duration: "2h 15m",
-    description: "An elite soldier embarks on his final mission to save the world from imminent destruction.",
-    youtubeId: "dQw4w9WgXcQ"
-  },
-  {
-    id: 2,
-    title: "Ocean's Heart",
-    poster: "https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=300&h=450&fit=crop",
-    year: 2024,
-    rating: 7.8,
-    genre: "Drama",
-    duration: "1h 58m",
-    description: "A heartwarming tale of love and sacrifice on the high seas.",
-    youtubeId: "LXb3EKWsInQ"
-  },
-  {
-    id: 3,
-    title: "Dark Universe",
-    poster: "https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=300&h=450&fit=crop",
-    year: 2024,
-    rating: 8.2,
-    genre: "Sci-Fi",
-    duration: "2h 30m",
-    description: "Explorers discover a parallel universe with dark secrets.",
-    youtubeId: "YoHD9XEInc0"
-  },
-  {
-    id: 4,
-    title: "Laugh Track",
-    poster: "https://images.unsplash.com/photo-1485846234645-a62644f84728?w=300&h=450&fit=crop",
-    year: 2024,
-    rating: 7.5,
-    genre: "Comedy",
-    duration: "1h 45m",
-    description: "A comedian's journey to stardom takes unexpected turns.",
-    youtubeId: "9bZkp7q19f0"
-  },
-  {
-    id: 5,
-    title: "Ghost Protocol",
-    poster: "https://images.unsplash.com/photo-1509347528160-9a9e33742cdb?w=300&h=450&fit=crop",
-    year: 2023,
-    rating: 8.0,
-    genre: "Thriller",
-    duration: "2h 05m",
-    description: "A cyber security expert uncovers a conspiracy that threatens global security.",
-    youtubeId: "ScMzIvxBSi4"
-  },
-  {
-    id: 6,
-    title: "Mountain Peak",
-    poster: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=300&h=450&fit=crop",
-    year: 2024,
-    rating: 7.9,
-    genre: "Adventure",
-    duration: "2h 10m",
-    description: "Climbers face deadly challenges on the world's highest peak.",
-    youtubeId: "jfKfPfyJRdk"
-  },
-];
-
-export const series = [
-  {
-    id: 1,
-    title: "Kingdom of Shadows",
-    poster: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=300&h=450&fit=crop",
-    year: 2024,
-    rating: 9.1,
-    genre: "Fantasy",
-    seasons: 3,
-    description: "A epic tale of warring kingdoms and ancient magic.",
-    youtubeId: "9bZkp7q19f0"
-  },
-  {
-    id: 2,
-    title: "Breaking Codes",
-    poster: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=300&h=450&fit=crop",
-    year: 2023,
-    rating: 8.7,
-    genre: "Crime",
-    seasons: 5,
-    description: "FBI agents track down the most dangerous cyber criminals.",
-    youtubeId: "dQw4w9WgXcQ"
-  },
-  {
-    id: 3,
-    title: "Medical Frontline",
-    poster: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=300&h=450&fit=crop",
-    year: 2024,
-    rating: 8.4,
-    genre: "Medical",
-    seasons: 2,
-    description: "Doctors face impossible choices in a busy city hospital.",
-    youtubeId: "LXb3EKWsInQ"
-  },
-  {
-    id: 4,
-    title: "Space Pioneers",
-    poster: "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=300&h=450&fit=crop",
-    year: 2024,
-    rating: 8.9,
-    genre: "Sci-Fi",
-    seasons: 4,
-    description: "The first colonists struggle to survive on Mars.",
-    youtubeId: "YoHD9XEInc0"
-  },
-  {
-    id: 5,
-    title: "Love in Paris",
-    poster: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=300&h=450&fit=crop",
-    year: 2024,
-    rating: 7.6,
-    genre: "Romance",
-    seasons: 2,
-    description: "An American chef finds love in the city of lights.",
-    youtubeId: "ScMzIvxBSi4"
-  },
-  {
-    id: 6,
-    title: "Detective Tales",
-    poster: "https://images.unsplash.com/photo-1509281373149-e957c6296406?w=300&h=450&fit=crop",
-    year: 2023,
-    rating: 8.3,
-    genre: "Mystery",
-    seasons: 6,
-    description: "A brilliant detective solves impossible cases.",
-    youtubeId: "jfKfPfyJRdk"
-  },
-];
-
-export const categories = [
-  "All", "Sports", "News", "Movies", "Kids", "Entertainment", "Documentary"
-];
-
 export const pricingPlans = [
   {
     id: 1,
-    name: "1 Month",
-    price: 60.00,
-    currency: "Rand",
-    features: ["60,000+ Movies & Series", "HD Quality", "1 Device", "Search any movie or series your heart desires"],
+    name: "Basic",
+    price: 99,
+    currency: "ZAR",
+    period: "month",
+    devices: "1 TV + 1 Phone",
+    features: [
+      "3-day free trial",
+      "60,000+ Movies & Series",
+      "HD Quality",
+      "1 TV device + 1 Phone",
+      "+R20/month per extra device",
+    ],
     popular: false
   },
   {
     id: 2,
-    name: "3 Months",
-    price: 150.00,
-    currency: "Rand",
-    features: ["60,000+ Movies & Series", "HD Quality", "2 Devices", "Save 17%", "Search any movie or series your heart desires"],
+    name: "Standard",
+    price: 149,
+    currency: "ZAR",
+    period: "month",
+    devices: "2 TVs + 2 Phones",
+    features: [
+      "3-day free trial",
+      "60,000+ Movies & Series",
+      "Full HD Quality",
+      "2 TV devices + 2 Phones",
+      "+R20/month per extra device",
+    ],
     popular: true
   },
   {
     id: 3,
-    name: "6 Months",
-    price: 280.00,
-    currency: "Rand",
-    features: ["60,000+ Movies & Series", "Full HD Quality", "3 Devices", "Save 25%", "Search any movie or series your heart desires"],
+    name: "Premium",
+    price: 199,
+    currency: "ZAR",
+    period: "month",
+    devices: "4 TVs + 4 Phones",
+    features: [
+      "3-day free trial",
+      "60,000+ Movies & Series",
+      "4K Quality",
+      "4 TV devices + 4 Phones",
+      "+R20/month per extra device",
+    ],
     popular: false
   },
   {
     id: 4,
-    name: "12 Months",
-    price: 600.00,
-    currency: "Rand",
-    features: ["60,000+ Movies & Series", "4K Quality", "5 Devices", "Save 33%", "Search any movie or series your heart desires"],
+    name: "Family",
+    price: 249,
+    currency: "ZAR",
+    period: "month",
+    devices: "Unlimited devices",
+    features: [
+      "3-day free trial",
+      "60,000+ Movies & Series",
+      "4K Quality",
+      "Unlimited devices",
+      "Priority support",
+    ],
     popular: false
   }
 ];
@@ -195,16 +70,16 @@ export const faqData = [
     category: "Getting Started",
     questions: [
       {
-        q: "What is Family Binge TV?",
-        a: "Family Binge TV is a Live TV & VOD app available for Android devices, with more than 60,000 movies & series and 220+ live channels, including the best in sports, news, and entertainment."
-      },
-      {
-        q: "How do I download and install Family Binge TV?",
-        a: "For mobile, download directly from our website. For TV devices, use the Downloader app with code 664118. The app is compatible with Android smartphones, TV Box, Smart TV, and TV Stick."
+        q: "What is Family Binge?",
+        a: "Family Binge is a streaming platform with 60,000+ movies and series. Available on web, Android, Smart TV and TV Stick."
       },
       {
         q: "Is there a free trial?",
-        a: "Yes! We offer a 3-day free trial so you can explore our entire library of content before subscribing."
+        a: "Yes! We offer a 3-day free trial so you can explore our entire library before subscribing. No credit card required to start."
+      },
+      {
+        q: "What devices can I watch on?",
+        a: "You can watch on your phone, tablet, computer, Smart TV, and TV Stick. Each plan includes 1 TV device and 1 phone as standard, with extra devices available for R20/month each."
       }
     ]
   },
@@ -213,15 +88,15 @@ export const faqData = [
     questions: [
       {
         q: "What payment methods are accepted?",
-        a: "We accept Visa, Mastercard, M-PESA, and various local payment methods depending on your region."
+        a: "We accept PayPal, Visa, and Mastercard. All prices are in South African Rand (ZAR)."
       },
       {
-        q: "Can I use my plan on multiple devices?",
-        a: "Yes! Depending on your plan, you can use your account on 1-5 devices simultaneously."
+        q: "Can I add more devices to my plan?",
+        a: "Yes! You can add extra TV devices or phones to any plan for R20 per device per month."
       },
       {
         q: "How do I cancel my subscription?",
-        a: "You can cancel your subscription anytime from your account settings. Your access will remain until the end of your billing period."
+        a: "You can cancel anytime from your account settings. Your access continues until the end of your billing period."
       }
     ]
   },
@@ -229,37 +104,15 @@ export const faqData = [
     category: "Troubleshooting",
     questions: [
       {
-        q: "The app is not working, what should I do?",
-        a: "Try these steps: 1) Check your internet connection, 2) Restart your device, 3) Clear the app cache, 4) Make sure you have the latest version installed."
+        q: "The video won't play, what should I do?",
+        a: "Try switching servers using the server selector. If one source doesn't work, try another. Also check your internet connection."
       },
       {
         q: "Video is buffering constantly",
-        a: "Buffering is usually caused by slow internet. Try lowering the video quality in settings, or connect to a faster network."
+        a: "Buffering is usually caused by a slow internet connection. Try switching to a different server source, or connect to a faster network."
       }
     ]
   }
 ];
 
-export const sportsHighlights = [
-  {
-    id: 1,
-    title: "Premier League Live",
-    image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&h=450&fit=crop",
-    channel: "Sports HD",
-    time: "Live Now"
-  },
-  {
-    id: 2,
-    title: "NBA Finals 2024",
-    image: "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&h=450&fit=crop",
-    channel: "ESPN Africa",
-    time: "8:00 PM"
-  },
-  {
-    id: 3,
-    title: "Rugby Championship",
-    image: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=800&h=450&fit=crop",
-    channel: "SuperSport",
-    time: "Tomorrow 3:00 PM"
-  }
-];
+export const categories = ["All", "Movies", "Series", "Action", "Comedy", "Drama", "Horror", "Sci-Fi"];

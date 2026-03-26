@@ -45,11 +45,7 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
   }, [searchOpen]);
 
   useEffect(() => {
-    if (!searchQuery.trim()) {
-      setSearchResults([]);
-      setShowResults(false);
-      return;
-    }
+    if (!searchQuery.trim()) { setSearchResults([]); setShowResults(false); return; }
     const timer = setTimeout(async () => {
       setSearching(true);
       try {
@@ -67,20 +63,24 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
 
   const handleResultClick = (item) => {
     onSelectContent(item);
+    // Clear search completely
     setSearchQuery('');
     setSearchResults([]);
     setShowResults(false);
     setSearchOpen(false);
   };
 
+  const closeSearch = () => {
+    setSearchOpen(false);
+    setSearchQuery('');
+    setSearchResults([]);
+    setShowResults(false);
+  };
+
   return (
-    <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled
-          ? 'bg-[#141414]'
-          : 'bg-gradient-to-b from-black/90 via-black/40 to-transparent'
-      }`}
-    >
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+      scrolled ? 'bg-[#141414]' : 'bg-gradient-to-b from-black/90 via-black/40 to-transparent'
+    }`}>
       <div className="flex items-center justify-between px-4 md:px-12 h-16 md:h-[68px]">
         {/* Logo */}
         <div className="flex items-center gap-8 flex-shrink-0">
@@ -91,18 +91,12 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
           >
             familybinge
           </button>
-
-          {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-5">
             {navItems.map(item => (
               <button
                 key={item.id}
                 onClick={() => setActiveSection(item.id)}
-                className={`text-sm transition-colors ${
-                  activeSection === item.id
-                    ? 'text-white font-medium'
-                    : 'text-[#e5e5e5] hover:text-white/70'
-                }`}
+                className={`text-sm transition-colors ${activeSection === item.id ? 'text-white font-medium' : 'text-[#e5e5e5] hover:text-white/70'}`}
               >
                 {item.label}
               </button>
@@ -110,7 +104,7 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
           </div>
         </div>
 
-        {/* Right side */}
+        {/* Right */}
         <div className="flex items-center gap-3">
           {/* Search */}
           <div ref={searchRef} className="relative">
@@ -126,7 +120,7 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
                   className="bg-transparent text-white text-sm outline-none w-48 md:w-64 placeholder-white/50"
                 />
                 {searching && <Loader2 className="w-4 h-4 text-white animate-spin flex-shrink-0" />}
-                <button onClick={() => { setSearchOpen(false); setSearchQuery(''); setShowResults(false); }}>
+                <button onClick={closeSearch}>
                   <X className="w-4 h-4 text-white/70 hover:text-white" />
                 </button>
               </div>
@@ -136,12 +130,12 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
               </button>
             )}
 
-            {/* Search results */}
+            {/* Search results dropdown - fully opaque */}
             {showResults && (
-              <div className="absolute top-full right-0 mt-2 w-80 md:w-96 bg-[#181818] border border-white/10 shadow-2xl rounded overflow-hidden z-[60]">
+              <div className="absolute top-full right-0 mt-2 w-80 md:w-[420px] bg-[#141414] border border-white/15 shadow-2xl rounded z-[60]" style={{ boxShadow: '0 8px 40px rgba(0,0,0,0.9)' }}>
                 {searchResults.length > 0 ? (
                   <>
-                    <div className="px-4 py-2 border-b border-white/10">
+                    <div className="px-4 py-2.5 border-b border-white/10">
                       <span className="text-[#757575] text-xs uppercase tracking-widest">{searchResults.length} results</span>
                     </div>
                     <div className="max-h-[70vh] overflow-y-auto">
@@ -149,24 +143,31 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
                         <div
                           key={`${item.type}-${item.id}`}
                           onClick={() => handleResultClick(item)}
-                          className="flex items-center gap-3 px-4 py-3 hover:bg-white/5 cursor-pointer transition-colors border-b border-white/5 last:border-0"
+                          className="flex items-center gap-3 px-4 py-3 hover:bg-white/8 cursor-pointer transition-colors border-b border-white/5 last:border-0"
+                          style={{ background: 'transparent' }}
+                          onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
+                          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                         >
-                          <div className="w-12 h-16 rounded overflow-hidden bg-[#2f2f2f] flex-shrink-0">
+                          {/* Bigger poster */}
+                          <div className="w-14 h-20 rounded overflow-hidden bg-[#2f2f2f] flex-shrink-0">
                             {item.poster ? (
                               <img src={item.poster} alt={item.title} className="w-full h-full object-cover" />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center">
-                                <Film className="w-5 h-5 text-[#757575]" />
+                                <Film className="w-6 h-6 text-[#757575]" />
                               </div>
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-white text-sm font-medium truncate">{item.title}</p>
+                            <p className="text-white text-sm font-semibold truncate">{item.title}</p>
                             <div className="flex items-center gap-2 mt-1">
                               <span className="text-[#e50914] text-xs font-medium">{item.type === 'series' ? 'Series' : 'Movie'}</span>
                               <span className="text-[#757575] text-xs">{item.year}</span>
-                              {item.rating > 0 && <span className="text-[#46d369] text-xs">{item.rating}★</span>}
+                              {item.rating > 0 && <span className="text-[#46d369] text-xs font-medium">{item.rating}★</span>}
                             </div>
+                            {item.genres?.length > 0 && (
+                              <p className="text-[#757575] text-xs mt-0.5 truncate">{item.genres.slice(0,2).join(' · ')}</p>
+                            )}
                           </div>
                         </div>
                       ))}
@@ -181,28 +182,19 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
             )}
           </div>
 
-          {/* Notifications */}
           <button className="hidden sm:flex p-1 hover:text-white/70 transition-colors relative">
             <Bell className="w-5 h-5 text-white" />
           </button>
 
           {/* Profile */}
           <div ref={profileRef} className="relative">
-            <button
-              onClick={() => setProfileOpen(!profileOpen)}
-              className="flex items-center gap-1 group"
-            >
-              <div className="w-8 h-8 rounded bg-[#e50914] flex items-center justify-center text-white font-bold text-sm">
-                G
-              </div>
+            <button onClick={() => setProfileOpen(!profileOpen)} className="flex items-center gap-1">
+              <div className="w-8 h-8 rounded bg-[#e50914] flex items-center justify-center text-white font-bold text-sm">G</div>
               <ChevronDown className={`w-3 h-3 text-white transition-transform ${profileOpen ? 'rotate-180' : ''}`} />
             </button>
             {profileOpen && (
               <div className="absolute right-0 top-full mt-2 w-48 bg-[#181818] border border-white/10 shadow-2xl rounded overflow-hidden">
-                {[
-                  { icon: User, label: 'Account' },
-                  { icon: Settings, label: 'Settings' },
-                ].map(({ icon: Icon, label }) => (
+                {[{ icon: User, label: 'Account' }, { icon: Settings, label: 'Settings' }].map(({ icon: Icon, label }) => (
                   <button key={label} className="w-full flex items-center gap-3 px-4 py-3 text-[#e5e5e5] hover:text-white hover:bg-white/5 transition-colors text-sm">
                     <Icon className="w-4 h-4" />{label}
                   </button>
@@ -215,14 +207,10 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
             )}
           </div>
 
-          {/* Mobile menu */}
+          {/* Mobile nav */}
           <div className="md:hidden flex items-center gap-3">
             {navItems.slice(1).map(item => (
-              <button
-                key={item.id}
-                onClick={() => setActiveSection(item.id)}
-                className={`text-xs transition-colors ${activeSection === item.id ? 'text-white font-medium' : 'text-[#e5e5e5]'}`}
-              >
+              <button key={item.id} onClick={() => setActiveSection(item.id)} className={`text-xs transition-colors ${activeSection === item.id ? 'text-white font-medium' : 'text-[#e5e5e5]'}`}>
                 {item.label}
               </button>
             ))}
