@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Play, Loader2, Tv, Film } from 'lucide-react';
-import { Button } from './ui/button';
+import { X, Loader2 } from 'lucide-react';
 import { movieAPI, seriesAPI } from '../services/api';
 
 const WATCH_HISTORY_KEY = 'familybinge_watch_history';
@@ -15,18 +14,18 @@ export const getWatchHistory = () => {
 export const saveToWatchHistory = (content, season = 1, episode = 1, progress = 0) => {
   try {
     const history = getWatchHistory();
-    const existingIndex = history.findIndex(h => h.id === content.id && h.type === content.type);
     const historyItem = {
       id: content.id,
-      title: content.title,
+      title: content.title || content.name,
       poster: content.poster,
       backdrop: content.backdrop,
-      type: content.type,
+      type: content.type || 'movie',
       season,
       episode,
       progress,
       timestamp: Date.now()
     };
+    const existingIndex = history.findIndex(h => h.id === content.id && h.type === content.type);
     if (existingIndex > -1) history[existingIndex] = historyItem;
     else history.unshift(historyItem);
     localStorage.setItem(WATCH_HISTORY_KEY, JSON.stringify(history.slice(0, 20)));
@@ -40,11 +39,12 @@ export const removeFromWatchHistory = (id, type) => {
   } catch (e) {}
 };
 
-const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
+const ContentDetailModal = ({ content, onClose }) => {
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
 
+  // Fetch full details (fixes blank screen after search)
   useEffect(() => {
     const fetchDetails = async () => {
       if (!content?.id) return;
@@ -58,8 +58,8 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
         }
         setDetails(data);
       } catch (err) {
-        console.error("Detail fetch failed, using fallback", err);
-        setDetails(content); // fallback to what we have
+        console.error(err);
+        setDetails(content); // fallback
       } finally {
         setLoading(false);
       }
@@ -67,60 +67,71 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
     fetchDetails();
   }, [content]);
 
-  // AUTO full-screen play the moment modal opens (exactly what you asked for)
+  // AUTO START full-screen player INSIDE the app the moment details load
   useEffect(() => {
     if (!loading && details && !isPlaying) {
       setIsPlaying(true);
-      const streamUrl = details.type === 'series' || details.media_type === 'tv'
-        ? `https://vidsrc.cc/v2/embed/tv/${details.id}/1/1`
-        : `https://vidsrc.cc/v2/embed/movie/${details.id}`;
-      
-      const playerWindow = window.open(streamUrl, '_blank', 'fullscreen=yes,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=yes,width=1920,height=1080');
-      if (playerWindow) {
-        playerWindow.focus();
-      }
-      // close modal after opening player
-      setTimeout(onClose, 800);
     }
-  }, [loading, details, isPlaying, onClose]);
+  }, [loading, details, isPlaying]);
+
+  const streamUrl = details ? (
+    (details.type === 'series' || details.media_type === 'tv')
+      ? `https://vidsrc.cc/v2/embed/tv/${details.id}/1/1`
+      : `https://vidsrc.cc/v2/embed/movie/${details.id}`
+  ) : '';
 
   if (loading) {
     return (
-      <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-[9999]">
-        <Loader2 className="w-12 h-12 animate-spin text-purple-500" />
+      <div className="fixed inset-0 bg-black/95 z-[9999] flex items-center justify-center">
+        <Loader2 className="w-12 h-12 animate-spin text-white" />
       </div>
     );
   }
 
+  // FULL-SCREEN PLAYER INSIDE YOUR APP
+  if (isPlaying && details) {
+    return (
+      <div className="fixed inset-0 bg-black z-[10000] flex flex-col">
+        <div className="flex justify-end p-4">
+          <button 
+            onClick={() => { setIsPlaying(false); onClose(); }}
+            className="text-white hover:text-red-500 transition-colors"
+          >
+            <X className="w-8 h-8" />
+          </button>
+        </div>
+        <iframe
+          src={streamUrl}
+          className="flex-1 w-full border-0"
+          allowFullScreen
+          allow="autoplay; encrypted-media"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+        />
+      </div>
+    );
+  }
+
+  // Details view (fallback if needed)
   return (
-    <div className="fixed inset-0 bg-black/95 flex items-center justify-center z-[9999] p-4">
+    <div className="fixed inset-0 bg-black/95 z-[9999] flex items-center justify-center p-4">
       <div className="max-w-4xl w-full bg-zinc-900 rounded-3xl overflow-hidden">
-        {/* Close button */}
         <button onClick={onClose} className="absolute top-6 right-6 text-white z-10">
           <X className="w-8 h-8" />
         </button>
-
         {details && (
-          <div className="relative">
-            {/* Backdrop */}
-            {details.backdrop && (
-              <img 
-                src={details.backdrop} 
-                alt={details.title}
-                className="w-full h-96 object-cover"
-              />
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent" />
-
-            <div className="absolute bottom-0 left-0 right-0 p-8">
-              <h1 className="text-5xl font-bold text-white mb-2">{details.title || details.name}</h1>
-              <div className="flex gap-4 text-white/80 mb-6">
-                <span>{details.year || new Date(details.release_date || details.first_air_date).getFullYear()}</span>
-                <span>? {details.rating || details.vote_average}</span>
-              </div>
-              <p className="text-white/90 max-w-2xl text-lg leading-relaxed">{details.overview}</p>
+          <>
+            {details.backdrop && <img src={details.backdrop} className="w-full h-96 object-cover" alt={details.title} />}
+            <div className="p-8">
+              <h1 className="text-5xl font-bold text-white">{details.title || details.name}</h1>
+              <p className="text-white/80 mt-2">{details.overview}</p>
+              <button 
+                onClick={() => setIsPlaying(true)}
+                className="mt-8 bg-purple-600 hover:bg-purple-700 px-10 py-4 rounded-2xl text-white font-semibold flex items-center gap-3"
+              >
+                ? Play Now
+              </button>
             </div>
-          </div>
+          </>
         )}
       </div>
     </div>
