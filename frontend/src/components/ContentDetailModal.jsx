@@ -217,13 +217,12 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
     return url;
   };
 
-  // Full screen player view
+    // ==================== CLEAN AUTOMATIC PLAYER ====================
   if (isPlaying) {
     return (
       <div className="fixed inset-0 z-[100] bg-black flex flex-col">
-        {/* Header */}
+        {/* Minimal Header */}
         <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/95 to-transparent border-b border-white/5">
-          {/* Left: Title */}
           <div className="flex items-center gap-3 min-w-0 flex-1">
             <div className="p-1.5 bg-purple-600/80 rounded-lg flex-shrink-0">
               {details?.type === 'series' ? <Tv className="w-4 h-4 text-white" /> : <Film className="w-4 h-4 text-white" />}
@@ -231,23 +230,22 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
             <div className="min-w-0">
               <h2 className="text-white font-semibold text-sm truncate">{details?.title}</h2>
               <div className="flex items-center gap-2 text-xs text-gray-400">
-                <span>{details?.type === 'series' ? `Season ${selectedSeason} · Episode ${selectedEpisode}` : details?.year}</span>
+                <span>{details?.type === 'series' ? `S${selectedSeason} E${selectedEpisode}` : details?.year}</span>
                 <span className="text-gray-600">·</span>
-                <span className="text-purple-400 font-medium">{VIDEO_SOURCES[currentSourceIndex].name}</span>
-                {!playerReady && isAutoSwitching && (
+                <span className="text-purple-400 font-medium">Auto</span>
+                {!playerReady && (
                   <span className="flex items-center gap-1 text-yellow-400">
                     <Loader2 className="w-3 h-3 animate-spin" />
-                    Connecting...
+                    Finding best server...
                   </span>
                 )}
-                {playerReady && <span className="text-green-400">● Live</span>}
+                {playerReady && <span className="text-green-400">● Playing</span>}
               </div>
             </div>
           </div>
 
-          {/* Right: Controls */}
-          <div className="flex items-center gap-2 flex-shrink-0">
-            {/* Episode selector for series */}
+          {/* Right side controls */}
+          <div className="flex items-center gap-2">
             {details?.type === 'series' && (
               <div className="hidden sm:flex items-center gap-1.5">
                 <select
@@ -261,10 +259,10 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
                     saveToWatchHistory(details, newSeason, selectedEpisode, 0);
                     window.dispatchEvent(new Event('watchHistoryUpdated'));
                   }}
-                  className="bg-white/10 text-white px-2.5 py-1.5 rounded-lg border border-white/15 text-xs font-medium cursor-pointer hover:bg-white/20 transition-colors"
+                  className="bg-white/10 text-white px-2.5 py-1.5 rounded-lg border border-white/15 text-xs font-medium cursor-pointer hover:bg-white/20"
                 >
                   {Array.from({ length: details?.seasons || 1 }, (_, i) => (
-                    <option key={i + 1} value={i + 1} className="bg-gray-900">Season {i + 1}</option>
+                    <option key={i + 1} value={i + 1} className="bg-gray-900">S{i + 1}</option>
                   ))}
                 </select>
                 <select
@@ -278,114 +276,44 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
                     saveToWatchHistory(details, selectedSeason, newEpisode, 0);
                     window.dispatchEvent(new Event('watchHistoryUpdated'));
                   }}
-                  className="bg-white/10 text-white px-2.5 py-1.5 rounded-lg border border-white/15 text-xs font-medium cursor-pointer hover:bg-white/20 transition-colors"
+                  className="bg-white/10 text-white px-2.5 py-1.5 rounded-lg border border-white/15 text-xs font-medium cursor-pointer hover:bg-white/20"
                 >
                   {Array.from({ length: 50 }, (_, i) => (
-                    <option key={i + 1} value={i + 1} className="bg-gray-900">Ep {i + 1}</option>
+                    <option key={i + 1} value={i + 1} className="bg-gray-900">E{i + 1}</option>
                   ))}
                 </select>
               </div>
             )}
 
-            {/* Next episode/movie */}
             <Button
               onClick={handleNext}
-              className="hidden sm:flex items-center gap-1.5 bg-white/10 hover:bg-white/20 text-white border-0 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors"
+              className="hidden sm:flex items-center gap-1.5 bg-white/10 hover:bg-white/20 text-white border-0 px-3 py-1.5 text-xs font-medium rounded-lg"
             >
               <SkipForward className="w-3.5 h-3.5" />
               Next
             </Button>
 
-            {/* Subtitle toggle */}
-            <button
-              onClick={handleToggleSubtitles}
-              className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                subtitlesEnabled
-                  ? 'bg-purple-600/50 border border-purple-500/40 text-white'
-                  : 'bg-white/10 border border-white/10 text-gray-400 hover:text-white hover:bg-white/20'
-              }`}
-            >
-              <Captions className="w-3.5 h-3.5" />
-              CC
-            </button>
-
-            {/* Server switcher - compact pill buttons */}
-            <div className="hidden sm:flex items-center gap-1 bg-white/5 border border-white/10 rounded-lg p-1">
-              {VIDEO_SOURCES.slice(0, 4).map((src, i) => (
-                <button
-                  key={i}
-                  onClick={() => {
-                    setCurrentSourceIndex(i);
-                    setPlayerReady(false);
-                    setIsAutoSwitching(false);
-                  }}
-                  title={src.name}
-                  className={`px-2.5 py-1 rounded text-xs font-medium transition-all ${
-                    i === currentSourceIndex
-                      ? 'bg-purple-600 text-white shadow-sm'
-                      : 'text-gray-400 hover:text-white hover:bg-white/10'
-                  }`}
-                >
-                  S{i + 1}
-                </button>
-              ))}
-              {currentSourceIndex >= 4 && (
-                <span className="px-2.5 py-1 bg-purple-600 text-white rounded text-xs font-medium">
-                  S{currentSourceIndex + 1}
-                </span>
-              )}
-              <button
-                onClick={tryNextServer}
-                disabled={currentSourceIndex >= VIDEO_SOURCES.length - 1}
-                title="Try next server"
-                className="px-2 py-1 text-gray-400 hover:text-white hover:bg-white/10 rounded text-xs transition-colors disabled:opacity-30"
-              >
-                <RefreshCw className="w-3 h-3" />
-              </button>
-            </div>
-
             <button
               onClick={() => setIsPlaying(false)}
               className="p-2 bg-white/10 hover:bg-red-500/80 rounded-lg transition-colors"
-              title="Close player"
+              title="Close"
             >
               <X className="w-4 h-4 text-white" />
             </button>
           </div>
         </div>
 
-        {/* Player */}
+        {/* Player Area */}
         <div className="flex-1 bg-black relative">
           {!playerReady && (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-black z-10">
-              <div className="relative">
-                <Loader2 className="w-14 h-14 text-purple-500 animate-spin" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-8 h-8 rounded-full bg-purple-600/20" />
-                </div>
-              </div>
-              <p className="text-white mt-5 font-medium">
-                {isAutoSwitching ? `Trying ${VIDEO_SOURCES[currentSourceIndex].name}...` : `Loading ${VIDEO_SOURCES[currentSourceIndex].name}...`}
-              </p>
-              {isAutoSwitching && currentSourceIndex < VIDEO_SOURCES.length - 1 && (
-                <p className="text-gray-500 text-sm mt-1">Auto-switching servers if needed</p>
-              )}
-              {/* Server dots */}
-              <div className="flex gap-2 mt-5">
-                {VIDEO_SOURCES.map((_, i) => (
-                  <div
-                    key={i}
-                    className={`w-2 h-2 rounded-full transition-all ${
-                      i < currentSourceIndex ? 'bg-gray-600' : i === currentSourceIndex ? 'bg-purple-500 scale-125' : 'bg-white/20'
-                    }`}
-                  />
-                ))}
-              </div>
+              <Loader2 className="w-14 h-14 text-purple-500 animate-spin" />
+              <p className="text-white mt-5 font-medium">Connecting to best server...</p>
             </div>
           )}
           <iframe
             ref={iframeRef}
-            key={`${details?.id}-${selectedSeason}-${selectedEpisode}-${currentSourceIndex}-${subtitlesEnabled}`}
+            key={`${details?.id}-${selectedSeason}-${selectedEpisode}-${currentSourceIndex}`}
             src={getStreamUrl()}
             className="w-full h-full border-0"
             allowFullScreen
