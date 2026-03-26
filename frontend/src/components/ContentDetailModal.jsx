@@ -114,6 +114,46 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
     }
   }, [details]);
 
+  const handleWatchNow = () => {
+    setIsPlaying(true);
+    setCurrentSourceIndex(0);
+    setPlayerReady(false);
+    setIsAutoSwitching(true);
+    
+    if (details) {
+      saveToWatchHistory(details, selectedSeason, selectedEpisode, 0);
+      window.dispatchEvent(new Event('watchHistoryUpdated'));
+    }
+  };
+
+  const handlePlayTrailer = () => {
+    if (details?.youtube_id) {
+      onPlayVideo(details.youtube_id);
+    }
+  };
+
+  const handleNext = () => {
+    if (!details) return;
+
+    if (details.type === 'series') {
+      const nextEpisode = selectedEpisode + 1;
+      setSelectedEpisode(nextEpisode);
+      setCurrentSourceIndex(0);
+      setPlayerReady(false);
+      setIsAutoSwitching(true);
+      saveToWatchHistory(details, selectedSeason, nextEpisode, 0);
+      window.dispatchEvent(new Event('watchHistoryUpdated'));
+    } else {
+      if (details.similar && details.similar.length > 0) {
+        const nextMovie = details.similar[0];
+        onClose();
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('selectContent', { detail: nextMovie }));
+        }, 100);
+      }
+    }
+  };
+
     // ==================== FULLY AUTOMATIC CLEAN PLAYER ====================
   if (isPlaying) {
     return (
