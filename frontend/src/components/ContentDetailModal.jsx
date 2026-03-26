@@ -34,15 +34,12 @@ export const removeFromWatchHistory = (id, type) => {
 };
 
 // Video sources - Reordered: VidSrc XYZ is now FIRST (most reliable right now)
+// Video sources - BEST working order (silent auto selection)
 const VIDEO_SOURCES = [
   { name: 'VidSrc XYZ', getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrc.xyz/embed/tv/${id}/${s}/${e}` : `https://vidsrc.xyz/embed/movie/${id}` },
   { name: 'VidSrc Pro', getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrc.pro/embed/tv/${id}/${s}/${e}` : `https://vidsrc.pro/embed/movie/${id}` },
-  { name: 'VidSrc CC', getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}` : `https://vidsrc.cc/v2/embed/movie/${id}` },
-  { name: 'VidSrc ICU', getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrc.icu/embed/tv/${id}/${s}/${e}` : `https://vidsrc.icu/embed/movie/${id}` },
-  { name: 'Smashy', getUrl: (type, id, s, e) => type === 'series' ? `https://player.smashy.stream/tv/${id}?s=${s}&e=${e}` : `https://player.smashy.stream/movie/${id}` },
-  { name: '2Embed', getUrl: (type, id, s, e) => type === 'series' ? `https://www.2embed.cc/embedtv/${id}&s=${s}&e=${e}` : `https://www.2embed.cc/embed/${id}` },
-  { name: 'SuperEmbed', getUrl: (type, id, s, e) => type === 'series' ? `https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1&s=${s}&e=${e}` : `https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1` },
-  { name: 'MoviesAPI', getUrl: (type, id, s, e) => type === 'series' ? `https://moviesapi.club/tv/${id}-${s}-${e}` : `https://moviesapi.club/movie/${id}` },
+  { name: 'Smashy',     getUrl: (type, id, s, e) => type === 'series' ? `https://player.smashy.stream/tv/${id}?s=${s}&e=${e}` : `https://player.smashy.stream/movie/${id}` },
+  { name: 'MultiEmbed', getUrl: (type, id, s, e) => type === 'series' ? `https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1&s=${s}&e=${e}` : `https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1` },
 ];
 
 
@@ -117,107 +114,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
     }
   }, [details]);
 
-  // Auto-switch to next server logic
-  useEffect(() => {
-    if (isPlaying && isAutoSwitching && !playerReady) {
-      autoSwitchTimeoutRef.current = setTimeout(() => {
-        if (!playerReady && currentSourceIndex < VIDEO_SOURCES.length - 1) {
-          console.log(`${VIDEO_SOURCES[currentSourceIndex].name} not responding, trying ${VIDEO_SOURCES[currentSourceIndex + 1].name}...`);
-          setCurrentSourceIndex(prev => prev + 1);
-        }
-      }, 5000); 
-    }
-    
-    return () => {
-      if (autoSwitchTimeoutRef.current) {
-        clearTimeout(autoSwitchTimeoutRef.current);
-      }
-    };
-  }, [isPlaying, currentSourceIndex, isAutoSwitching, playerReady]);
-
-  // --- NEW: HANDLE NEXT LOGIC ---
-  const handleNext = () => {
-    if (!details) return;
-
-    if (details.type === 'series') {
-      const nextEpisode = selectedEpisode + 1;
-      setSelectedEpisode(nextEpisode);
-      
-      setCurrentSourceIndex(0); // Reset to VidSrc CC
-      setPlayerReady(false);
-      setIsAutoSwitching(true);
-      
-      saveToWatchHistory(details, selectedSeason, nextEpisode, 0);
-      window.dispatchEvent(new Event('watchHistoryUpdated'));
-    } else {
-      // Movie: Select first similar
-      if (details.similar && details.similar.length > 0) {
-        const nextMovie = details.similar[0];
-        onClose();
-        setTimeout(() => {
-           window.dispatchEvent(new CustomEvent('selectContent', { detail: nextMovie }));
-        }, 100);
-      }
-    }
-  };
-
-  const handleToggleSubtitles = () => {
-    setSubtitlesEnabled(!subtitlesEnabled);
-    // Toggling this will force a re-render of the iframe due to the 'key' prop update
-  };
-
-  if (!content) return null;
-
-  const handlePlayTrailer = () => {
-    if (details?.youtube_id) {
-      onPlayVideo(details.youtube_id);
-    }
-  };
-
-  const handleWatchNow = () => {
-    setIsPlaying(true);
-    setCurrentSourceIndex(0);
-    setPlayerReady(false);
-    setIsAutoSwitching(true);
-    
-    if (details) {
-      saveToWatchHistory(details, selectedSeason, selectedEpisode, 0);
-      window.dispatchEvent(new Event('watchHistoryUpdated'));
-    }
-  };
-
-  const handleIframeLoad = () => {
-    setPlayerReady(true);
-    setIsAutoSwitching(false);
-    if (autoSwitchTimeoutRef.current) {
-      clearTimeout(autoSwitchTimeoutRef.current);
-    }
-  };
-
-  const tryNextServer = () => {
-    if (currentSourceIndex < VIDEO_SOURCES.length - 1) {
-      setCurrentSourceIndex(prev => prev + 1);
-      setPlayerReady(false);
-    }
-  };
-
-  const getStreamUrl = () => {
-    if (!details) return null;
-    const source = VIDEO_SOURCES[currentSourceIndex];
-    let url = source.getUrl(details.type, details.id, selectedSeason, selectedEpisode);
-    
-    // Attempt to append subtitle param if supported (generic approach)
-    // Note: Most embeds handle this internally via their own UI, 
-    // but this ensures the React state is tracked.
-    if (!subtitlesEnabled) {
-      // Some players accept ?caption=false or similar, 
-      // primarily this state update forces the key refresh below
-    }
-    
-    return url;
-  };
-
-    // ==================== CLEAN AUTOMATIC PLAYER ====================
+    // ==================== FULLY AUTOMATIC CLEAN PLAYER ====================
   if (isPlaying) {
     return (
       <div className="fixed inset-0 z-[100] bg-black flex flex-col">
@@ -230,7 +127,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
             <div className="min-w-0">
               <h2 className="text-white font-semibold text-sm truncate">{details?.title}</h2>
               <div className="flex items-center gap-2 text-xs text-gray-400">
-                <span>{details?.type === 'series' ? `S${selectedSeason} E${selectedEpisode}` : details?.year}</span>
+                <span>{details?.type === 'series' ? `Season ${selectedSeason} · Episode ${selectedEpisode}` : details?.year}</span>
                 <span className="text-gray-600">·</span>
                 <span className="text-purple-400 font-medium">Auto</span>
                 {!playerReady && (
@@ -244,60 +141,23 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
             </div>
           </div>
 
-          {/* Right side controls */}
           <div className="flex items-center gap-2">
             {details?.type === 'series' && (
               <div className="hidden sm:flex items-center gap-1.5">
-                <select
-                  value={selectedSeason}
-                  onChange={(e) => {
-                    const newSeason = Number(e.target.value);
-                    setSelectedSeason(newSeason);
-                    setCurrentSourceIndex(0);
-                    setPlayerReady(false);
-                    setIsAutoSwitching(true);
-                    saveToWatchHistory(details, newSeason, selectedEpisode, 0);
-                    window.dispatchEvent(new Event('watchHistoryUpdated'));
-                  }}
-                  className="bg-white/10 text-white px-2.5 py-1.5 rounded-lg border border-white/15 text-xs font-medium cursor-pointer hover:bg-white/20"
-                >
-                  {Array.from({ length: details?.seasons || 1 }, (_, i) => (
-                    <option key={i + 1} value={i + 1} className="bg-gray-900">S{i + 1}</option>
-                  ))}
+                <select value={selectedSeason} onChange={(e) => { const ns = Number(e.target.value); setSelectedSeason(ns); setCurrentSourceIndex(0); setPlayerReady(false); setIsAutoSwitching(true); saveToWatchHistory(details, ns, selectedEpisode, 0); window.dispatchEvent(new Event('watchHistoryUpdated')); }} className="bg-white/10 text-white px-2.5 py-1.5 rounded-lg border border-white/15 text-xs font-medium cursor-pointer hover:bg-white/20">
+                  {Array.from({ length: details?.seasons || 1 }, (_, i) => <option key={i+1} value={i+1} className="bg-gray-900">Season {i+1}</option>)}
                 </select>
-                <select
-                  value={selectedEpisode}
-                  onChange={(e) => {
-                    const newEpisode = Number(e.target.value);
-                    setSelectedEpisode(newEpisode);
-                    setCurrentSourceIndex(0);
-                    setPlayerReady(false);
-                    setIsAutoSwitching(true);
-                    saveToWatchHistory(details, selectedSeason, newEpisode, 0);
-                    window.dispatchEvent(new Event('watchHistoryUpdated'));
-                  }}
-                  className="bg-white/10 text-white px-2.5 py-1.5 rounded-lg border border-white/15 text-xs font-medium cursor-pointer hover:bg-white/20"
-                >
-                  {Array.from({ length: 50 }, (_, i) => (
-                    <option key={i + 1} value={i + 1} className="bg-gray-900">E{i + 1}</option>
-                  ))}
+                <select value={selectedEpisode} onChange={(e) => { const ne = Number(e.target.value); setSelectedEpisode(ne); setCurrentSourceIndex(0); setPlayerReady(false); setIsAutoSwitching(true); saveToWatchHistory(details, selectedSeason, ne, 0); window.dispatchEvent(new Event('watchHistoryUpdated')); }} className="bg-white/10 text-white px-2.5 py-1.5 rounded-lg border border-white/15 text-xs font-medium cursor-pointer hover:bg-white/20">
+                  {Array.from({ length: 50 }, (_, i) => <option key={i+1} value={i+1} className="bg-gray-900">Ep {i+1}</option>)}
                 </select>
               </div>
             )}
 
-            <Button
-              onClick={handleNext}
-              className="hidden sm:flex items-center gap-1.5 bg-white/10 hover:bg-white/20 text-white border-0 px-3 py-1.5 text-xs font-medium rounded-lg"
-            >
-              <SkipForward className="w-3.5 h-3.5" />
-              Next
+            <Button onClick={handleNext} className="hidden sm:flex items-center gap-1.5 bg-white/10 hover:bg-white/20 text-white border-0 px-3 py-1.5 text-xs font-medium rounded-lg">
+              <SkipForward className="w-3.5 h-3.5" /> Next
             </Button>
 
-            <button
-              onClick={() => setIsPlaying(false)}
-              className="p-2 bg-white/10 hover:bg-red-500/80 rounded-lg transition-colors"
-              title="Close"
-            >
+            <button onClick={() => setIsPlaying(false)} className="p-2 bg-white/10 hover:bg-red-500/80 rounded-lg transition-colors">
               <X className="w-4 h-4 text-white" />
             </button>
           </div>
