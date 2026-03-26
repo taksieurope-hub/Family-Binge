@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Play, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, Play, Loader2, Tv, Film } from 'lucide-react';
 import { Button } from './ui/button';
 import { movieAPI, seriesAPI } from '../services/api';
 
@@ -12,7 +12,7 @@ export const getWatchHistory = () => {
   } catch { return []; }
 };
 
-export const saveToWatchHistory = (content, season = 1, episode = 1) => {
+export const saveToWatchHistory = (content, season = 1, episode = 1, progress = 0) => {
   try {
     const history = getWatchHistory();
     const existingIndex = history.findIndex(h => h.id === content.id && h.type === content.type);
@@ -22,45 +22,44 @@ export const saveToWatchHistory = (content, season = 1, episode = 1) => {
       poster: content.poster,
       backdrop: content.backdrop,
       type: content.type,
-      year: content.year,
-      rating: content.rating || 0,
       season,
       episode,
-      lastWatched: Date.now(),
+      progress,
+      timestamp: Date.now()
     };
-    if (existingIndex >= 0) history[existingIndex] = historyItem;
+    if (existingIndex > -1) history[existingIndex] = historyItem;
     else history.unshift(historyItem);
     localStorage.setItem(WATCH_HISTORY_KEY, JSON.stringify(history.slice(0, 20)));
-  } catch (e) { console.error('Error saving watch history:', e); }
+  } catch (e) {}
 };
 
 export const removeFromWatchHistory = (id, type) => {
   try {
     const history = getWatchHistory().filter(h => !(h.id === id && h.type === type));
     localStorage.setItem(WATCH_HISTORY_KEY, JSON.stringify(history));
-  } catch (e) { console.error('Error removing from watch history:', e); }
+  } catch (e) {}
 };
 
-const ContentDetailModal = ({ content, onClose }) => {
+const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [selectedSeason, setSelectedSeason] = useState(1);
-  const [selectedEpisode, setSelectedEpisode] = useState(1);
   const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     const fetchDetails = async () => {
-      if (!content) return;
+      if (!content?.id) return;
       setLoading(true);
       try {
-        const api = content.type === 'series' ? seriesAPI : movieAPI;
-        const res = await api.getDetails(content.id);
-        const data = res?.data || res;
+        let data;
+        if (content.type === 'series' || content.media_type === 'tv') {
+          data = await seriesAPI.getDetails(content.id);
+        } else {
+          data = await movieAPI.getDetails(content.id);
+        }
         setDetails(data);
-        saveToWatchHistory(data, selectedSeason, selectedEpisode);
-      } catch (error) {
-        console.error('Error fetching details:', error);
-        setDetails(content);
+      } catch (err) {
+        console.error("Detail fetch failed, using fallback", err);
+        setDetails(content); // fallback to what we have
       } finally {
         setLoading(false);
       }
@@ -68,91 +67,60 @@ const ContentDetailModal = ({ content, onClose }) => {
     fetchDetails();
   }, [content]);
 
-  const handleWatchNow = () => {
-    if (!details?.id) return;
-    setIsPlaying(true);
-  };
+  // AUTO full-screen play the moment modal opens (exactly what you asked for)
+  useEffect(() => {
+    if (!loading && details && !isPlaying) {
+      setIsPlaying(true);
+      const streamUrl = details.type === 'series' || details.media_type === 'tv'
+        ? `https://vidsrc.cc/v2/embed/tv/${details.id}/1/1`
+        : `https://vidsrc.cc/v2/embed/movie/${details.id}`;
+      
+      const playerWindow = window.open(streamUrl, '_blank', 'fullscreen=yes,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=yes,width=1920,height=1080');
+      if (playerWindow) {
+        playerWindow.focus();
+      }
+      // close modal after opening player
+      setTimeout(onClose, 800);
+    }
+  }, [loading, details, isPlaying, onClose]);
 
-  const handleNext = () => setSelectedEpisode(prev => prev + 1);
-  const handlePrev = () => setSelectedEpisode(prev => (prev > 1 ? prev - 1 : 1));
-
-  if (isPlaying && details) {
-    const streamUrl = details.type === 'series'
-      ? `https://vidsrc.cc/v2/embed/tv/${details.id}/${selectedSeason}/${selectedEpisode}`
-      : `https://vidsrc.cc/v2/embed/movie/${details.id}`;
-
+  if (loading) {
     return (
-      <div className="fixed inset-0 z-[100] bg-black flex flex-col">
-        <div className="flex items-center justify-between px-6 py-4 bg-black/90 z-10">
-          <h2 className="text-white font-semibold truncate">{details.title}</h2>
-
-          {details.type === 'series' && (
-            <div className="flex items-center gap-4">
-              <select value={selectedSeason} onChange={e => setSelectedSeason(Number(e.target.value))} className="bg-zinc-800 text-white px-3 py-1 rounded-lg">
-                {Array.from({length: 10}, (_, i) => i+1).map(s => <option key={s} value={s}>S{s}</option>)}
-              </select>
-              <select value={selectedEpisode} onChange={e => setSelectedEpisode(Number(e.target.value))} className="bg-zinc-800 text-white px-3 py-1 rounded-lg">
-                {Array.from({length: 30}, (_, i) => i+1).map(e => <option key={e} value={e}>E{e}</option>)}
-              </select>
-
-              <button onClick={handlePrev} className="p-2 hover:bg-zinc-700 rounded"><ChevronLeft className="w-5 h-5 text-white" /></button>
-              <button onClick={handleNext} className="p-2 hover:bg-zinc-700 rounded"><ChevronRight className="w-5 h-5 text-white" /></button>
-            </div>
-          )}
-
-          <button onClick={() => setIsPlaying(false)} className="p-2 hover:bg-red-600 rounded">
-            <X className="w-6 h-6 text-white" />
-          </button>
-        </div>
-
-        <div className="flex-1 bg-black">
-          <iframe
-            src={streamUrl}
-            className="w-full h-full"
-            allowFullScreen
-            allow="autoplay; fullscreen"
-            sandbox="allow-scripts allow-same-origin"
-            referrerPolicy="no-referrer"
-            title={details.title}
-          />
-        </div>
+      <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-[9999]">
+        <Loader2 className="w-12 h-12 animate-spin text-purple-500" />
       </div>
     );
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-zinc-900 rounded-2xl max-w-4xl w-full overflow-hidden" onClick={e => e.stopPropagation()}>
-        {loading ? (
-          <div className="h-96 flex items-center justify-center">
-            <Loader2 className="w-12 h-12 animate-spin text-green-400" />
-          </div>
-        ) : details ? (
-          <div>
-            <div className="relative h-80 bg-black">
-              {details.backdrop && <img src={details.backdrop} alt={details.title} className="w-full h-full object-cover" />}
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent" />
-              <button onClick={onClose} className="absolute top-4 right-4 p-3 bg-black/50 hover:bg-black rounded-full">
-                <X className="w-6 h-6 text-white" />
-              </button>
-            </div>
+    <div className="fixed inset-0 bg-black/95 flex items-center justify-center z-[9999] p-4">
+      <div className="max-w-4xl w-full bg-zinc-900 rounded-3xl overflow-hidden">
+        {/* Close button */}
+        <button onClick={onClose} className="absolute top-6 right-6 text-white z-10">
+          <X className="w-8 h-8" />
+        </button>
 
-            <div className="p-8">
-              <h1 className="text-4xl font-bold text-white mb-4">{details.title}</h1>
-              <div className="flex gap-4 text-sm text-gray-400 mb-6">
-                {details.year && <span>{details.year}</span>}
-                {details.rating > 0 && <span>? {details.rating}</span>}
+        {details && (
+          <div className="relative">
+            {/* Backdrop */}
+            {details.backdrop && (
+              <img 
+                src={details.backdrop} 
+                alt={details.title}
+                className="w-full h-96 object-cover"
+              />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent" />
+
+            <div className="absolute bottom-0 left-0 right-0 p-8">
+              <h1 className="text-5xl font-bold text-white mb-2">{details.title || details.name}</h1>
+              <div className="flex gap-4 text-white/80 mb-6">
+                <span>{details.year || new Date(details.release_date || details.first_air_date).getFullYear()}</span>
+                <span>? {details.rating || details.vote_average}</span>
               </div>
-
-              <Button onClick={handleWatchNow} className="bg-green-400 hover:bg-green-500 text-black px-10 py-6 text-lg mb-8 w-full">
-                <Play className="w-6 h-6 mr-2 fill-black" /> Watch Now
-              </Button>
-
-              {details.overview && <p className="text-gray-300 leading-relaxed">{details.overview}</p>}
+              <p className="text-white/90 max-w-2xl text-lg leading-relaxed">{details.overview}</p>
             </div>
           </div>
-        ) : (
-          <div className="p-12 text-center text-red-400">Could not load details</div>
         )}
       </div>
     </div>
