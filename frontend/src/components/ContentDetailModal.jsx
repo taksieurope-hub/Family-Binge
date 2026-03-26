@@ -74,8 +74,8 @@ const ContentDetailModal = ({ content, onClose }) => {
 
   const streamUrl = details ? (
     (details.type === 'series' || details.media_type === 'tv')
-      ? `https://vidsrc.to/embed/tv/${details.id}/1/1`
-      : `https://vidsrc.to/embed/movie/${details.id}`
+      ? `https://vidsrc.cc/v2/embed/tv/${details.id}/1/1`
+      : `https://vidsrc.cc/v2/embed/movie/${details.id}`
   ) : '';
 
   if (loading) {
@@ -102,7 +102,8 @@ const ContentDetailModal = ({ content, onClose }) => {
           className="flex-1 w-full border-0"
           allowFullScreen
           allow="autoplay; encrypted-media"
-          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+          sandbox="allow-scripts allow-same-origin"
+          referrerPolicy="no-referrer"
         />
       </div>
     );
