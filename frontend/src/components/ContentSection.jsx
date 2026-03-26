@@ -5,12 +5,9 @@ import { getWatchHistory, removeFromWatchHistory } from './ContentDetailModal';
 
 const ContentSection = ({ type = 'movies', onSelectContent }) => {
   const [rows, setRows] = useState({
+    playingInCinemas: [],
     popular: [],
-    trending: [],
-    action: [],
-    comedy: [],
-    horror: [],
-    scifi: []
+    mostWatched: []
   });
   const [loading, setLoading] = useState(true);
 
@@ -18,22 +15,16 @@ const ContentSection = ({ type = 'movies', onSelectContent }) => {
     const fetchContent = async () => {
       setLoading(true);
       try {
-        const [pop, trend, actionRes, comedyRes, horrorRes, scifiRes] = await Promise.all([
+        const [cinemaRes, popularRes, mostWatchedRes] = await Promise.all([
+          movieAPI.getNowPlayingInCinemas(),
           movieAPI.getPopular(),
-          movieAPI.getTrending(),
-          movieAPI.getByGenre(28),   // Action
-          movieAPI.getByGenre(35),   // Comedy
-          movieAPI.getByGenre(27),   // Horror
-          movieAPI.getByGenre(878)   // Sci-Fi
+          movieAPI.getMostWatched()
         ]);
 
         setRows({
-          popular: pop.data.items || [],
-          trending: trend.data.items || [],
-          action: actionRes.data.items || [],
-          comedy: comedyRes.data.items || [],
-          horror: horrorRes.data.items || [],
-          scifi: scifiRes.data.items || []
+          playingInCinemas: cinemaRes.data.items || [],
+          popular: popularRes.data.items || [],
+          mostWatched: mostWatchedRes.data.items || []
         });
       } catch (e) {
         console.error(e);
@@ -70,12 +61,9 @@ const ContentSection = ({ type = 'movies', onSelectContent }) => {
   return (
     <section className="py-12 bg-gray-900">
       <div className="max-w-7xl mx-auto">
+        {renderRow("Playing in Cinemas", rows.playingInCinemas)}
         {renderRow("Popular Movies", rows.popular)}
-        {renderRow("Trending Now", rows.trending)}
-        {renderRow("Action Movies", rows.action)}
-        {renderRow("Comedy Movies", rows.comedy)}
-        {renderRow("Horror Movies", rows.horror)}
-        {renderRow("Sci-Fi Movies", rows.scifi)}
+        {renderRow("Most Watched", rows.mostWatched)}
       </div>
     </section>
   );
