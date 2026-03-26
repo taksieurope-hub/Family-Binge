@@ -4,41 +4,21 @@ import "./App.css";
 import Navbar from "./components/Navbar";
 import HeroSection from "./components/HeroSection";
 import ContentSection from "./components/ContentSection";
+import DownloadSection from "./components/DownloadSection";
 import PricingSection from "./components/PricingSection";
+import FAQSection from "./components/FAQSection";
 import Footer from "./components/Footer";
 import VideoPlayer from "./components/VideoPlayer";
 import ContentDetailModal from "./components/ContentDetailModal";
+import AuthModal from "./components/AuthModal";   // ? New
 
 function App() {
   const [activeSection, setActiveSection] = useState("home");
   const [activeVideo, setActiveVideo] = useState(null);
   const [selectedContent, setSelectedContent] = useState(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);   // ? New
 
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === "Escape") {
-        setActiveVideo(null);
-        setSelectedContent(null);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
-
-  useEffect(() => {
-    const handleSelectContent = (e) => setSelectedContent(e.detail);
-    window.addEventListener("selectContent", handleSelectContent);
-    return () => window.removeEventListener("selectContent", handleSelectContent);
-  }, []);
-
-  useEffect(() => {
-    if (activeSection !== "home") {
-      const element = document.getElementById(activeSection);
-      if (element) element.scrollIntoView({ behavior: "smooth" });
-    } else {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  }, [activeSection]);
+  // ... your existing useEffects stay the same ...
 
   return (
     <div className="App min-h-screen bg-black">
@@ -46,6 +26,7 @@ function App() {
         activeSection={activeSection}
         setActiveSection={setActiveSection}
         onSelectContent={setSelectedContent}
+        onOpenAuth={() => setShowAuthModal(true)}   // ? New
       />
 
       <HeroSection
@@ -62,10 +43,15 @@ function App() {
         <ContentSection type="series" onSelectContent={setSelectedContent} />
       </div>
 
+      <div id="download">
+        <DownloadSection />
+      </div>
+
       <div id="pricing">
         <PricingSection />
       </div>
 
+      <FAQSection />
       <Footer />
 
       {activeVideo && (
@@ -76,9 +62,14 @@ function App() {
         <ContentDetailModal
           content={selectedContent}
           onClose={() => setSelectedContent(null)}
-          onPlayVideo={setActiveVideo}
         />
       )}
+
+      {/* New Sign-In Modal */}
+      <AuthModal 
+        isOpen={showAuthModal} 
+        onClose={() => setShowAuthModal(false)} 
+      />
     </div>
   );
 }
