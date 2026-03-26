@@ -8,35 +8,21 @@
   --white: #ffffff;
 }
 
-/* Soft bubble text - purple + blue + white, much less shine */
-h1, h2, h3, .font-bold, .font-semibold, button, .text-white {
-  font-weight: 900;
-  letter-spacing: -0.02em;
-  text-shadow: 
-    0 0 6px var(--purple),
-    0 0 12px var(--blue),
-    0 0 18px var(--white) !important;
-  color: var(--white) !important;
+/* Softer text everywhere except logo */
+h1, h2, h3, button, .font-bold, .font-semibold {
+  text-shadow: 0 0 6px var(--purple), 0 0 12px var(--blue) !important;
 }
 
-/* Normal text - almost no glow */
-p, span, div, .text-gray-300 {
+/* Logo - clean and readable */
+nav .text-xl, nav span.font-black {
   text-shadow: none !important;
-  color: #e0f8ff !important;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: var(--white) !important;
+  -webkit-text-stroke: 1px #000;
 }
 
-/* Buttons */
-button {
-  background: linear-gradient(90deg, var(--purple), var(--blue)) !important;
-  color: white !important;
-  text-shadow: 0 0 10px var(--white) !important;
-}
-
-button:hover {
-  background: linear-gradient(90deg, #a31cff, #00b8e6) !important;
-}
-
-/* Dark background */
-body, .App {
+/* Keep background dark */
+body, .App, nav {
   background: #0a0a12 !important;
 }
