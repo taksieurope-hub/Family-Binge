@@ -16,7 +16,7 @@ const LandingPage = () => {
           </div>
           <div className="flex gap-4">
             <Button variant="ghost" onClick={() => navigate('/login')}>Login</Button>
-            <Button onClick={() => navigate('/signup')} className="bg-purple-600 hover:bg-purple-700">Start Free Trial</Button>
+            <Button onClick={() => navigate('/signup')} className="bg-purple-600 hover:bg-purple-700">Start 3-Day Free Trial</Button>
           </div>
         </div>
       </nav>
@@ -26,20 +26,28 @@ const LandingPage = () => {
           <h1 className="text-6xl md:text-7xl font-bold leading-tight mb-6">
             Unlimited Movies,<br />Series &amp; Live TV
           </h1>
-          <p className="text-2xl text-gray-400 mb-10">Watch with your whole family. 7 days free.</p>
+          <p className="text-2xl text-gray-400 mb-10">
+            3 days free • Then pay for full access
+          </p>
           
           <Button 
             size="lg"
             onClick={() => navigate('/signup')}
             className="text-2xl px-12 py-8 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
           >
-            Start 7-Day Free Trial <ArrowRight className="ml-3" />
+            Start 3-Day Free Trial <ArrowRight className="ml-3" />
           </Button>
+          
+          <p className="text-sm text-gray-500 mt-8">
+            No credit card required for trial • Cancel anytime
+          </p>
         </div>
       </section>
 
       <div className="py-20 bg-zinc-900 text-center">
-        <p className="text-gray-400 text-sm">No credit card required • Cancel anytime</p>
+        <p className="text-gray-400 text-sm">
+          After 3 days your subscription will automatically continue unless you cancel
+        </p>
       </div>
     </div>
   );
