@@ -2,7 +2,7 @@ export const pricingPlans = [
   {
     id: 1,
     name: "Basic",
-    price: 99,
+    price: 60,
     currency: "ZAR",
     period: "month",
     devices: "1 TV + 1 Phone",
@@ -18,10 +18,10 @@ export const pricingPlans = [
   {
     id: 2,
     name: "Standard",
-    price: 149,
+    price: 150,
     currency: "ZAR",
-    period: "month",
-    devices: "2 TVs + 2 Phones",
+    period: "3 months",
+    devices: "1 TVs +  Phones",
     features: [
       "3-day free trial",
       "60,000+ Movies & Series",
@@ -34,10 +34,10 @@ export const pricingPlans = [
   {
     id: 3,
     name: "Premium",
-    price: 199,
+    price: 320,
     currency: "ZAR",
-    period: "month",
-    devices: "4 TVs + 4 Phones",
+    period: "6 months",
+    devices: "1 TVs + 1 Phones",
     features: [
       "3-day free trial",
       "60,000+ Movies & Series",
@@ -50,9 +50,9 @@ export const pricingPlans = [
   {
     id: 4,
     name: "Family",
-    price: 249,
+    price: 600,
     currency: "ZAR",
-    period: "month",
+    period: "12 months",
     devices: "Unlimited devices",
     features: [
       "3-day free trial",
