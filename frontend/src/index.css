@@ -7,40 +7,69 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
         "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
         sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    background: #0a0a0a;
-    color: #ffffff;
+    background: #0a0a12;
+    color: #e0f8ff;
 }
 
+/* Luminous Green-Blue-Orange Theme */
+:root {
+    --primary-green: #00ff9f;
+    --primary-blue: #00d4ff;
+    --accent-orange: #ff9500;
+}
+
+/* App Background - Deep Space */
 .App {
+    background: linear-gradient(to bottom, #0a0a1f, #05050f);
     min-height: 100vh;
-    background: #141414;
 }
 
-/* Restore nice movie cards */
+/* Navbar */
+nav {
+    background: rgba(10, 15, 30, 0.98);
+    border-bottom: 1px solid rgba(0, 212, 255, 0.3);
+}
+
+/* Buttons - Green primary */
+button, .bg-purple-600 {
+    background-color: var(--primary-green) !important;
+    color: #0a0a12 !important;
+}
+
+button:hover, .bg-purple-600:hover {
+    background-color: #00cc7a !important;
+}
+
+/* Accents */
+.text-purple-500, .text-purple-400 {
+    color: var(--primary-blue) !important;
+}
+
+/* Movie Cards */
 .movie-card {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border-radius: 12px;
+    transition: all 0.4s ease;
+    border-radius: 16px;
     overflow: hidden;
 }
 
 .movie-card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    transform: scale(1.06);
+    box-shadow: 0 0 30px rgba(0, 255, 159, 0.4);
 }
 
-/* Purple accents like your original */
-.purple-accent {
-    color: #a855f7;
+/* Genre buttons */
+button[active] {
+    background: var(--accent-orange) !important;
+    color: white !important;
+}
+
+/* Play button glow */
+.play-button {
+    background: var(--primary-green);
+    box-shadow: 0 0 20px var(--primary-green);
 }
 
 /* Scrollbar */
-::-webkit-scrollbar {
-    width: 8px;
-}
-
 ::-webkit-scrollbar-thumb {
-    background: #6b21a8;
-    border-radius: 4px;
+    background: var(--primary-blue);
 }
