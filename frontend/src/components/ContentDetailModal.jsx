@@ -43,6 +43,13 @@ const ContentDetailModal = ({ content, onClose }) => {
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [serverIndex, setServerIndex] = useState(0);
+
+  const servers = [
+    "https://vidsrc.cc",   // your favourite - first
+    "https://vidsrc.to",   // automatic fallback
+    "https://vidsrc.me"    // last resort
+  ];
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -66,11 +73,30 @@ const ContentDetailModal = ({ content, onClose }) => {
     fetchDetails();
   }, [content]);
 
+  // Auto-play inside app
+  useEffect(() => {
+    if (!loading && details && !isPlaying) {
+      setIsPlaying(true);
+    }
+  }, [loading, details, isPlaying]);
+
+  const base = servers[serverIndex];
   const streamUrl = details ? (
     (details.type === 'series' || details.media_type === 'tv')
-      ? `https://vidsrc.cc/v2/embed/tv/${details.id}/1/1`
-      : `https://vidsrc.cc/v2/embed/movie/${details.id}`
+      ? `${base}/v2/embed/tv/${details.id}/1/1`
+      : `${base}/v2/embed/movie/${details.id}`
   ) : '';
+
+  // Silent auto-switch to next server after 6 seconds if nothing loaded
+  useEffect(() => {
+    if (!isPlaying || !streamUrl) return;
+    const timer = setTimeout(() => {
+      if (serverIndex < servers.length - 1) {
+        setServerIndex(serverIndex + 1);
+      }
+    }, 6000);
+    return () => clearTimeout(timer);
+  }, [isPlaying, serverIndex, streamUrl]);
 
   if (loading) {
     return (
@@ -92,6 +118,7 @@ const ContentDetailModal = ({ content, onClose }) => {
           </button>
         </div>
         <iframe
+          key={streamUrl}   // forces reload when server changes
           src={streamUrl}
           className="flex-1 w-full border-0"
           allowFullScreen
@@ -120,9 +147,8 @@ const ContentDetailModal = ({ content, onClose }) => {
                 onClick={() => setIsPlaying(true)}
                 className="mt-8 bg-purple-600 hover:bg-purple-700 px-10 py-4 rounded-2xl text-white font-semibold flex items-center gap-3 text-lg"
               >
-                <Play className="w-6 h-6" /> Play Now (VidSrc CC)
+                <Play className="w-6 h-6" /> Play Now
               </button>
-              <p className="text-xs text-white/50 mt-6">Some titles may not be available on VidSrc CC right now — try another show if you see 404.</p>
             </div>
           </>
         )}
