@@ -20,7 +20,7 @@ from services.iptv_service import (
     get_categories, search_channels
 )
 
-router = APIRouter(prefix="/content", tags=["content"])
+router = APIRouter(tags=["content"])
 
 # Response Models
 class ContentListResponse(BaseModel):
