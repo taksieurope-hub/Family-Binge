@@ -2,11 +2,13 @@ const API_BASE_URL = "https://family-binge-backend.onrender.com";
 
 const wrapResults = (data) => ({
   data: {
-    items: (data.results || data || []).map(item => ({
+    items: (data.results || []).map(item => ({
       id: item.id,
-      title: item.title || item.name || "Unknown Title",
+      title: item.title || item.name || "Unknown",
       poster: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : null,
-      year: (item.release_date || item.first_air_date || "")?.slice(0, 4) || "N/A",
+      backdrop: item.backdrop_path ? `https://image.tmdb.org/t/p/original${item.backdrop_path}` : null,
+      year: (item.release_date || item.first_air_date || "").slice(0, 4) || "",
+      rating: item.vote_average ? Math.round(item.vote_average * 10) / 10 : 0,
       type: item.media_type || (item.title ? "movie" : "series")
     }))
   }
@@ -14,6 +16,8 @@ const wrapResults = (data) => ({
 
 export const movieAPI = {
   getPopular: () => fetch(`${API_BASE_URL}/api/content/movies/popular`).then(r => r.json()).then(wrapResults),
+  getNowPlaying: () => fetch(`${API_BASE_URL}/api/content/movies/popular`).then(r => r.json()).then(wrapResults),   // fallback for now
+  getTrending: () => fetch(`${API_BASE_URL}/api/content/movies/popular`).then(r => r.json()).then(wrapResults),
   getDetails: (id) => fetch(`${API_BASE_URL}/api/content/movies/${id}`).then(r => r.json()),
 };
 
@@ -24,4 +28,6 @@ export const seriesAPI = {
 
 export const searchAPI = {
   search: (query) => fetch(`${API_BASE_URL}/api/content/search?q=${encodeURIComponent(query)}`).then(r => r.json()).then(wrapResults),
+  // Add this for Navbar
+  searchAll: (query) => fetch(`${API_BASE_URL}/api/content/search?q=${encodeURIComponent(query)}`).then(r => r.json()).then(wrapResults),
 };
