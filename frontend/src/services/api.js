@@ -2,7 +2,7 @@ const API_BASE_URL = "https://family-binge-backend.onrender.com";
 
 const wrapResults = (data) => ({
   data: {
-    items: (data.results || []).map(item => ({
+    items: (data.results || data || []).map(item => ({
       id: item.id,
       title: item.title || item.name || "Unknown Title",
       poster: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : null,
@@ -17,7 +17,9 @@ const wrapResults = (data) => ({
 export const movieAPI = {
   getPopular: () => fetch(`${API_BASE_URL}/api/content/movies/popular`).then(r => r.json()).then(wrapResults),
   getNowPlaying: () => fetch(`${API_BASE_URL}/api/content/movies/popular`).then(r => r.json()).then(wrapResults),
+  getNowPlayingInCinemas: () => fetch(`${API_BASE_URL}/api/content/movies/popular`).then(r => r.json()).then(wrapResults),
   getTrending: () => fetch(`${API_BASE_URL}/api/content/movies/popular`).then(r => r.json()).then(wrapResults),
+  getMostWatched: () => fetch(`${API_BASE_URL}/api/content/movies/popular`).then(r => r.json()).then(wrapResults),
   getDetails: (id) => fetch(`${API_BASE_URL}/api/content/movies/${id}`).then(r => r.json()),
 };
 
