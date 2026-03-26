@@ -7,8 +7,10 @@ const ContentSection = ({ type = 'movies', onSelectContent }) => {
   const [rows, setRows] = useState({
     popular: [],
     trending: [],
-    nowPlaying: [],
-    topRated: []
+    action: [],
+    comedy: [],
+    horror: [],
+    scifi: []
   });
   const [loading, setLoading] = useState(true);
 
@@ -16,18 +18,22 @@ const ContentSection = ({ type = 'movies', onSelectContent }) => {
     const fetchContent = async () => {
       setLoading(true);
       try {
-        const [pop, trend, now, top] = await Promise.all([
+        const [pop, trend, actionRes, comedyRes, horrorRes, scifiRes] = await Promise.all([
           movieAPI.getPopular(),
           movieAPI.getTrending(),
-          movieAPI.getNowPlaying(),
-          movieAPI.getPopular()   // fallback for top rated
+          movieAPI.getByGenre(28),   // Action
+          movieAPI.getByGenre(35),   // Comedy
+          movieAPI.getByGenre(27),   // Horror
+          movieAPI.getByGenre(878)   // Sci-Fi
         ]);
 
         setRows({
           popular: pop.data.items || [],
           trending: trend.data.items || [],
-          nowPlaying: now.data.items || [],
-          topRated: top.data.items || []
+          action: actionRes.data.items || [],
+          comedy: comedyRes.data.items || [],
+          horror: horrorRes.data.items || [],
+          scifi: scifiRes.data.items || []
         });
       } catch (e) {
         console.error(e);
@@ -66,8 +72,10 @@ const ContentSection = ({ type = 'movies', onSelectContent }) => {
       <div className="max-w-7xl mx-auto">
         {renderRow("Popular Movies", rows.popular)}
         {renderRow("Trending Now", rows.trending)}
-        {renderRow("Now Playing", rows.nowPlaying)}
-        {renderRow("Top Rated", rows.topRated)}
+        {renderRow("Action Movies", rows.action)}
+        {renderRow("Comedy Movies", rows.comedy)}
+        {renderRow("Horror Movies", rows.horror)}
+        {renderRow("Sci-Fi Movies", rows.scifi)}
       </div>
     </section>
   );
