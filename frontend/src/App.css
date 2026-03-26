@@ -1,146 +1,179 @@
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+/* =========================================
+   1. CSS VARIABLES (THEMING)
+   ========================================= */
+:root {
+  /* Core Colors */
+  --bg-primary: #0f0f10;
+  --bg-secondary: #18181b;
+  --bg-tertiary: #27272a;
+  
+  /* Brand Colors (Using your purple theme) */
+  --brand-primary: #9333ea; /* Purple 600 */
+  --brand-hover: #a855f7;   /* Purple 500 */
+  --brand-glow: rgba(147, 51, 234, 0.5);
+  
+  /* Text */
+  --text-primary: #ffffff;
+  --text-secondary: #a1a1aa; /* Zinc 400 */
+  
+  /* UI Elements */
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
+  --transition-fast: 150ms ease;
+  --transition-smooth: 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+/* =========================================
+   2. GLOBAL RESETS & BASE
+   ========================================= */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-.App-header {
-    background-color: #0f0f10;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+html {
+  scroll-behavior: smooth;
+  /* Prevent horizontal scrolling on the whole page */
+  overflow-x: hidden; 
 }
 
-.App-link {
-    color: #61dafb;
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+::selection {
+  background: var(--brand-glow);
+  color: white;
 }
 
-/* Custom Scrollbar */
+/* =========================================
+   3. CUSTOM SCROLLBARS (For Movie Rows)
+   ========================================= */
 ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+  width: 8px;
+  height: 8px; /* Height is important for horizontal carousels */
 }
 
 ::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-primary);
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(147, 51, 234, 0.5);
-    border-radius: 4px;
+  background: var(--bg-tertiary);
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(147, 51, 234, 0.7);
+  background: var(--brand-primary);
 }
 
-/* Hide scrollbar for horizontal scrollers */
+/* Hide scrollbar completely but keep functionality */
 .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
-
 .scrollbar-hide::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
 
-/* Smooth scroll */
-html {
-    scroll-behavior: smooth;
+/* =========================================
+   4. STREAMING UI UTILITIES
+   ========================================= */
+/* Glassmorphism for Navbars and Modals */
+.glass-panel {
+  background: rgba(15, 15, 16, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* Animate In utilities */
-@keyframes slideInFromTop {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+/* Movie Card Hover Effects */
+.card-zoom {
+  transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
+  will-change: transform; /* Optimizes performance for animations */
 }
 
-.animate-in {
-    animation-duration: 300ms;
-    animation-fill-mode: both;
+.card-zoom:hover {
+  transform: scale(1.05) translateY(-5px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+  z-index: 10;
 }
 
-.slide-in-from-top {
-    animation-name: slideInFromTop;
+/* Fade text truncation for long movie descriptions */
+.text-fade-clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;  
+  overflow: hidden;
 }
 
-.slide-in-from-top-2 {
-    animation-name: slideInFromTop;
+/* =========================================
+   5. ADVANCED ANIMATIONS
+   ========================================= */
+/* Live TV Pulse */
+@keyframes pulse-live {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }
 
-/* Gradient text animation */
-@keyframes gradient-shift {
-    0%, 100% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
+.badge-live {
+  animation: pulse-live 2s infinite;
+  background-color: #ef4444; /* Red */
 }
 
-.animated-gradient {
-    background-size: 200% 200%;
-    animation: gradient-shift 3s ease infinite;
+/* Modal Slide In */
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
-/* Pulse animation for live indicators */
-@keyframes pulse-glow {
-    0%, 100% {
-        opacity: 1;
-        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
-    }
-    50% {
-        opacity: 0.8;
-        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
-    }
+.animate-modal-in {
+  animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.pulse-glow {
-    animation: pulse-glow 2s infinite;
+/* Animated Gradient Background for Hero Section */
+@keyframes gradient-pan {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
-/* Hover scale transition */
-.hover-scale {
-    transition: transform 0.3s ease;
+.hero-gradient {
+  background: linear-gradient(-45deg, #0f0f10, #27272a, #1a1a1d, #0f0f10);
+  background-size: 400% 400%;
+  animation: gradient-pan 15s ease infinite;
 }
 
-.hover-scale:hover {
-    transform: scale(1.05);
+/* Skeleton Loading (For fetching API data) */
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
 }
 
-/* Glass effect */
-.glass {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Selection color */
-::selection {
-    background: rgba(147, 51, 234, 0.5);
-    color: white;
+.skeleton-loader {
+  background: #27272a;
+  background-image: linear-gradient(
+    to right,
+    #27272a 0%,
+    #3f3f46 20%,
+    #27272a 40%,
+    #27272a 100%
+  );
+  background-repeat: no-repeat;
+  background-size: 800px 100%; 
+  animation: shimmer 2s infinite linear forwards;
 }
