@@ -19,7 +19,7 @@ function MainApp() {
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [isTrialExpired, setIsTrialExpired] = useState(false);
 
-  // === SUBSCRIPTION + TRIAL CHECK (this is the fixed part) ===
+  // Subscription + Trial Check
   useEffect(() => {
     const signupDate = localStorage.getItem('familybinge_signup_date');
     const paid = localStorage.getItem('familybinge_paid') === 'true';
@@ -33,7 +33,7 @@ function MainApp() {
       }
     }
 
-    // Free trial logic
+    // Free trial check
     if (signupDate) {
       const daysSinceSignup = (new Date() - new Date(signupDate)) / (1000 * 60 * 60 * 24);
       setIsTrialExpired(daysSinceSignup > 3);
