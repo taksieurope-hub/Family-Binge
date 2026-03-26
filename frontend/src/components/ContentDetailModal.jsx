@@ -33,7 +33,6 @@ export const removeFromWatchHistory = (id, type) => {
   } catch (e) { console.error('Error removing from watch history:', e); }
 };
 
-// Video sources - VidSrc CC is now FIRST (as requested) + best fallback order
 const VIDEO_SOURCES = [
   { name: 'VidSrc CC',   getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}` : `https://vidsrc.cc/v2/embed/movie/${id}` },
   { name: 'VidSrc XYZ',  getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrc.xyz/embed/tv/${id}/${s}/${e}` : `https://vidsrc.xyz/embed/movie/${id}` },
@@ -42,7 +41,10 @@ const VIDEO_SOURCES = [
   { name: 'MultiEmbed',  getUrl: (type, id, s, e) => type === 'series' ? `https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1&s=${s}&e=${e}` : `https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1` },
 ];
 
-
+// Auto next episode countdown (seconds before end of episode)
+const AUTO_NEXT_COUNTDOWN = 15;
+// Approximate episode duration in ms (40 min) - triggers the "Up Next" overlay
+const EPISODE_DURATION_MS = 40 * 60 * 1000;
 
 const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
   const [details, setDetails] = useState(null);
@@ -54,9 +56,61 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
   const [isAutoSwitching, setIsAutoSwitching] = useState(true);
   const [playerReady, setPlayerReady] = useState(false);
   const [subtitlesEnabled, setSubtitlesEnabled] = useState(true);
+  const [showNextOverlay, setShowNextOverlay] = useState(false);
+  const [nextCountdown, setNextCountdown] = useState(AUTO_NEXT_COUNTDOWN);
   const iframeRef = useRef(null);
+  const playerContainerRef = useRef(null);
   const autoSwitchTimeoutRef = useRef(null);
   const shouldAutoPlayRef = useRef(false);
+  const episodeTimerRef = useRef(null);
+  const countdownIntervalRef = useRef(null);
+
+  // Fullscreen helper
+  const enterFullscreen = useCallback(() => {
+    const el = playerContainerRef.current;
+    if (!el) return;
+    try {
+      if (el.requestFullscreen) el.requestFullscreen();
+      else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+      else if (el.mozRequestFullScreen) el.mozRequestFullScreen();
+      else if (el.msRequestFullscreen) el.msRequestFullscreen();
+    } catch (e) { console.log('Fullscreen not available'); }
+  }, []);
+
+  // Clear auto-next timers
+  const clearNextTimers = useCallback(() => {
+    if (episodeTimerRef.current) clearTimeout(episodeTimerRef.current);
+    if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+    setShowNextOverlay(false);
+    setNextCountdown(AUTO_NEXT_COUNTDOWN);
+  }, []);
+
+  // Start auto-next countdown (only for series)
+  const startAutoNextTimer = useCallback((detailsData, season, episode) => {
+    if (!detailsData || detailsData.type !== 'series') return;
+    clearNextTimers();
+    episodeTimerRef.current = setTimeout(() => {
+      setShowNextOverlay(true);
+      setNextCountdown(AUTO_NEXT_COUNTDOWN);
+      let count = AUTO_NEXT_COUNTDOWN;
+      countdownIntervalRef.current = setInterval(() => {
+        count -= 1;
+        setNextCountdown(count);
+        if (count <= 0) {
+          clearInterval(countdownIntervalRef.current);
+          // Auto advance
+          const nextEp = episode + 1;
+          setSelectedEpisode(nextEp);
+          setCurrentSourceIndex(0);
+          setPlayerReady(false);
+          setIsAutoSwitching(true);
+          setShowNextOverlay(false);
+          saveToWatchHistory(detailsData, season, nextEp, 0);
+          window.dispatchEvent(new Event('watchHistoryUpdated'));
+        }
+      }, 1000);
+    }, EPISODE_DURATION_MS);
+  }, [clearNextTimers]);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -67,11 +121,10 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
         const res = await api.getDetails(content.id);
         const data = res.data;
         setDetails(data);
-        
-        // Check history
+
         const history = getWatchHistory();
         const saved = history.find(h => h.id === content.id && h.type === content.type);
-        
+
         let initialSeason = 1;
         let initialEpisode = 1;
 
@@ -95,15 +148,13 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
     };
 
     fetchDetails();
-    
-    return () => {
-      if (autoSwitchTimeoutRef.current) {
-        clearTimeout(autoSwitchTimeoutRef.current);
-      }
-    };
-  }, [content]);
 
-  // Auto-play: fires after details state is committed to DOM
+    return () => {
+      if (autoSwitchTimeoutRef.current) clearTimeout(autoSwitchTimeoutRef.current);
+      clearNextTimers();
+    };
+  }, [content, clearNextTimers]);
+
   useEffect(() => {
     if (details && shouldAutoPlayRef.current) {
       shouldAutoPlayRef.current = false;
@@ -119,7 +170,8 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
     setCurrentSourceIndex(0);
     setPlayerReady(false);
     setIsAutoSwitching(true);
-    
+    clearNextTimers();
+
     if (details) {
       saveToWatchHistory(details, selectedSeason, selectedEpisode, 0);
       window.dispatchEvent(new Event('watchHistoryUpdated'));
@@ -127,14 +179,12 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
   };
 
   const handlePlayTrailer = () => {
-    if (details?.youtube_id) {
-      onPlayVideo(details.youtube_id);
-    }
+    if (details?.youtube_id) onPlayVideo(details.youtube_id);
   };
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     if (!details) return;
-
+    clearNextTimers();
     if (details.type === 'series') {
       const nextEpisode = selectedEpisode + 1;
       setSelectedEpisode(nextEpisode);
@@ -152,7 +202,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
         }, 100);
       }
     }
-  };
+  }, [details, selectedEpisode, selectedSeason, onClose, clearNextTimers]);
 
   const getStreamUrl = () => {
     if (!details) return null;
@@ -163,12 +213,20 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
   const handleIframeLoad = () => {
     setPlayerReady(true);
     setIsAutoSwitching(false);
+    // Enter fullscreen when player is ready
+    setTimeout(() => enterFullscreen(), 300);
+    // Start auto-next timer for series
+    startAutoNextTimer(details, selectedSeason, selectedEpisode);
   };
 
-    // ==================== FULLY AUTOMATIC CLEAN PLAYER ====================
+  // Dismiss next overlay without skipping
+  const handleDismissNext = () => {
+    clearNextTimers();
+  };
+
   if (isPlaying) {
     return (
-      <div className="fixed inset-0 z-[100] bg-black flex flex-col">
+      <div ref={playerContainerRef} className="fixed inset-0 z-[100] bg-black flex flex-col">
         {/* Minimal Header */}
         <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/95 to-transparent border-b border-white/5">
           <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -195,10 +253,28 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
           <div className="flex items-center gap-2">
             {details?.type === 'series' && (
               <div className="hidden sm:flex items-center gap-1.5">
-                <select value={selectedSeason} onChange={(e) => { const ns = Number(e.target.value); setSelectedSeason(ns); setCurrentSourceIndex(0); setPlayerReady(false); setIsAutoSwitching(true); saveToWatchHistory(details, ns, selectedEpisode, 0); window.dispatchEvent(new Event('watchHistoryUpdated')); }} className="bg-white/10 text-white px-2.5 py-1.5 rounded-lg border border-white/15 text-xs font-medium cursor-pointer hover:bg-white/20">
+                <select value={selectedSeason} onChange={(e) => {
+                  const ns = Number(e.target.value);
+                  setSelectedSeason(ns);
+                  setCurrentSourceIndex(0);
+                  setPlayerReady(false);
+                  setIsAutoSwitching(true);
+                  clearNextTimers();
+                  saveToWatchHistory(details, ns, selectedEpisode, 0);
+                  window.dispatchEvent(new Event('watchHistoryUpdated'));
+                }} className="bg-white/10 text-white px-2.5 py-1.5 rounded-lg border border-white/15 text-xs font-medium cursor-pointer hover:bg-white/20">
                   {Array.from({ length: details?.seasons || 1 }, (_, i) => <option key={i+1} value={i+1} className="bg-gray-900">Season {i+1}</option>)}
                 </select>
-                <select value={selectedEpisode} onChange={(e) => { const ne = Number(e.target.value); setSelectedEpisode(ne); setCurrentSourceIndex(0); setPlayerReady(false); setIsAutoSwitching(true); saveToWatchHistory(details, selectedSeason, ne, 0); window.dispatchEvent(new Event('watchHistoryUpdated')); }} className="bg-white/10 text-white px-2.5 py-1.5 rounded-lg border border-white/15 text-xs font-medium cursor-pointer hover:bg-white/20">
+                <select value={selectedEpisode} onChange={(e) => {
+                  const ne = Number(e.target.value);
+                  setSelectedEpisode(ne);
+                  setCurrentSourceIndex(0);
+                  setPlayerReady(false);
+                  setIsAutoSwitching(true);
+                  clearNextTimers();
+                  saveToWatchHistory(details, selectedSeason, ne, 0);
+                  window.dispatchEvent(new Event('watchHistoryUpdated'));
+                }} className="bg-white/10 text-white px-2.5 py-1.5 rounded-lg border border-white/15 text-xs font-medium cursor-pointer hover:bg-white/20">
                   {Array.from({ length: 50 }, (_, i) => <option key={i+1} value={i+1} className="bg-gray-900">Ep {i+1}</option>)}
                 </select>
               </div>
@@ -208,7 +284,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
               <SkipForward className="w-3.5 h-3.5" /> Next
             </Button>
 
-            <button onClick={() => setIsPlaying(false)} className="p-2 bg-white/10 hover:bg-red-500/80 rounded-lg transition-colors">
+            <button onClick={() => { setIsPlaying(false); clearNextTimers(); }} className="p-2 bg-white/10 hover:bg-red-500/80 rounded-lg transition-colors">
               <X className="w-4 h-4 text-white" />
             </button>
           </div>
@@ -222,6 +298,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
               <p className="text-white mt-5 font-medium">Connecting to best server...</p>
             </div>
           )}
+
           <iframe
             ref={iframeRef}
             key={`${details?.id}-${selectedSeason}-${selectedEpisode}-${currentSourceIndex}`}
@@ -233,22 +310,46 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
             title={details?.title}
             onLoad={handleIframeLoad}
           />
+
+          {/* Auto Next Episode Overlay */}
+          {showNextOverlay && details?.type === 'series' && (
+            <div className="absolute bottom-8 right-8 z-20 bg-black/90 border border-white/10 rounded-2xl p-5 flex flex-col gap-3 min-w-[260px] shadow-2xl">
+              <p className="text-gray-400 text-xs uppercase tracking-widest">Up Next</p>
+              <p className="text-white font-semibold">
+                {details?.title} — Episode {selectedEpisode + 1}
+              </p>
+              <div className="w-full bg-white/10 rounded-full h-1.5">
+                <div
+                  className="bg-purple-500 h-1.5 rounded-full transition-all duration-1000"
+                  style={{ width: `${((AUTO_NEXT_COUNTDOWN - nextCountdown) / AUTO_NEXT_COUNTDOWN) * 100}%` }}
+                />
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleNext}
+                  className="flex-1 bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold py-2 px-4 rounded-xl transition-colors"
+                >
+                  Play Now
+                </button>
+                <button
+                  onClick={handleDismissNext}
+                  className="flex-1 bg-white/10 hover:bg-white/20 text-white text-sm py-2 px-4 rounded-xl transition-colors"
+                >
+                  Cancel ({nextCountdown}s)
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
   }
 
-  // --- DETAILS VIEW (Fallback) ---
+  // --- DETAILS VIEW ---
   return (
-    <div 
-      className="fixed inset-0 z-[90] bg-black/95 overflow-y-auto"
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 z-[90] bg-black/95 overflow-y-auto" onClick={onClose}>
       <div className="min-h-screen">
-        <button
-          onClick={onClose}
-          className="fixed top-4 right-4 z-10 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
-        >
+        <button onClick={onClose} className="fixed top-4 right-4 z-10 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors">
           <X className="w-6 h-6 text-white" />
         </button>
 
@@ -260,7 +361,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
 
         {!loading && details && (
           <div onClick={(e) => e.stopPropagation()}>
-             <div className="relative h-[50vh] sm:h-[60vh]">
+            <div className="relative h-[50vh] sm:h-[60vh]">
               {details.backdrop ? (
                 <img src={details.backdrop} alt={details.title} className="w-full h-full object-cover" />
               ) : (
@@ -272,7 +373,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
               <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-12">
                 <div className="max-w-4xl">
                   <h1 className="text-3xl sm:text-5xl font-bold text-white mb-4">{details.title}</h1>
-                  
+
                   <div className="flex flex-wrap items-center gap-4 text-gray-300 mb-6">
                     <div className="flex items-center gap-1">
                       <Star className="w-5 h-5 fill-yellow-500 text-yellow-500" />
@@ -303,19 +404,11 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
                   </div>
 
                   <div className="flex flex-wrap gap-4">
-                    <Button
-                      onClick={handleWatchNow}
-                      className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-8 py-6 text-lg font-semibold rounded-lg"
-                    >
+                    <Button onClick={handleWatchNow} className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-8 py-6 text-lg font-semibold rounded-lg">
                       <Play className="w-6 h-6 fill-white" />
                       Resume
                     </Button>
-                    <Button
-                      onClick={handlePlayTrailer}
-                      disabled={!details.youtube_id}
-                      variant="outline"
-                      className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white border-white/30 px-8 py-6 text-lg rounded-lg disabled:opacity-50"
-                    >
+                    <Button onClick={handlePlayTrailer} disabled={!details.youtube_id} variant="outline" className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white border-white/30 px-8 py-6 text-lg rounded-lg disabled:opacity-50">
                       <Play className="w-6 h-6" />
                       Trailer
                     </Button>
@@ -327,9 +420,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
             <div className="max-w-7xl mx-auto px-6 sm:px-12 py-8">
               <div className="grid md:grid-cols-3 gap-8">
                 <div className="md:col-span-2">
-                  {details.tagline && (
-                    <p className="text-purple-400 italic text-lg mb-4">"{details.tagline}"</p>
-                  )}
+                  {details.tagline && <p className="text-purple-400 italic text-lg mb-4">"{details.tagline}"</p>}
                   <h3 className="text-xl font-bold text-white mb-4">Overview</h3>
                   <p className="text-gray-300 leading-relaxed">{details.overview}</p>
 
@@ -368,16 +459,10 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
                   </h3>
                   <div className="grid grid-cols-3 sm:grid-cols-6 gap-4">
                     {details.similar.map((item) => (
-                      <div
-                        key={item.id}
-                        className="cursor-pointer transition-transform hover:scale-105"
-                        onClick={() => {
-                          onClose();
-                          setTimeout(() => {
-                            window.dispatchEvent(new CustomEvent('selectContent', { detail: item }));
-                          }, 100);
-                        }}
-                      >
+                      <div key={item.id} className="cursor-pointer transition-transform hover:scale-105" onClick={() => {
+                        onClose();
+                        setTimeout(() => { window.dispatchEvent(new CustomEvent('selectContent', { detail: item })); }, 100);
+                      }}>
                         {item.poster && <img src={item.poster} alt={item.title} className="w-full rounded-lg" />}
                         <p className="text-white text-sm mt-2 truncate">{item.title}</p>
                       </div>

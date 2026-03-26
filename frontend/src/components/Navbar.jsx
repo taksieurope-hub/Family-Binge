@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Tv, Menu, X, Search, User, ChevronDown, Film, Bell, Settings } from 'lucide-react';
+import { Tv, Menu, X, Search, User, ChevronDown, Film, Bell, Settings, Loader2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { searchAPI } from '../services/api';
 import { useNavigate } from 'react-router-dom';
