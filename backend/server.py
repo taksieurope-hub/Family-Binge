@@ -13,48 +13,54 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-TMDB_KEY = os.getenv("TMDB_API_KEY")
+TMDB_API_KEY = os.getenv("TMDB_API_KEY")
+TMDB_BASE_URL = "https://api.themoviedb.org/3"
 
 @app.get("/")
 async def root():
-    return {"message": "Backend running", "tmdb_key_set": bool(TMDB_KEY)}
+    return {"status": "ok", "tmdb_key": bool(TMDB_API_KEY)}
 
 @app.get("/api/content/movies/popular")
-async def movies_popular(page: int = 1):
-    if not TMDB_KEY:
+async def get_popular_movies(page: int = 1):
+    if not TMDB_API_KEY:
         return {"results": []}
     async with httpx.AsyncClient() as client:
-        r = await client.get("https://api.themoviedb.org/3/movie/popular", params={"api_key": TMDB_KEY, "page": page})
+        r = await client.get(f"{TMDB_BASE_URL}/movie/popular", params={"api_key": TMDB_API_KEY, "page": page})
+        return r.json()
+
+@app.get("/api/content/movies")
+async def get_movies(with_genres: str = None, page: int = 1):
+    if not TMDB_API_KEY:
+        return {"results": []}
+    params = {"api_key": TMDB_API_KEY, "page": page}
+    if with_genres:
+        params["with_genres"] = with_genres
+    async with httpx.AsyncClient() as client:
+        r = await client.get(f"{TMDB_BASE_URL}/discover/movie", params=params)
         return r.json()
 
 @app.get("/api/content/movies/{movie_id}")
-async def movie_details(movie_id: int):
-    if not TMDB_KEY:
+async def get_movie_details(movie_id: int):
+    if not TMDB_API_KEY:
         return {}
     async with httpx.AsyncClient() as client:
-        r = await client.get(f"https://api.themoviedb.org/3/movie/{movie_id}", params={"api_key": TMDB_KEY})
+        r = await client.get(f"{TMDB_BASE_URL}/movie/{movie_id}", params={"api_key": TMDB_API_KEY})
         return r.json()
 
 @app.get("/api/content/series/popular")
-async def series_popular(page: int = 1):
-    if not TMDB_KEY:
+async def get_popular_series(page: int = 1):
+    if not TMDB_API_KEY:
         return {"results": []}
     async with httpx.AsyncClient() as client:
-        r = await client.get("https://api.themoviedb.org/3/tv/popular", params={"api_key": TMDB_KEY, "page": page})
-        return r.json()
-
-@app.get("/api/content/series/{series_id}")
-async def series_details(series_id: int):
-    if not TMDB_KEY:
-        return {}
-    async with httpx.AsyncClient() as client:
-        r = await client.get(f"https://api.themoviedb.org/3/tv/{series_id}", params={"api_key": TMDB_KEY})
+        r = await client.get(f"{TMDB_BASE_URL}/tv/popular", params={"api_key": TMDB_API_KEY, "page": page})
         return r.json()
 
 @app.get("/api/content/search")
-async def search(q: str, page: int = 1):
-    if not TMDB_KEY:
+async def search(q: str):
+    if not TMDB_API_KEY:
         return {"results": []}
     async with httpx.AsyncClient() as client:
-        r = await client.get("https://api.themoviedb.org/3/search/multi", params={"api_key": TMDB_KEY, "query": q, "page": page})
+        r = await client.get(f"{TMDB_BASE_URL}/search/multi", params={"api_key": TMDB_API_KEY, "query": q})
         return r.json()
+
+print("Backend with genre support started")
