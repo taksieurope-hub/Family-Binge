@@ -2,12 +2,14 @@ const API_BASE_URL = "https://family-binge-backend.onrender.com";
 
 const wrapResults = (data) => ({
   data: {
-    items: data.results || data || []
+    items: data.results || []
   }
 });
 
 export const movieAPI = {
   getPopular: () => fetch(`${API_BASE_URL}/api/content/movies/popular`).then(r => r.json()).then(wrapResults),
+  getTrending: () => fetch(`${API_BASE_URL}/api/content/movies/popular`).then(r => r.json()).then(wrapResults),
+  getNowPlaying: () => fetch(`${API_BASE_URL}/api/content/movies/popular`).then(r => r.json()).then(wrapResults),
   getDetails: (id) => fetch(`${API_BASE_URL}/api/content/movies/${id}`).then(r => r.json()),
 };
 
