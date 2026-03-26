@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Loader2 } from 'lucide-react';
+import { X, Loader2, Play } from 'lucide-react';
 import { movieAPI, seriesAPI } from '../services/api';
 
 const WATCH_HISTORY_KEY = 'familybinge_watch_history';
@@ -66,12 +66,6 @@ const ContentDetailModal = ({ content, onClose }) => {
     fetchDetails();
   }, [content]);
 
-  useEffect(() => {
-    if (!loading && details && !isPlaying) {
-      setIsPlaying(true);
-    }
-  }, [loading, details, isPlaying]);
-
   const streamUrl = details ? (
     (details.type === 'series' || details.media_type === 'tv')
       ? `https://vidsrc.cc/v2/embed/tv/${details.id}/1/1`
@@ -124,10 +118,11 @@ const ContentDetailModal = ({ content, onClose }) => {
               <p className="text-white/80 mt-2">{details.overview}</p>
               <button 
                 onClick={() => setIsPlaying(true)}
-                className="mt-8 bg-purple-600 hover:bg-purple-700 px-10 py-4 rounded-2xl text-white font-semibold flex items-center gap-3"
+                className="mt-8 bg-purple-600 hover:bg-purple-700 px-10 py-4 rounded-2xl text-white font-semibold flex items-center gap-3 text-lg"
               >
-                ? Play Now
+                <Play className="w-6 h-6" /> Play Now (VidSrc CC)
               </button>
+              <p className="text-xs text-white/50 mt-6">Some titles may not be available on VidSrc CC right now — try another show if you see 404.</p>
             </div>
           </>
         )}
