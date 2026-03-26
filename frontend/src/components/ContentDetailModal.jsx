@@ -12,7 +12,7 @@ export const getWatchHistory = () => {
   } catch { return []; }
 };
 
-export const saveToWatchHistory = (content) => {
+export const saveToWatchHistory = (content, season = 1, episode = 1, progress = 0) => {
   try {
     const history = getWatchHistory();
     const existingIndex = history.findIndex(h => h.id === content.id && h.type === content.type);
@@ -24,12 +24,22 @@ export const saveToWatchHistory = (content) => {
       type: content.type,
       year: content.year,
       rating: content.rating || 0,
+      season,
+      episode,
+      progress,
       lastWatched: Date.now(),
     };
     if (existingIndex >= 0) history[existingIndex] = historyItem;
     else history.unshift(historyItem);
     localStorage.setItem(WATCH_HISTORY_KEY, JSON.stringify(history.slice(0, 20)));
   } catch (e) { console.error('Error saving watch history:', e); }
+};
+
+export const removeFromWatchHistory = (id, type) => {
+  try {
+    const history = getWatchHistory().filter(h => !(h.id === id && h.type === type));
+    localStorage.setItem(WATCH_HISTORY_KEY, JSON.stringify(history));
+  } catch (e) { console.error('Error removing from watch history:', e); }
 };
 
 const ContentDetailModal = ({ content, onClose }) => {
@@ -39,22 +49,20 @@ const ContentDetailModal = ({ content, onClose }) => {
 
   useEffect(() => {
     const fetchDetails = async () => {
-      if (!content?.id) {
-        setDetails(content); // fallback if no id (from search)
-        setLoading(false);
-        return;
-      }
+      if (!content) return;
       setLoading(true);
       try {
-        const api = content.type === 'series' ? seriesAPI : movieAPI;
-        const res = await api.getDetails(content.id);
-        const data = res?.data || res;
-        const fullDetails = { ...content, ...data };
-        setDetails(fullDetails);
-        saveToWatchHistory(fullDetails);
+        let data = content;
+        if (content.id) {
+          const api = content.type === 'series' ? seriesAPI : movieAPI;
+          const res = await api.getDetails(content.id);
+          data = { ...content, ...(res?.data || res) };
+        }
+        setDetails(data);
+        saveToWatchHistory(data);
       } catch (error) {
         console.error('Error fetching details:', error);
-        setDetails(content); // fallback
+        setDetails(content);
       } finally {
         setLoading(false);
       }
@@ -65,7 +73,6 @@ const ContentDetailModal = ({ content, onClose }) => {
   const handleWatchNow = () => {
     if (!details?.id) return;
     setIsPlaying(true);
-    saveToWatchHistory(details);
   };
 
   if (isPlaying && details) {
@@ -76,7 +83,7 @@ const ContentDetailModal = ({ content, onClose }) => {
     return (
       <div className="fixed inset-0 z-[100] bg-black flex flex-col">
         <div className="flex items-center justify-between px-4 py-3 bg-black/90">
-          <h2 className="text-white font-semibold truncate pr-4">{details.title}</h2>
+          <h2 className="text-white font-semibold truncate">{details.title}</h2>
           <button onClick={() => setIsPlaying(false)} className="p-2 hover:bg-red-600 rounded">
             <X className="w-5 h-5 text-white" />
           </button>
@@ -105,27 +112,16 @@ const ContentDetailModal = ({ content, onClose }) => {
           </div>
         ) : details ? (
           <div>
-            {/* Backdrop + Title */}
             <div className="relative h-80 bg-black">
-              {details.backdrop && (
-                <img 
-                  src={details.backdrop} 
-                  alt={details.title} 
-                  className="w-full h-full object-cover" 
-                />
-              )}
+              {details.backdrop && <img src={details.backdrop} alt={details.title} className="w-full h-full object-cover" />}
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent" />
-              <button 
-                onClick={onClose} 
-                className="absolute top-4 right-4 p-3 bg-black/60 hover:bg-black rounded-full"
-              >
+              <button onClick={onClose} className="absolute top-4 right-4 p-3 bg-black/50 hover:bg-black rounded-full">
                 <X className="w-6 h-6 text-white" />
               </button>
             </div>
 
             <div className="p-8">
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">{details.title}</h1>
-              
+              <h1 className="text-4xl font-bold text-white mb-4">{details.title}</h1>
               <div className="flex gap-4 text-sm text-gray-400 mb-6">
                 {details.year && <span>{details.year}</span>}
                 {details.rating > 0 && <span>? {details.rating}</span>}
@@ -133,20 +129,16 @@ const ContentDetailModal = ({ content, onClose }) => {
 
               <Button 
                 onClick={handleWatchNow}
-                className="bg-purple-600 hover:bg-purple-700 text-white px-10 py-6 text-lg mb-8 flex items-center gap-3"
+                className="bg-purple-600 hover:bg-purple-700 text-white px-10 py-6 text-lg mb-8"
               >
-                <Play className="w-6 h-6 fill-white" /> Watch Now
+                <Play className="w-6 h-6 mr-2 fill-white" /> Watch Now
               </Button>
 
-              {details.overview && (
-                <p className="text-gray-300 leading-relaxed text-lg">{details.overview}</p>
-              )}
+              {details.overview && <p className="text-gray-300 leading-relaxed">{details.overview}</p>}
             </div>
           </div>
         ) : (
-          <div className="p-12 text-center text-gray-400">
-            Could not load movie details
-          </div>
+          <div className="p-12 text-center text-red-400">Could not load details</div>
         )}
       </div>
     </div>
