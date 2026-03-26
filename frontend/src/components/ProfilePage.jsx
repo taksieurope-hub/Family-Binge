@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Clock, LogOut, Settings, Film, Tv } from 'lucide-react';
+import { User, Clock, LogOut, Settings, Film } from 'lucide-react';
 import { getWatchHistory, removeFromWatchHistory } from './ContentDetailModal';
 import { Button } from './ui/button';
-import { useNavigate } from 'react-router-dom';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
   const [history, setHistory] = useState([]);
+
   const [user] = useState({
     name: "Alex Rivera",
     email: "alex@example.com",
@@ -29,9 +29,9 @@ const ProfilePage = () => {
     setHistory(items);
   };
 
-    const handleLogout = () => {
+  const handleLogout = () => {
     if (window.confirm("Log out of your account?")) {
-      localStorage.removeItem('familybinge_token');   // clear any saved login
+      localStorage.removeItem('familybinge_token');
       localStorage.removeItem('familybinge_user');
       navigate('/login');
     }
@@ -63,20 +63,26 @@ const ProfilePage = () => {
               Continue Watching
             </h2>
           </div>
-
           {history.length === 0 ? (
             <p className="text-gray-400">No watch history yet.</p>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {history.map((item) => (
-                <div key={item.id} className="group relative bg-zinc-900 rounded-2xl overflow-hidden cursor-pointer" onClick={() => navigate('/app')}>
-                  <img 
-                    src={item.backdrop || item.poster} 
+                <div
+                  key={item.id}
+                  className="group relative bg-zinc-900 rounded-2xl overflow-hidden cursor-pointer"
+                  onClick={() => navigate('/app')}
+                >
+                  <img
+                    src={item.backdrop || item.poster}
                     alt={item.title}
                     className="w-full aspect-video object-cover"
                   />
                   <button
-                    onClick={(e) => { e.stopPropagation(); handleRemove(item.id, item.type); }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemove(item.id, item.type);
+                    }}
                     className="absolute top-3 right-3 p-2 bg-black/70 hover:bg-red-600 rounded-full transition-colors"
                   >
                     <LogOut className="w-4 h-4 text-white" />
@@ -126,7 +132,7 @@ const ProfilePage = () => {
 
         {/* Logout */}
         <div className="mt-12 flex justify-center">
-          <Button 
+          <Button
             onClick={handleLogout}
             variant="destructive"
             className="flex items-center gap-3 px-10 py-6"
