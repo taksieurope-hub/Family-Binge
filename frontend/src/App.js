@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./App.css";
 
 import Navbar from "./components/Navbar";
@@ -10,15 +10,13 @@ import FAQSection from "./components/FAQSection";
 import Footer from "./components/Footer";
 import VideoPlayer from "./components/VideoPlayer";
 import ContentDetailModal from "./components/ContentDetailModal";
-import AuthModal from "./components/AuthModal";   // ? New
+import DownloadModal from "./components/DownloadModal";   // ? New
 
 function App() {
   const [activeSection, setActiveSection] = useState("home");
   const [activeVideo, setActiveVideo] = useState(null);
   const [selectedContent, setSelectedContent] = useState(null);
-  const [showAuthModal, setShowAuthModal] = useState(false);   // ? New
-
-  // ... your existing useEffects stay the same ...
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
 
   return (
     <div className="App min-h-screen bg-black">
@@ -26,7 +24,6 @@ function App() {
         activeSection={activeSection}
         setActiveSection={setActiveSection}
         onSelectContent={setSelectedContent}
-        onOpenAuth={() => setShowAuthModal(true)}   // ? New
       />
 
       <HeroSection
@@ -54,21 +51,13 @@ function App() {
       <FAQSection />
       <Footer />
 
-      {activeVideo && (
-        <VideoPlayer videoId={activeVideo} onClose={() => setActiveVideo(null)} />
-      )}
+      {activeVideo && <VideoPlayer videoId={activeVideo} onClose={() => setActiveVideo(null)} />}
+      {selectedContent && <ContentDetailModal content={selectedContent} onClose={() => setSelectedContent(null)} />}
 
-      {selectedContent && (
-        <ContentDetailModal
-          content={selectedContent}
-          onClose={() => setSelectedContent(null)}
-        />
-      )}
-
-      {/* New Sign-In Modal */}
-      <AuthModal 
-        isOpen={showAuthModal} 
-        onClose={() => setShowAuthModal(false)} 
+      {/* Download Modal */}
+      <DownloadModal 
+        isOpen={showDownloadModal} 
+        onClose={() => setShowDownloadModal(false)} 
       />
     </div>
   );
