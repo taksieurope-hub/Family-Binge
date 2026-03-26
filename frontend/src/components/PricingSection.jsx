@@ -56,14 +56,28 @@ const PricingSection = () => {
     return data.id;
   };
 
-  const onApprove = async (data) => {
+    const onApprove = async (data, actions, plan) => {
     const res = await fetch(`https://family-binge-backend.onrender.com/api/payment/capture-order/${data.orderID}`, {
       method: 'POST'
     });
+
     if (res.ok) {
+      const planDurations = {
+        "Basic": 30,      // days
+        "Standard": 90,
+        "Premium (The High Roller)": 180,
+        "Annual (The Best Value) Family": 365
+      };
+
+      const days = planDurations[plan.name] || 30;
+      const expires = new Date();
+      expires.setDate(expires.getDate() + days);
+
       localStorage.setItem('familybinge_paid', 'true');
-      localStorage.setItem('familybinge_subscription_plan', data.plan || 'Premium');
-      alert('✅ Payment successful! Full access unlocked.');
+      localStorage.setItem('familybinge_subscription_plan', plan.name);
+      localStorage.setItem('familybinge_subscription_expires', expires.toISOString());
+
+      alert(`✅ Payment successful!\nPlan: ${plan.name}\nExpires: ${expires.toDateString()}`);
       navigate('/app');
     }
   };
@@ -96,10 +110,10 @@ const PricingSection = () => {
                   <p className="text-purple-400">+R20/month per extra device</p>
                 </div>
 
-                <PayPalButtons
+                                <PayPalButtons
                   style={{ layout: "vertical" }}
                   createOrder={() => createOrder(plan)}
-                  onApprove={onApprove}
+                  onApprove={(data, actions) => onApprove(data, actions, plan)}
                 />
               </div>
             ))}

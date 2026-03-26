@@ -9,21 +9,19 @@ const ProfilePage = () => {
   const [history, setHistory] = useState([]);
   const [subscription, setSubscription] = useState(null);
 
-  useEffect(() => {
-    // Load real user data from signup
+    useEffect(() => {
     const savedUser = localStorage.getItem('familybinge_user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
+    if (savedUser) setUser(JSON.parse(savedUser));
 
-    // Load subscription from PayPal payment
-    const paid = localStorage.getItem('familybinge_paid');
+    const paid = localStorage.getItem('familybinge_paid') === 'true';
     const plan = localStorage.getItem('familybinge_subscription_plan');
-    if (paid && plan) {
-      setSubscription({ plan, status: 'active', expires: 'March 2027' });
+    const expires = localStorage.getItem('familybinge_subscription_expires');
+
+    if (paid && plan && expires) {
+      setSubscription({ plan, expires });
     }
 
-    // Load watch history
+    // watch history
     let items = getWatchHistory();
     items.sort((a, b) => b.lastWatched - a.lastWatched);
     setHistory(items);
@@ -70,7 +68,7 @@ const ProfilePage = () => {
       </div>
 
       <div className="max-w-4xl mx-auto px-6">
-        {/* Subscription Management */}
+                {/* Subscription Management */}
         <div className="mt-10">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-semibold flex items-center gap-3">
@@ -90,18 +88,12 @@ const ProfilePage = () => {
                   <h3 className="text-3xl font-bold mt-4">{subscription.plan}</h3>
                   <p className="text-gray-400 flex items-center gap-2 mt-2">
                     <Calendar className="w-4 h-4" />
-                    Next billing: {subscription.expires}
+                    Expires: {new Date(subscription.expires).toDateString()}
                   </p>
                 </div>
                 <Button onClick={handleCancelSubscription} variant="destructive" className="px-6">
                   Cancel Subscription
                 </Button>
-              </div>
-
-              <div className="mt-8 grid grid-cols-3 gap-4 text-center">
-                <Button onClick={handleUpgrade} className="bg-white/10 hover:bg-white/20">Upgrade Plan</Button>
-                <Button onClick={handleUpgrade} variant="outline">Manage Billing</Button>
-                <Button onClick={() => navigate('/app#pricing')} variant="outline">View All Plans</Button>
               </div>
             </div>
           ) : (
