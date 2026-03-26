@@ -4,9 +4,7 @@ import "./App.css";
 import Navbar from "./components/Navbar";
 import HeroSection from "./components/HeroSection";
 import ContentSection from "./components/ContentSection";
-import DownloadSection from "./components/DownloadSection";
 import PricingSection from "./components/PricingSection";
-import FAQSection from "./components/FAQSection";
 import Footer from "./components/Footer";
 import VideoPlayer from "./components/VideoPlayer";
 import ContentDetailModal from "./components/ContentDetailModal";
@@ -28,9 +26,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const handleSelectContent = (e) => {
-      setSelectedContent(e.detail);
-    };
+    const handleSelectContent = (e) => setSelectedContent(e.detail);
     window.addEventListener("selectContent", handleSelectContent);
     return () => window.removeEventListener("selectContent", handleSelectContent);
   }, []);
@@ -66,15 +62,10 @@ function App() {
         <ContentSection type="series" onSelectContent={setSelectedContent} />
       </div>
 
-      <div id="download">
-        <DownloadSection />
-      </div>
-
       <div id="pricing">
         <PricingSection />
       </div>
 
-      <FAQSection />
       <Footer />
 
       {activeVideo && (
