@@ -2,45 +2,142 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
 :root {
-  --green: #39FF14;
-  --blue: #00D4FF;
-  --orange: #FF9500;
+  --purple: #a855f7;
+  --purple-dark: #7c3aed;
+  --pink: #ec4899;
+  --pink-dark: #be185d;
+  --bg: #0a0a0f;
+  --bg2: #111118;
+  --bg3: #16161f;
+  --card: #1a1a24;
+  --border: rgba(168, 85, 247, 0.15);
+  --text: #f1f0ff;
+  --muted: #8b8aa0;
+  --grad: linear-gradient(135deg, #a855f7, #ec4899);
+  --grad-soft: linear-gradient(135deg, rgba(168,85,247,0.15), rgba(236,72,153,0.15));
 }
 
-/* Kill ALL red/purple */
-.bg-purple-*, .text-purple-*, .border-purple-*, .bg-red-*, .text-red-* {
-  background-color: var(--green) !important;
-  color: #0a0a12 !important;
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
-/* Main colours */
-button, .bg-purple-600, .Button {
-  background-color: var(--green) !important;
-  color: #0a0a12 !important;
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--purple-dark); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--purple); }
+
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+
+/* Glow effects */
+.glow-purple { box-shadow: 0 0 20px rgba(168,85,247,0.4), 0 0 40px rgba(168,85,247,0.2); }
+.glow-pink { box-shadow: 0 0 20px rgba(236,72,153,0.4), 0 0 40px rgba(236,72,153,0.2); }
+.text-glow { text-shadow: 0 0 30px rgba(168,85,247,0.5); }
+
+/* Gradient text */
+.grad-text {
+  background: var(--grad);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-button:hover {
-  background-color: #2be300 !important;
+/* Gradient button */
+.btn-grad {
+  background: var(--grad);
+  border: none;
+  color: white;
+  font-weight: 600;
+  transition: opacity 0.2s, transform 0.2s;
+}
+.btn-grad:hover { opacity: 0.9; transform: scale(1.02); }
+
+/* Glass card */
+.glass {
+  background: rgba(26, 26, 36, 0.8);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(12px);
 }
 
-/* Active / highlights = orange */
-button[active], .active {
-  background-color: var(--orange) !important;
+/* Shimmer */
+@keyframes shimmer {
+  0% { background-position: -800px 0; }
+  100% { background-position: 800px 0; }
+}
+.shimmer {
+  background: linear-gradient(90deg, #1a1a24 25%, #222230 50%, #1a1a24 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.8s infinite;
 }
 
-/* Accents = blue */
-.text-purple-400, .text-purple-500, .border-purple-500 {
-  color: var(--blue) !important;
+/* Fade in */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp 0.35s ease forwards; }
+
+/* Progress bar */
+@keyframes progress-bar {
+  from { width: 0%; }
+  to { width: 100%; }
 }
 
-/* Logo text */
-nav span.font-black {
-  color: #ffffff !important;
-  text-shadow: none !important;
+/* Badge pill */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.badge-grad { background: var(--grad); color: white; }
+.badge-outline {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.25);
+  color: rgba(255,255,255,0.8);
 }
 
-/* Dark background */
-body, .App, nav {
-  background: #0a0a12 !important;
+@layer base {
+  :root {
+    --background: 240 10% 4%;
+    --foreground: 250 100% 98%;
+    --card: 240 10% 8%;
+    --card-foreground: 250 100% 98%;
+    --popover: 240 10% 6%;
+    --popover-foreground: 250 100% 98%;
+    --primary: 271 91% 65%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 10% 12%;
+    --secondary-foreground: 250 100% 98%;
+    --muted: 240 10% 12%;
+    --muted-foreground: 240 5% 55%;
+    --accent: 240 10% 12%;
+    --accent-foreground: 250 100% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 271 91% 65% / 0.15;
+    --input: 240 10% 12%;
+    --ring: 271 91% 65%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+  body { @apply bg-background text-foreground; }
 }
