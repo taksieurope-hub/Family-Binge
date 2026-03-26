@@ -1,5 +1,5 @@
 import React from 'react';
-import { Check, Star, Zap } from 'lucide-react';
+import { Check, Star } from 'lucide-react';
 import { Button } from './ui/button';
 
 const pricingPlans = [
@@ -22,7 +22,7 @@ const pricingPlans = [
     id: 2,
     name: "Standard 3 Months once off",
     price: "160",
-    period: "month",
+    period: "3 months",
     devices: "1 TV + 1 Phone",
     popular: true,
     features: [
