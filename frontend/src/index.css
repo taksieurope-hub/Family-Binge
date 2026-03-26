@@ -3,20 +3,19 @@
 @tailwind utilities;
 
 :root {
-  --luminous-green: #39FF14;
-  --electric-blue: #00E5FF;
-  --vibrant-orange: #FF9500;
+  --green: #39FF14;
+  --blue: #00E5FF;
+  --orange: #FF9500;
 }
 
-/* Force dark background everywhere */
-body, .App, nav, .bg-black, .bg-zinc-900, .bg-gray-900, .bg-white, .bg-slate-900 {
+body, .App, nav, .bg-black, .bg-zinc-900, .bg-gray-900 {
   background: #0a0a12 !important;
   color: #f0f8ff !important;
 }
 
-/* Force green on all buttons and main accents */
-.bg-purple-600, .bg-purple-500, .bg-purple-700, button, .Button, .bg-green-500 {
-  background-color: var(--luminous-green) !important;
+/* Green buttons */
+.bg-purple-600, .bg-purple-500, .bg-purple-700, button, .Button {
+  background-color: var(--green) !important;
   color: #0a0a12 !important;
 }
 
@@ -26,21 +25,16 @@ button:hover {
 
 /* Blue accents */
 .text-purple-400, .text-purple-500, .border-purple-500 {
-  color: var(--electric-blue) !important;
+  color: var(--blue) !important;
 }
 
-/* Orange for active items and highlights */
-.bg-orange-500, button[active], .active {
-  background-color: var(--vibrant-orange) !important;
+/* Orange for active genres */
+button[active], .active {
+  background-color: var(--orange) !important;
   color: white !important;
 }
 
 /* Fix highlighted/shit text */
-h1, h2, h3, p, span, div, .text-white, .text-gray-300 {
+* {
   color: #f0f8ff !important;
-}
-
-/* Movie card hover glow */
-.movie-card:hover {
-  box-shadow: 0 0 40px rgba(57, 255, 20, 0.7) !important;
 }
