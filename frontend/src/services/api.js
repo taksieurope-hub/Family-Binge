@@ -18,10 +18,11 @@ const formatItem = (item) => ({
   rating: Math.round((item.vote_average || 0) * 10) / 10,
   overview: item.overview || "",
   genres: item.genres
-    ? item.genres.map(g => typeof g === "string" ? g : g.name).filter(Boolean)
+    ? item.genres.map(g => typeof g === 'string' ? g : g.name).filter(Boolean)
     : (item.genre_ids || []).map(id => GENRE_MAP[id]).filter(Boolean),
   popularity: item.popularity || 0,
   type: item.name && !item.title ? "series" : "movie",
+  // Details fields
   runtime: item.runtime || null,
   seasons: item.number_of_seasons || null,
   episodes: item.number_of_episodes || null,
@@ -32,10 +33,11 @@ const formatItem = (item) => ({
     character: c.character,
     profile: c.profile_path ? `https://image.tmdb.org/t/p/w185${c.profile_path}` : null
   })) || item.cast || [],
-  similar: item.similar?.results?.slice(0, 6).map(i => formatItem(i)) || item.similar || [],
+  similar: item.similar?.results?.slice(0, 6).map(formatItem) || item.similar || [],
   status: item.status || "",
 });
 
+// Wraps response in axios-like {data: {items: []}} format for component compatibility
 const fetchList = (url) =>
   fetch(url)
     .then(r => r.json())
@@ -53,7 +55,7 @@ const fetchSearch = (url) =>
       data: {
         items: (data.results || []).map(item => ({
           ...formatItem(item),
-          type: item.media_type === "tv" ? "series" : "movie"
+          type: item.media_type === 'tv' ? 'series' : 'movie'
         })).filter(i => i.poster)
       }
     }));

@@ -17,7 +17,7 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
 
   const navItems = [
     { id: 'home', label: 'Home' },
-    { id: 'live-tv', label: 'Live TV' },
+    
     { id: 'movies', label: 'Movies' },
     { id: 'series', label: 'Series' },
     { id: 'download', label: 'Download' },
@@ -173,7 +173,7 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
             </div>
 
             {showResults && searchResults.length > 0 && (
-              <div className="absolute left-0 right-0 mt-2 bg-gray-950/98 border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50 backdrop-blur-md">
+              <div className="absolute left-0 right-0 mt-2 bg-gray-950 border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50 backdrop-blur-md">
                 <div className="px-4 py-2 border-b border-white/5">
                   <span className="text-gray-500 text-xs font-medium uppercase tracking-wider">{searchResults.length} Results</span>
                 </div>
@@ -204,7 +204,7 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
             )}
 
             {showResults && searchResults.length === 0 && searchQuery.trim() && !searching && (
-              <div className="absolute left-0 right-0 mt-2 bg-gray-950/98 border border-white/10 rounded-xl p-8 text-center backdrop-blur-md z-50">
+              <div className="absolute left-0 right-0 mt-2 bg-gray-950 border border-white/10 rounded-xl p-8 text-center backdrop-blur-md z-50">
                 <Film className="w-10 h-10 text-gray-700 mx-auto mb-3" />
                 <p className="text-gray-400 text-sm">No results for <span className="text-white">"{searchQuery}"</span></p>
               </div>
@@ -215,7 +215,7 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden pb-4">
-            <div className="flex flex-col bg-gray-950/95 backdrop-blur-md rounded-2xl border border-white/8 overflow-hidden">
+            <div className="flex flex-col bg-gray-950 backdrop-blur-md rounded-2xl border border-white/8 overflow-hidden">
               {navItems.map((item) => (
                 <button
                   key={item.id}
