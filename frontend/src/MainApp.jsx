@@ -14,7 +14,6 @@ import { auth, db } from "./services/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { Crown, AlertTriangle, X } from "lucide-react";
-import LiveTVSection from "./components/LiveTVSection";
 
 // ── Paywall Modal ──────────────────────────────────────────────────────────────
 const PaywallModal = ({ onClose, onGoToPricing, trialEnds }) => {
@@ -242,7 +241,6 @@ function MainApp() {
       </div>
       <div id="series">
         <div id="livetv">
-  <LiveTVSection />
 </div>
         <ContentSection type="series" onSelectContent={handleSelectContent} />
       </div>
