@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { X, Play, Star, Clock, Calendar, Users, ChevronRight, Loader2, Tv, Film, AlertCircle, RefreshCw, SkipForward, Captions } from 'lucide-react';
+import { X, Play, Star, Clock, Calendar, Users, ChevronRight, Loader2, Tv, Film, AlertCircle, RefreshCw, SkipForward, Captions, Share2, Check } from 'lucide-react';
 import { Button } from './ui/button';
 import { movieAPI, seriesAPI } from '../services/api';
 
@@ -57,6 +57,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
   const [playerReady, setPlayerReady] = useState(false);
   const [watchCountdown, setWatchCountdown] = useState(null);
   const watchCountdownRef = useRef(null);
+  const [shareCopied, setShareCopied] = useState(false);
   const [subtitlesEnabled, setSubtitlesEnabled] = useState(true);
   const [showNextOverlay, setShowNextOverlay] = useState(false);
   const [nextCountdown, setNextCountdown] = useState(AUTO_NEXT_COUNTDOWN);
@@ -185,6 +186,19 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
     }
   }, 1000);
 };
+
+  const handleShare = async () => {
+    const text = `Check out ${details?.title} on Family Binge! Watch it here: https://familybinge.co.za`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: details?.title, text, url: `https://familybinge.co.za` });
+      } catch (e) {}
+    } else {
+      navigator.clipboard.writeText(text);
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+    }
+  };
 
   const handlePlayTrailer = () => {
     if (details?.youtube_id) onPlayVideo(details.youtube_id);
@@ -419,6 +433,10 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
                     <Button onClick={handlePlayTrailer} disabled={!details.youtube_id} variant="outline" className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white border-white/30 px-8 py-6 text-lg rounded-lg disabled:opacity-50">
                       <Play className="w-6 h-6" />
                       Trailer
+                    </Button>
+                    <Button onClick={handleShare} variant="outline" className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white border-white/30 px-8 py-6 text-lg rounded-lg">
+                      {shareCopied ? <Check className="w-6 h-6 text-green-400" /> : <Share2 className="w-6 h-6" />}
+                      {shareCopied ? "Copied!" : "Share"}
                     </Button>
                   </div>
                 </div>
