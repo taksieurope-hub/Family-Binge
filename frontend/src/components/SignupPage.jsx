@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Button } from './ui/button';
 import { auth, db } from '../services/firebase';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
@@ -8,6 +8,7 @@ import { AlertTriangle } from 'lucide-react';
 
 const SignupPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -39,6 +40,7 @@ const SignupPage = () => {
         plan: 'free_trial',
         subscriptionExpires: null,
         subscriptionPlan: null,
+        referredBy: new URLSearchParams(location.search).get('ref') || null,
       });
 
       navigate('/app');

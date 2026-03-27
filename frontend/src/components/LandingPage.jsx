@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tv, Play, ArrowRight } from 'lucide-react';
+import InviteSection from './InviteSection';
 import { Button } from './ui/button';
 
 const LandingPage = () => {
@@ -49,6 +50,7 @@ const LandingPage = () => {
           After 3 days your subscription will automatically continue unless you cancel
         </p>
       </div>
+      <InviteSection />
     </div>
   );
 };

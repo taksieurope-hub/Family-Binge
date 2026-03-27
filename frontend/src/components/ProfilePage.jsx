@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { User, Clock, LogOut, Settings, Crown, Shield, Zap, Calendar, AlertTriangle } from 'lucide-react';
 import { getWatchHistory, removeFromWatchHistory } from './ContentDetailModal';
 import { Button } from './ui/button';
+import InviteSection from './InviteSection';
 import { auth, db } from '../services/firebase';
 import { signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
@@ -295,6 +296,9 @@ const ProfilePage = () => {
             </div>
           </div>
         </div>
+
+        {/* Invite Friends */}
+        <InviteSection compact />
 
         {/* Logout */}
         <div className="mt-12 flex justify-center">
