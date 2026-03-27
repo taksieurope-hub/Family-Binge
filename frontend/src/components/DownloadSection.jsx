@@ -95,12 +95,7 @@ const DownloadSection = () => {
               <p className="text-gray-400 text-sm mb-4">{device.description}</p>
 
               {/* Download Button */}
-              <Button
-                className="w-full bg-white/10 hover:bg-purple-600 text-white border-0 transition-colors"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Download
-              </Button>
+              <a href={device.downloadLink} download><Button className="w-full bg-white/10 hover:bg-purple-600 text-white border-0 transition-colors"><Download className="w-4 h-4 mr-2" />Download</Button></a>
             </div>
           ))}
         </div>
@@ -161,3 +156,4 @@ const DownloadSection = () => {
 };
 
 export default DownloadSection;
+
