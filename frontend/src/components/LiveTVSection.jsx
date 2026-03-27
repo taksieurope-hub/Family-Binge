@@ -149,9 +149,11 @@ const channels = [
   { id: 139, name: 'The First TV',          category: 'News',          logo: 'https://i.imgur.com/rOSlp93.png',    streams: ['https://d35j504z0x2vu2.cloudfront.net/v1/master/0bc8e8376bd8417a1b6761138aa41c26c7309312/the-first/playlist.m3u8', 'https://pb-7dne0wn288z2f.akamaized.net/The_First.m3u8', 'https://thefirst-oando.amagi.tv/playlist.m3u8'] },
   { id: 140, name: 'PBS Nature',            category: 'Nature',        logo: 'https://i.imgur.com/Brry7cZ.png',    streams: ['https://amg02333-pbs-amg02333c11-firetv-us-4242.playouts.now.amagi.tv/playlist.m3u8', 'https://d3mr43kyql7wgk.cloudfront.net/PBS_Nature.m3u8', 'https://amg01597-wnetnewyorkpubl-pbsnature-xumo-8xorq.amagi.tv/playlist.m3u8'] },
   { id: 141, name: 'Fox News Channel',      category: 'News',          logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Fox_News_Channel_logo.svg/960px-Fox_News_Channel_logo.svg.png', streams: ['http://247preview.foxnews.com/hls/live/2020027/fncv3preview/primary.m3u8'] },
+
+  { id: 142, name: 'PowerNation TV', category: 'Auto', logo: 'https://i.imgur.com/jguTO8E.png', streams: ['https://d1g3ue0w0jg45k.cloudfront.net/POWERNATION.m3u8', 'https://amg01258-raycomsports-powernationau-samsungau-18bwc.amagi.tv/playlist.m3u8', 'https://amg01258-raycomsports-powernationnz-samsungnz-q92ks.amagi.tv/playlist.m3u8'] },
 ];
 
-const categories = ['All', 'News', 'Movies', 'Series', 'Entertainment', 'Comedy', 'Sports', 'Business', 'Documentary', 'Nature', 'Travel', 'Cooking', 'Family', 'Science', 'Religious', 'Animation', 'Music', 'Lifestyle', 'Kids', 'Outdoor', 'Weather', 'Shopping', 'Classic'];
+const categories = ['All', 'News', 'Movies', 'Series', 'Entertainment', 'Comedy', 'Sports', 'Business', 'Documentary', 'Nature', 'Travel', 'Cooking', 'Family', 'Science', 'Religious', 'Animation', 'Music', 'Lifestyle', 'Kids', 'Outdoor', 'Weather', 'Shopping', 'Classic', 'Auto'];
 
 const colorMap = {
   News: 'from-blue-700 to-blue-900', Movies: 'from-violet-700 to-purple-900', Series: 'from-amber-600 to-orange-700',
