@@ -149,7 +149,7 @@ async def search_all(q: str = Query(..., min_length=1), page: int = Query(1, ge=
 @router.get("/livetv/channels")
 async def get_live_channels(category: str = Query("all")):
     """Get all live TV channels, optionally filtered by category"""
-    channels = get_channels_by_category(category)
+    channels = await get_channels_by_category(category)
     return ChannelListResponse(channels=channels, total=len(channels))
 
 @router.get("/livetv/categories")
@@ -161,7 +161,7 @@ async def get_channel_categories():
 @router.get("/livetv/channel/{channel_id}")
 async def get_channel(channel_id: str):
     """Get a specific channel by ID"""
-    channel = get_channel_by_id(channel_id)
+    channel = await get_channel_by_id(channel_id)
     if not channel:
         raise HTTPException(status_code=404, detail="Channel not found")
     
@@ -170,7 +170,7 @@ async def get_channel(channel_id: str):
 @router.get("/livetv/search")
 async def search_live_channels(q: str = Query(..., min_length=1)):
     """Search for live TV channels"""
-    channels = search_channels(q)
+    channels = await search_channels(q)
     return ChannelListResponse(channels=channels, total=len(channels))
 
 # ============ HLS PROXY FOR LIVE TV ============

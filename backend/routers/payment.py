@@ -1,8 +1,7 @@
 from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 import httpx
 import os
-from pydantic import BaseModel
-from typing import Optional
 
 router = APIRouter(prefix="/payment", tags=["payment"])
 
@@ -27,47 +26,35 @@ async def get_paypal_access_token():
 class CreateOrderRequest(BaseModel):
     plan: str
     amount: float
-    currency: str = "ZAR"
+    currency: str = "USD"   # change to ZAR if you want
 
 @router.post("/create-order")
 async def create_order(request: CreateOrderRequest):
     token = await get_paypal_access_token()
-    
     async with httpx.AsyncClient() as client:
         response = await client.post(
             f"{BASE_URL}/v2/checkout/orders",
-            headers={
-                "Authorization": f"Bearer {token}",
-                "Content-Type": "application/json"
-            },
+            headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
             json={
                 "intent": "CAPTURE",
                 "purchase_units": [{
-                    "amount": {
-                        "currency_code": request.currency,
-                        "value": str(request.amount)
-                    },
+                    "amount": {"currency_code": request.currency, "value": str(request.amount)},
                     "description": f"Family Binge - {request.plan} Plan"
                 }]
             }
         )
-        
         if response.status_code != 201:
             raise HTTPException(status_code=400, detail="Failed to create PayPal order")
-        
         return response.json()
 
 @router.post("/capture-order/{order_id}")
 async def capture_order(order_id: str):
     token = await get_paypal_access_token()
-    
     async with httpx.AsyncClient() as client:
         response = await client.post(
             f"{BASE_URL}/v2/checkout/orders/{order_id}/capture",
             headers={"Authorization": f"Bearer {token}"}
         )
-        
         if response.status_code != 201:
             raise HTTPException(status_code=400, detail="Payment capture failed")
-        
         return response.json()
