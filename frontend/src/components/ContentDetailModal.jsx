@@ -166,6 +166,15 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
     if (onExpiredClick) onExpiredClick();
     return;
   }
+  setIsPlaying(true);
+  setCurrentSourceIndex(0);
+  setPlayerReady(false);
+  setIsAutoSwitching(true);
+  clearNextTimers();
+  if (details) {
+    saveToWatchHistory(details, selectedSeason, selectedEpisode, 0);
+    window.dispatchEvent(new Event('watchHistoryUpdated'));
+  }
   setWatchCountdown(5);
   let count = 5;
   watchCountdownRef.current = setInterval(() => {
@@ -174,15 +183,6 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
     if (count <= 0) {
       clearInterval(watchCountdownRef.current);
       setWatchCountdown(null);
-      setIsPlaying(true);
-      setCurrentSourceIndex(0);
-      setPlayerReady(false);
-      setIsAutoSwitching(true);
-      clearNextTimers();
-      if (details) {
-        saveToWatchHistory(details, selectedSeason, selectedEpisode, 0);
-        window.dispatchEvent(new Event('watchHistoryUpdated'));
-      }
     }
   }, 1000);
 };
