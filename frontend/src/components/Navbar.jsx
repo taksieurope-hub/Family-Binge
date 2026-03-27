@@ -174,7 +174,7 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
                 placeholder="Search movies, series, channels..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-12 py-3 bg-white/8 border border-white/15 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/60 focus:bg-white/10 transition-all text-sm"
+                className="w-full pl-12 pr-12 py-3 bg-zinc-800 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:bg-zinc-700 transition-all text-sm"
                 autoFocus
               />
               {searching && <Loader2 className="absolute right-12 w-4 h-4 text-purple-400 animate-spin" />}
