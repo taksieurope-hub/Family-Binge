@@ -26,7 +26,7 @@ async def get_paypal_access_token():
 class CreateOrderRequest(BaseModel):
     plan: str
     amount: float
-    currency: str = "ZAR"   # change to ZAR if you want
+    currency: str = "USD"   # change to ZAR if you want
 
 @router.post("/create-order")
 async def create_order(request: CreateOrderRequest):

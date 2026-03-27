@@ -49,14 +49,21 @@ const PricingSection = () => {
   ];
 
   const createOrder = async (plan) => {
-    const res = await fetch('https://family-binge-backend.onrender.com/api/payment/create-order', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ plan: plan.name, amount: plan.price, currency: "ZAR" })
-    });
-    const data = await res.json();
-    return data.id;
-  };
+  // Fetch current USD/ZAR rate
+  const rateRes = await fetch('https://open.er-api.com/v6/latest/ZAR');
+  const rateData = await rateRes.json();
+  const zarToUsd = rateData.rates.USD; // e.g. 0.055
+
+  const usdAmount = (plan.price * zarToUsd).toFixed(2);
+
+  const res = await fetch('https://family-binge-backend.onrender.com/api/payment/create-order', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ plan: plan.name, amount: usdAmount, currency: 'USD' })
+  });
+  const data = await res.json();
+  return data.id;
+};
 
   const onApprove = async (data, actions, plan) => {
     const res = await fetch(`https://family-binge-backend.onrender.com/api/payment/capture-order/${data.orderID}`, {
