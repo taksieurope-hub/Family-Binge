@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import InstallAppButton from './InstallAppButton';
 import { Tv, Menu, X, Search, User, ChevronDown, Film, Bell, Settings, Loader2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { searchAPI } from '../services/api';

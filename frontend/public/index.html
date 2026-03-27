@@ -93,5 +93,5 @@
                 person_profiles: "identified_only"
             });
         </script>
-    </body>
+    <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').then(()=>console.log('SW registered')).catch(e=>console.log('SW failed',e))}</script></body>
 </html>
