@@ -46,7 +46,7 @@ const AUTO_NEXT_COUNTDOWN = 15;
 // Approximate episode duration in ms (40 min) - triggers the "Up Next" overlay
 const EPISODE_DURATION_MS = 40 * 60 * 1000;
 
-const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
+const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExpiredClick }) => {
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedSeason, setSelectedSeason] = useState(1);
@@ -166,6 +166,11 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo }) => {
   }, [details]);
 
   const handleWatchNow = () => {
+  if (accessStatus === 'expired') {
+    onClose();
+    if (onExpiredClick) onExpiredClick();
+    return;
+  }
     setIsPlaying(true);
     setCurrentSourceIndex(0);
     setPlayerReady(false);

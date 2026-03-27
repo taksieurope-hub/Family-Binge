@@ -257,7 +257,7 @@ function MainApp() {
         <VideoPlayer videoId={activeVideo} onClose={() => setActiveVideo(null)} />
       )}
       {selectedContent && (
-        <ContentDetailModal
+        <ContentDetailModal accessStatus={accessStatus} onExpiredClick={() => setShowPaywall(true)}
           content={selectedContent}
           onClose={() => setSelectedContent(null)}
           onPlayVideo={handlePlayVideo}
