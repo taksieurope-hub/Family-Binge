@@ -4,3 +4,5 @@ httpx
 pymongo
 bcrypt
 python-jose[cryptography]
+firebase-admin
+python-dotenv
