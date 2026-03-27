@@ -6,7 +6,11 @@ app = FastAPI(title="Family Binge API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "https://family-binge-9lws.onrender.com",
+        "http://localhost:3000",
+        "http://localhost:3001",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -16,7 +20,6 @@ app.add_middleware(
 async def root():
     return {"message": "Family Binge API running"}
 
-# Use the full content router with all routes
 from routers.content import router as content_router
 from routers.payment import router as payment_router
 app.include_router(payment_router, prefix="/api")
