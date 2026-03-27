@@ -147,14 +147,15 @@ function MainApp() {
             : data.subscriptionExpires ? new Date(data.subscriptionExpires) : null;
 
           const hasPaidSub = data.plan && data.plan !== 'free_trial' && subExpires && subExpires > now;
+const isFreeAccess = data.role === 'admin' || data.role === 'family';
 
-          if (hasPaidSub) {
-            setAccessStatus('full');
-          } else if (trialEnds > now) {
-            setAccessStatus('trial');
-          } else {
-            setAccessStatus('expired');
-          }
+if (isFreeAccess || hasPaidSub) {
+  setAccessStatus('full');
+} else if (trialEnds > now) {
+  setAccessStatus('trial');
+} else {
+  setAccessStatus('expired');
+}
         } else {
           setAccessStatus('guest');
         }
