@@ -1,36 +1,43 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Clock, LogOut, Settings, Crown, Shield, Zap, Calendar } from 'lucide-react';
+import { User, Clock, LogOut, Settings, Crown, Shield, Zap, Calendar, AlertTriangle } from 'lucide-react';
 import { getWatchHistory, removeFromWatchHistory } from './ContentDetailModal';
 import { Button } from './ui/button';
+import { auth, db } from '../services/firebase';
+import { signOut } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
   const [history, setHistory] = useState([]);
-  const [subscription, setSubscription] = useState(null);
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-    const savedUser = localStorage.getItem('familybinge_user');
-    if (savedUser) setUser(JSON.parse(savedUser));
+  useEffect(() => {
+    const fetchUser = async () => {
+      const user = auth.currentUser;
+      if (!user) {
+        navigate('/login');
+        return;
+      }
+      try {
+        const snap = await getDoc(doc(db, 'users', user.uid));
+        if (snap.exists()) {
+          setUserData(snap.data());
+        }
+      } catch (e) {
+        console.error('Error fetching user data:', e);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    const paid = localStorage.getItem('familybinge_paid') === 'true';
-    const plan = localStorage.getItem('familybinge_subscription_plan');
-    const expires = localStorage.getItem('familybinge_subscription_expires');
+    fetchUser();
 
-    if (paid && plan && expires) {
-      setSubscription({ plan, expires });
-    }
-
-    // watch history
     let items = getWatchHistory();
     items.sort((a, b) => b.lastWatched - a.lastWatched);
     setHistory(items);
-  }, []);
-
-  const [user, setUser] = useState({
-    name: "Guest User",
-    email: "guest@example.com"
-  });
+  }, [navigate]);
 
   const handleRemove = (id, type) => {
     removeFromWatchHistory(id, type);
@@ -39,68 +46,183 @@ const ProfilePage = () => {
     setHistory(items);
   };
 
-  const handleCancelSubscription = () => {
-    if (window.confirm("Cancel your subscription? You will lose access after the current period.")) {
-      localStorage.removeItem('familybinge_paid');
-      localStorage.removeItem('familybinge_subscription_plan');
-      setSubscription(null);
-      alert("Subscription cancelled. You can resubscribe anytime.");
+  const handleLogout = async () => {
+    if (window.confirm('Log out?')) {
+      await signOut(auth);
+      navigate('/login');
     }
   };
 
-  const handleUpgrade = () => {
-    navigate('/app#pricing');
+  const handleCancelSubscription = async () => {
+    if (window.confirm('Cancel your subscription? You will lose access after the current period.')) {
+      const { updateDoc, doc: firestoreDoc } = await import('firebase/firestore');
+      await updateDoc(firestoreDoc(db, 'users', auth.currentUser.uid), {
+        plan: 'free_trial',
+        subscriptionPlan: null,
+        subscriptionExpires: null,
+      });
+      const snap = await getDoc(doc(db, 'users', auth.currentUser.uid));
+      setUserData(snap.data());
+      alert('Subscription cancelled. You can resubscribe anytime.');
+    }
   };
+
+  // Date helpers
+  const toDate = (val) => {
+    if (!val) return null;
+    if (val?.toDate) return val.toDate();
+    return new Date(val);
+  };
+
+  const formatDate = (date) => {
+    if (!date) return 'N/A';
+    return date.toLocaleDateString('en-ZA', {
+      weekday: 'long', year: 'numeric', month: 'long',
+      day: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
+  };
+
+  const getDaysLeft = (date) => {
+    if (!date) return 0;
+    const diff = date - new Date();
+    return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  const user = auth.currentUser;
+  const now = new Date();
+  const trialEnds = toDate(userData?.trialEnds);
+  const subExpires = toDate(userData?.subscriptionExpires);
+  const hasPaidSub = userData?.plan && userData.plan !== 'free_trial' && subExpires && subExpires > now;
+  const trialExpired = !hasPaidSub && trialEnds && trialEnds < now;
+  const trialActive = !hasPaidSub && trialEnds && trialEnds >= now;
+  const trialDaysLeft = trialActive ? getDaysLeft(trialEnds) : 0;
 
   return (
     <div className="min-h-screen bg-black text-white pb-20">
+      {/* Trial Expiry Banner */}
+      {trialExpired && (
+        <div className="bg-red-600 px-6 py-4 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="w-5 h-5 text-white flex-shrink-0" />
+            <p className="text-white font-semibold">
+              Your free trial expired on <span className="underline">{formatDate(trialEnds)}</span>
+            </p>
+          </div>
+          <Button
+            onClick={() => navigate('/app#pricing')}
+            className="bg-white text-red-600 hover:bg-gray-100 font-bold px-6 py-2 rounded-xl flex-shrink-0"
+          >
+            <Crown className="w-4 h-4 mr-2" /> Subscribe Now
+          </Button>
+        </div>
+      )}
+
+      {trialActive && trialDaysLeft <= 1 && (
+        <div className="bg-orange-500 px-6 py-4 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <Clock className="w-5 h-5 text-white flex-shrink-0" />
+            <p className="text-white font-semibold">
+              Your trial expires <span className="underline">{formatDate(trialEnds)}</span> — don't lose access!
+            </p>
+          </div>
+          <Button
+            onClick={() => navigate('/app#pricing')}
+            className="bg-white text-orange-600 hover:bg-gray-100 font-bold px-6 py-2 rounded-xl flex-shrink-0"
+          >
+            <Crown className="w-4 h-4 mr-2" /> Upgrade
+          </Button>
+        </div>
+      )}
+
       {/* Header */}
       <div className="bg-zinc-900 border-b border-white/10 py-6">
         <div className="max-w-4xl mx-auto px-6 flex items-center gap-4">
           <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center text-white text-4xl font-bold">
-            {user.name ? user.name[0].toUpperCase() : '?'}
+            {userData?.name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || '?'}
           </div>
           <div>
-            <h1 className="text-3xl font-bold">{user.name}</h1>
-            <p className="text-gray-400">{user.email}</p>
+            <h1 className="text-3xl font-bold">{userData?.name || 'User'}</h1>
+            <p className="text-gray-400">{user?.email}</p>
+            {hasPaidSub && (
+              <span className="inline-flex items-center gap-1 bg-yellow-500/20 text-yellow-400 text-xs font-semibold px-3 py-1 rounded-full mt-1">
+                <Crown className="w-3 h-3" /> {userData.subscriptionPlan}
+              </span>
+            )}
+            {trialActive && (
+              <span className="inline-flex items-center gap-1 bg-purple-500/20 text-purple-400 text-xs font-semibold px-3 py-1 rounded-full mt-1">
+                <Zap className="w-3 h-3" /> Free Trial — {trialDaysLeft} day{trialDaysLeft !== 1 ? 's' : ''} left
+              </span>
+            )}
+            {trialExpired && (
+              <span className="inline-flex items-center gap-1 bg-red-500/20 text-red-400 text-xs font-semibold px-3 py-1 rounded-full mt-1">
+                <AlertTriangle className="w-3 h-3" /> Trial Expired
+              </span>
+            )}
           </div>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto px-6">
-                {/* Subscription Management */}
+        {/* Subscription Management */}
         <div className="mt-10">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-semibold flex items-center gap-3">
-              <Crown className="w-6 h-6 text-yellow-400" />
-              Subscription Management
-            </h2>
-          </div>
+          <h2 className="text-2xl font-semibold flex items-center gap-3 mb-6">
+            <Crown className="w-6 h-6 text-yellow-400" />
+            Subscription
+          </h2>
 
-          {subscription ? (
+          {hasPaidSub ? (
             <div className="bg-zinc-900 rounded-3xl p-8">
-              <div className="flex justify-between items-start">
+              <div className="flex justify-between items-start flex-wrap gap-4">
                 <div>
                   <span className="inline-flex items-center gap-2 bg-emerald-600 text-white text-sm font-medium px-4 py-1.5 rounded-2xl">
-                    <Shield className="w-4 h-4" />
-                    ACTIVE
+                    <Shield className="w-4 h-4" /> ACTIVE
                   </span>
-                  <h3 className="text-3xl font-bold mt-4">{subscription.plan}</h3>
+                  <h3 className="text-3xl font-bold mt-4">{userData.subscriptionPlan}</h3>
                   <p className="text-gray-400 flex items-center gap-2 mt-2">
                     <Calendar className="w-4 h-4" />
-                    Expires: {new Date(subscription.expires).toDateString()}
+                    Expires: <span className="text-white font-medium">{formatDate(subExpires)}</span>
                   </p>
+                  <p className="text-green-400 text-sm mt-1">{getDaysLeft(subExpires)} days remaining</p>
                 </div>
                 <Button onClick={handleCancelSubscription} variant="destructive" className="px-6">
                   Cancel Subscription
                 </Button>
               </div>
             </div>
+          ) : trialActive ? (
+            <div className="bg-zinc-900 rounded-3xl p-8">
+              <div className="flex justify-between items-start flex-wrap gap-4">
+                <div>
+                  <span className="inline-flex items-center gap-2 bg-purple-600 text-white text-sm font-medium px-4 py-1.5 rounded-2xl">
+                    <Zap className="w-4 h-4" /> FREE TRIAL
+                  </span>
+                  <h3 className="text-2xl font-bold mt-4">Trial Period</h3>
+                  <p className="text-gray-400 flex items-center gap-2 mt-2">
+                    <Calendar className="w-4 h-4" />
+                    Expires: <span className="text-white font-medium">{formatDate(trialEnds)}</span>
+                  </p>
+                  <p className="text-purple-400 text-sm mt-1">{trialDaysLeft} day{trialDaysLeft !== 1 ? 's' : ''} remaining</p>
+                </div>
+                <Button onClick={() => navigate('/app#pricing')} className="bg-purple-600 hover:bg-purple-700 px-8 py-4 flex items-center gap-2">
+                  <Crown className="w-4 h-4" /> Upgrade Plan
+                </Button>
+              </div>
+            </div>
           ) : (
             <div className="bg-zinc-900 rounded-3xl p-12 text-center">
-              <p className="text-gray-400 text-lg">No active subscription</p>
-              <Button onClick={() => navigate('/app#pricing')} className="mt-6 px-10 py-6 text-lg">
-                Choose a Plan
+              <AlertTriangle className="w-12 h-12 text-red-400 mx-auto mb-4" />
+              <p className="text-red-400 font-semibold text-lg">Trial expired on {formatDate(trialEnds)}</p>
+              <p className="text-gray-400 mt-2">Subscribe to continue watching unlimited content.</p>
+              <Button onClick={() => navigate('/app#pricing')} className="mt-6 px-10 py-6 text-lg bg-purple-600 hover:bg-purple-700 flex items-center gap-2 mx-auto">
+                <Crown className="w-5 h-5" /> Choose a Plan
               </Button>
             </div>
           )}
@@ -108,12 +230,10 @@ const ProfilePage = () => {
 
         {/* Watch History */}
         <div className="mt-16">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-semibold flex items-center gap-3">
-              <Clock className="w-6 h-6 text-green-400" />
-              Continue Watching
-            </h2>
-          </div>
+          <h2 className="text-2xl font-semibold flex items-center gap-3 mb-6">
+            <Clock className="w-6 h-6 text-green-400" />
+            Continue Watching
+          </h2>
           {history.length === 0 ? (
             <p className="text-gray-400">No watch history yet.</p>
           ) : (
@@ -153,23 +273,23 @@ const ProfilePage = () => {
             <div className="flex justify-between items-center">
               <div>
                 <p className="font-medium">Email</p>
-                <p className="text-gray-400 text-sm">{user.email}</p>
+                <p className="text-gray-400 text-sm">{user?.email}</p>
               </div>
-              <Button variant="outline">Change Email</Button>
             </div>
             <div className="flex justify-between items-center">
               <div>
-                <p className="font-medium">Password</p>
-                <p className="text-gray-400 text-sm">Last changed 3 months ago</p>
+                <p className="font-medium">Member Since</p>
+                <p className="text-gray-400 text-sm">
+                  {userData?.createdAt?.toDate ? userData.createdAt.toDate().toLocaleDateString('en-ZA', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'}
+                </p>
               </div>
-              <Button variant="outline">Change Password</Button>
             </div>
           </div>
         </div>
 
         {/* Logout */}
         <div className="mt-12 flex justify-center">
-          <Button onClick={() => { if (window.confirm("Log out?")) navigate('/login'); }} variant="destructive" className="flex items-center gap-3 px-10 py-6">
+          <Button onClick={handleLogout} variant="destructive" className="flex items-center gap-3 px-10 py-6">
             <LogOut className="w-5 h-5" />
             Log Out
           </Button>

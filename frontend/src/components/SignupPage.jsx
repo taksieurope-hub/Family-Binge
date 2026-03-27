@@ -3,7 +3,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Button } from './ui/button';
 import { auth, db } from '../services/firebase';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, Timestamp } from 'firebase/firestore';
+import { AlertTriangle } from 'lucide-react';
 
 const SignupPage = () => {
   const navigate = useNavigate();
@@ -16,20 +17,40 @@ const SignupPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters.');
+      return;
+    }
+
     setLoading(true);
     try {
       const { user } = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(user, { displayName: name });
+
+      const now = new Date();
+      const trialEnds = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000); // 3 days
+
       await setDoc(doc(db, 'users', user.uid), {
         name,
         email,
-        createdAt: new Date(),
+        createdAt: Timestamp.fromDate(now),
+        trialEnds: Timestamp.fromDate(trialEnds),
         plan: 'free_trial',
-        trialEnds: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        subscriptionExpires: null,
+        subscriptionPlan: null,
       });
+
       navigate('/app');
     } catch (err) {
-      setError(err.message.replace('Firebase: ', ''));
+      const msg = err.message.replace('Firebase: ', '');
+      if (msg.includes('email-already-in-use')) {
+        setError('This email is already registered. Please log in instead.');
+      } else if (msg.includes('invalid-email')) {
+        setError('Please enter a valid email address.');
+      } else {
+        setError(msg);
+      }
     } finally {
       setLoading(false);
     }
@@ -39,14 +60,40 @@ const SignupPage = () => {
     <div className="min-h-screen bg-black flex items-center justify-center p-6">
       <div className="max-w-md w-full bg-zinc-900 rounded-3xl p-10">
         <h1 className="text-4xl font-bold text-center mb-2">Join Family Binge</h1>
-        <p className="text-center text-gray-400 mb-8">7 days free • Cancel anytime</p>
-        {error && <p className="text-red-400 text-sm text-center mb-4">{error}</p>}
+        <p className="text-center text-gray-400 mb-8">3 days free • Cancel anytime</p>
+        {error && (
+          <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 mb-6">
+            <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0" />
+            <p className="text-red-400 text-sm">{error}</p>
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="space-y-6">
-          <input type="text" placeholder="Full Name" value={name} onChange={e => setName(e.target.value)} className="w-full px-6 py-4 bg-zinc-800 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500" required />
-          <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} className="w-full px-6 py-4 bg-zinc-800 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500" required />
-          <input type="password" placeholder="Password (min 6 characters)" value={password} onChange={e => setPassword(e.target.value)} className="w-full px-6 py-4 bg-zinc-800 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500" required />
+          <input
+            type="text"
+            placeholder="Full Name"
+            value={name}
+            onChange={e => setName(e.target.value)}
+            className="w-full px-6 py-4 bg-zinc-800 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+            required
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            className="w-full px-6 py-4 bg-zinc-800 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password (min 6 characters)"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            className="w-full px-6 py-4 bg-zinc-800 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+            required
+          />
           <Button type="submit" disabled={loading} className="w-full py-7 text-lg bg-purple-600 hover:bg-purple-700">
-            {loading ? 'Creating account...' : 'Create Free Account'}
+            {loading ? 'Creating account...' : 'Start Free Trial'}
           </Button>
         </form>
         <p className="text-center text-gray-400 mt-8">
