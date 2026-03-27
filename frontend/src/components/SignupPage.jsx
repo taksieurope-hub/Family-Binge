@@ -43,7 +43,10 @@ const SignupPage = () => {
 
       navigate('/app');
     } catch (err) {
-      const msg = err.message.replace('Firebase: ', '');
+  console.log('FULL ERROR:', JSON.stringify(err));
+  console.log('ERROR CODE:', err.code);
+  console.log('ERROR MESSAGE:', err.message);
+  const msg = err.message.replace('Firebase: ', '');
       if (msg.includes('email-already-in-use')) {
         setError('This email is already registered. Please log in instead.');
       } else if (msg.includes('invalid-email')) {

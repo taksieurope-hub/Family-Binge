@@ -49,7 +49,10 @@ const LoginPage = () => {
         navigate('/app');
       }
     } catch (err) {
-      const msg = err.message.replace('Firebase: ', '');
+  console.log('FULL ERROR:', JSON.stringify(err));
+  console.log('ERROR CODE:', err.code);
+  console.log('ERROR MESSAGE:', err.message);
+  const msg = err.message.replace('Firebase: ', '');
       if (msg.includes('invalid-credential') || msg.includes('wrong-password') || msg.includes('user-not-found')) {
         setError('Invalid email or password. Please try again.');
       } else {
