@@ -52,7 +52,7 @@ const PricingSection = () => {
     const res = await fetch('https://family-binge-backend.onrender.com/api/payment/create-order', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ plan: plan.name, amount: plan.price })
+      body: JSON.stringify({ plan: plan.name, amount: plan.price, currency: "ZAR" })
     });
     const data = await res.json();
     return data.id;
