@@ -14,6 +14,8 @@ import { auth, db } from "./services/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { Crown, AlertTriangle, X } from "lucide-react";
+import { registerDevice, getDeviceId } from "./services/deviceService";
+import DeviceBlockedModal from "./components/DeviceBlockedModal";
 
 // ── Paywall Modal ──────────────────────────────────────────────────────────────
 const PaywallModal = ({ onClose, onGoToPricing, trialEnds }) => {
@@ -127,7 +129,9 @@ function MainApp() {
   const [showPaywall, setShowPaywall] = useState(false);
   const [showBanner, setShowBanner] = useState(true);
   const [userData, setUserData] = useState(null);
-  const [accessStatus, setAccessStatus] = useState('loading'); // 'loading' | 'full' | 'trial' | 'expired' | 'guest'
+  const [accessStatus, setAccessStatus] = useState('loading');
+  const [deviceBlocked, setDeviceBlocked] = useState(false);
+  const [deviceType, setDeviceType] = useState(null); // 'loading' | 'full' | 'trial' | 'expired' | 'guest'
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
@@ -155,6 +159,15 @@ if (isFreeAccess || hasPaidSub) {
   setAccessStatus('trial');
 } else {
   setAccessStatus('expired');
+}
+
+// Register device and check limit
+if (isFreeAccess || hasPaidSub || trialEnds > now) {
+  const result = await registerDevice(user.uid);
+  if (result.status === 'limit_reached') {
+    setDeviceBlocked(true);
+    setDeviceType(result.device_type);
+  }
 }
         } else {
           setAccessStatus('guest');
@@ -266,6 +279,14 @@ if (isFreeAccess || hasPaidSub) {
         isOpen={showDownloadModal}
         onClose={() => setShowDownloadModal(false)}
       />
+
+      {/* Device Blocked Modal */}
+      {deviceBlocked && (
+        <DeviceBlockedModal
+          deviceType={deviceType}
+          onUnblocked={() => setDeviceBlocked(false)}
+        />
+      )}
 
       {/* Paywall Modal */}
       {showPaywall && (

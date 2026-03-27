@@ -65,37 +65,21 @@ const PricingSection = () => {
   return data.id;
 };
 
-  const onApprove = async (data, actions, plan) => {
-    const res = await fetch(`https://family-binge-backend.onrender.com/api/payment/capture-order/${data.orderID}`, {
+    const onApprove = async (data, actions, plan) => {
+    const res = await fetch('https://family-binge-backend.onrender.com/api/payment/capture-order/' + data.orderID, {
       method: 'POST'
     });
-
     if (res.ok) {
-      const planDurations = {
-        "Basic": 30,
-        "Standard": 90,
-        "Premium (The High Roller)": 180,
-        "Annual (The Best Value) Family": 365
-      };
-
-      const days = planDurations[plan.name] || 30;
-      const expires = new Date();
-      expires.setDate(expires.getDate() + days);
-
       const user = auth.currentUser;
       if (user) {
-        await updateDoc(doc(db, 'users', user.uid), {
-          plan: plan.name,
-          subscriptionPlan: plan.name,
-          subscriptionExpires: expires,
-          subscriptionDays: days,
-          lastPaymentDate: new Date(),
-          lastPaymentAmount: plan.price
+        await fetch('https://family-binge-backend.onrender.com/api/payment/activate-plan', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id: user.uid, plan: plan.id, order_id: data.orderID })
         });
       }
-
-      alert(`✅ Payment successful!\nPlan: ${plan.name}\nExpires: ${expires.toDateString()}`);
-      navigate('/app');
+      alert('Payment successful! Plan: ' + plan.name);
+      window.location.href = '/app';
     }
   };
 

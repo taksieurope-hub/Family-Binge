@@ -1,4 +1,8 @@
-from fastapi import APIRouter, HTTPException
+import pathlib
+
+path = pathlib.Path(r'C:\Users\edahl\Desktop\Family Binge\backend\routers\payment.py')
+
+content = '''from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 import httpx
 import os
@@ -186,3 +190,7 @@ async def remove_device(user_id: str, device_id: str):
     registered = [d for d in data.get("registeredDevices", []) if d["device_id"] != device_id]
     user_ref.update({"registeredDevices": registered})
     return {"success": True}
+'''
+
+path.write_text(content, encoding='utf-8')
+print('Done! payment.py updated.')
