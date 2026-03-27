@@ -55,6 +55,8 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
   const [currentSourceIndex, setCurrentSourceIndex] = useState(0);
   const [isAutoSwitching, setIsAutoSwitching] = useState(true);
   const [playerReady, setPlayerReady] = useState(false);
+  const [watchCountdown, setWatchCountdown] = useState(null);
+  const watchCountdownRef = useRef(null);
   const [subtitlesEnabled, setSubtitlesEnabled] = useState(true);
   const [showNextOverlay, setShowNextOverlay] = useState(false);
   const [nextCountdown, setNextCountdown] = useState(AUTO_NEXT_COUNTDOWN);
@@ -137,7 +139,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
 
         saveToWatchHistory(data, initialSeason, initialEpisode, 0);
         window.dispatchEvent(new Event('watchHistoryUpdated'));
-        shouldAutoPlayRef.current = true;
+        shouldAutoPlayRef.current = false;
 
       } catch (error) {
         console.error('Error fetching details:', error);
@@ -155,15 +157,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
     };
   }, [content, clearNextTimers]);
 
-  useEffect(() => {
-    if (details && shouldAutoPlayRef.current) {
-      shouldAutoPlayRef.current = false;
-      setCurrentSourceIndex(0);
-      setPlayerReady(false);
-      setIsAutoSwitching(true);
-      setIsPlaying(true);
-    }
-  }, [details]);
+
 
   const handleWatchNow = () => {
   if (accessStatus === 'expired') {
@@ -171,17 +165,26 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
     if (onExpiredClick) onExpiredClick();
     return;
   }
-    setIsPlaying(true);
-    setCurrentSourceIndex(0);
-    setPlayerReady(false);
-    setIsAutoSwitching(true);
-    clearNextTimers();
-
-    if (details) {
-      saveToWatchHistory(details, selectedSeason, selectedEpisode, 0);
-      window.dispatchEvent(new Event('watchHistoryUpdated'));
+  setWatchCountdown(5);
+  let count = 5;
+  watchCountdownRef.current = setInterval(() => {
+    count -= 1;
+    setWatchCountdown(count);
+    if (count <= 0) {
+      clearInterval(watchCountdownRef.current);
+      setWatchCountdown(null);
+      setIsPlaying(true);
+      setCurrentSourceIndex(0);
+      setPlayerReady(false);
+      setIsAutoSwitching(true);
+      clearNextTimers();
+      if (details) {
+        saveToWatchHistory(details, selectedSeason, selectedEpisode, 0);
+        window.dispatchEvent(new Event('watchHistoryUpdated'));
+      }
     }
-  };
+  }, 1000);
+};
 
   const handlePlayTrailer = () => {
     if (details?.youtube_id) onPlayVideo(details.youtube_id);
@@ -409,10 +412,10 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
                   </div>
 
                   <div className="flex flex-wrap gap-4">
-                    <Button onClick={handleWatchNow} className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-8 py-6 text-lg font-semibold rounded-lg">
-                      <Play className="w-6 h-6 fill-white" />
-                      Resume
-                    </Button>
+                    <Button onClick={watchCountdown !== null ? () => { clearInterval(watchCountdownRef.current); setWatchCountdown(null); } : handleWatchNow} className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-8 py-6 text-lg font-semibold rounded-lg">
+  <Play className="w-6 h-6 fill-white" />
+  {watchCountdown !== null ? `Starting in ${watchCountdown}s... (tap to cancel)` : 'Watch Now'}
+</Button>
                     <Button onClick={handlePlayTrailer} disabled={!details.youtube_id} variant="outline" className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white border-white/30 px-8 py-6 text-lg rounded-lg disabled:opacity-50">
                       <Play className="w-6 h-6" />
                       Trailer
