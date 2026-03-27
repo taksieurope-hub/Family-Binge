@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { auth } from '../services/firebase';
+import { signOut } from 'firebase/auth';
 import InstallAppButton from './InstallAppButton';
 import { Tv, Menu, X, Search, User, ChevronDown, Film, Bell, Settings, Loader2 } from 'lucide-react';
 import { Button } from './ui/button';
@@ -149,7 +151,7 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
                     <Settings className="w-4 h-4" /> Settings
                   </button>
                   <div className="border-t border-white/10" />
-                  <button className="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors text-sm">Sign Out</button>
+                  <button onClick={async () => { await signOut(auth); window.location.href = "/"; }} className="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors text-sm">Sign Out</button>
                 </div>
               )}
             </div>
