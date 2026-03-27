@@ -2,7 +2,8 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { PayPalButtons, PayPalScriptProvider } from '@paypal/react-paypal-js';
-import { auth } from '../services/firebase';
+import { auth, db } from '../services/firebase';
+import { doc, updateDoc } from 'firebase/firestore';
 
 const PricingSection = () => {
   const navigate = useNavigate();
@@ -57,46 +58,34 @@ const PricingSection = () => {
     return data.id;
   };
 
-    const onApprove = async (data, actions, plan) => {
-  const res = await fetch(`https://family-binge-backend.onrender.com/api/payment/capture-order/${data.orderID}`, {
-    method: 'POST'
-  });
+  const onApprove = async (data, actions, plan) => {
+    const res = await fetch(`https://family-binge-backend.onrender.com/api/payment/capture-order/${data.orderID}`, {
+      method: 'POST'
+    });
 
-  if (res.ok) {
-    const planDurations = {
-      "Basic": 30,
-      "Standard": 90,
-      "Premium (The High Roller)": 180,
-      "Annual (The Best Value) Family": 365
-    };
+    if (res.ok) {
+      const planDurations = {
+        "Basic": 30,
+        "Standard": 90,
+        "Premium (The High Roller)": 180,
+        "Annual (The Best Value) Family": 365
+      };
 
-    const days = planDurations[plan.name] || 30;
-    const expires = new Date();
-    expires.setDate(expires.getDate() + days);
+      const days = planDurations[plan.name] || 30;
+      const expires = new Date();
+      expires.setDate(expires.getDate() + days);
 
-    // Save to Firebase so MainApp can read it
-    const user = auth.currentUser;
-    if (user) {
-      const { doc, updateDoc } = await import('firebase/firestore');
-      const { db } = await import('./services/firebase');
-      await updateDoc(doc(db, 'users', user.uid), {
-        plan: plan.name,
-        subscriptionPlan: plan.name,
-        subscriptionExpires: expires,
-        subscriptionDays: days,
-        lastPaymentDate: new Date(),
-        lastPaymentAmount: plan.price
-      });
-    }
-
-    alert(`✅ Payment successful!\nPlan: ${plan.name}\nExpires: ${expires.toDateString()}`);
-    navigate('/app');
-  }
-};
-
-      localStorage.setItem('familybinge_paid', 'true');
-      localStorage.setItem('familybinge_subscription_plan', plan.name);
-      localStorage.setItem('familybinge_subscription_expires', expires.toISOString());
+      const user = auth.currentUser;
+      if (user) {
+        await updateDoc(doc(db, 'users', user.uid), {
+          plan: plan.name,
+          subscriptionPlan: plan.name,
+          subscriptionExpires: expires,
+          subscriptionDays: days,
+          lastPaymentDate: new Date(),
+          lastPaymentAmount: plan.price
+        });
+      }
 
       alert(`✅ Payment successful!\nPlan: ${plan.name}\nExpires: ${expires.toDateString()}`);
       navigate('/app');
@@ -131,7 +120,7 @@ const PricingSection = () => {
                   <p className="text-purple-400">+R20/month per extra device</p>
                 </div>
 
-                                <PayPalButtons
+                <PayPalButtons
                   style={{ layout: "vertical" }}
                   createOrder={() => createOrder(plan)}
                   onApprove={(data, actions) => onApprove(data, actions, plan)}
