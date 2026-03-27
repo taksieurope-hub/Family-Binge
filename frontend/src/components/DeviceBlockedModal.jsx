@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
-import { auth, db } from "../services/firebase";
-import { doc, updateDoc } from "firebase/firestore";
-import { Smartphone, Tv, Plus, X } from "lucide-react";
+import { auth } from "../services/firebase";
+import { Smartphone, Tv } from "lucide-react";
 import { addExtraDevice, getDeviceId, getDeviceType, getDeviceName } from "../services/deviceService";
 
 const API = process.env.REACT_APP_API_URL || "https://family-binge-backend.onrender.com/api";
@@ -16,17 +15,11 @@ const DeviceBlockedModal = ({ deviceType, onUnblocked }) => {
     try {
       const user = auth.currentUser;
       if (!user) return;
-
-      // Capture payment
-      const res = await fetch(${API}/payment/capture-order/, { method: "POST" });
+      const res = await fetch(`${API}/payment/capture-order/${data.orderID}`, { method: "POST" });
       const capture = await res.json();
-
       if (capture.status === "COMPLETED") {
-        // Add extra device to user account
         await addExtraDevice(user.uid, deviceType, data.orderID);
-
-        // Now register this device
-        const regRes = await fetch(${API}/payment/register-device, {
+        await fetch(`${API}/payment/register-device`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -36,7 +29,6 @@ const DeviceBlockedModal = ({ deviceType, onUnblocked }) => {
             device_name: getDeviceName()
           })
         });
-
         setPaid(true);
         setTimeout(() => onUnblocked(), 1500);
       }
@@ -55,12 +47,11 @@ const DeviceBlockedModal = ({ deviceType, onUnblocked }) => {
         </div>
         <h2 style={{ color: "#fff", fontSize: 22, fontWeight: 700, marginBottom: 10 }}>Device Limit Reached</h2>
         <p style={{ color: "#888", fontSize: 14, marginBottom: 6 }}>
-          You have reached the maximum number of {deviceType === "tv" ? "TVs" : "phones"} allowed on your plan.
+          You have reached the maximum number of {deviceType === "tv" ? "TVs" : "phones"} on your plan.
         </p>
         <p style={{ color: "#aaa", fontSize: 14, marginBottom: 28 }}>
           Add this {deviceType === "tv" ? "TV" : "phone"} for <strong style={{ color: "#fff" }}>R20/month</strong>.
         </p>
-
         {paid ? (
           <div style={{ color: "#22c55e", fontWeight: 600, fontSize: 16 }}>Device added! Loading...</div>
         ) : (
@@ -68,7 +59,7 @@ const DeviceBlockedModal = ({ deviceType, onUnblocked }) => {
             <PayPalButtons
               style={{ layout: "vertical", shape: "rect", color: "gold" }}
               createOrder={async () => {
-                const res = await fetch(${API}/payment/create-order, {
+                const res = await fetch(`${API}/payment/create-order`, {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ plan: "extra_device", amount: 1.10, currency: "USD" })
@@ -80,9 +71,8 @@ const DeviceBlockedModal = ({ deviceType, onUnblocked }) => {
             />
           </PayPalScriptProvider>
         )}
-
         <p style={{ color: "#555", fontSize: 11, marginTop: 16 }}>
-          To remove a device, go to your Profile page and manage registered devices.
+          To remove a device, go to your Profile page.
         </p>
       </div>
     </div>
