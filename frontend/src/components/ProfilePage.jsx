@@ -295,7 +295,6 @@ const ProfilePage = () => {
           </Button>
         </div>
       </div>
-    </div>
 
       {/* Cancel Subscription Modal */}
       {showCancelModal && (
