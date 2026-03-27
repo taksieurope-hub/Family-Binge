@@ -39,6 +39,11 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
 
   // Smooth scroll to section
   const scrollToSection = (id) => {
+    if (id === 'livetv') {
+      navigate('/livetv');
+      setMobileMenuOpen(false);
+      return;
+    }
     setActiveSection(id);
     setMobileMenuOpen(false);
 
