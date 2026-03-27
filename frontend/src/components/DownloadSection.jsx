@@ -65,12 +65,12 @@ const DownloadSection = () => {
         {/* Header */}
         <div className="text-center mb-16">
           <span className="inline-block px-4 py-2 bg-purple-600/20 text-purple-400 rounded-full text-sm font-medium mb-4">
-            7 DAYS FREE TRIAL
+            3 DAYS FREE TRIAL
           </span>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
             Download the App to{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">
-              Enjoy 7 Days Free
+              Enjoy 3 Days Free
             </span>
           </h2>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
