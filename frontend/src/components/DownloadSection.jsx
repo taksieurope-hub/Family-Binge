@@ -10,7 +10,7 @@ const DownloadSection = () => {
       description: 'For Android smartphones',
       icon: Smartphone,
       image: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=200&h=400&fit=crop',
-      downloadLink: '#'
+      downloadLink: 'https://drive.google.com/uc?export=download&id=1vJD0YOHHw9vq8tabz7k0CNRmPZqecA2c'
     },
     {
       id: 2,
@@ -18,7 +18,7 @@ const DownloadSection = () => {
       description: 'For Smart TVs',
       icon: Tv,
       image: 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=200&h=150&fit=crop',
-      downloadLink: '#'
+      downloadLink: 'https://drive.google.com/uc?export=download&id=1vJD0YOHHw9vq8tabz7k0CNRmPZqecA2c'
     },
     {
       id: 3,
@@ -26,7 +26,7 @@ const DownloadSection = () => {
       description: 'For Fire Stick & more',
       icon: Usb,
       image: 'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=200&h=150&fit=crop',
-      downloadLink: '#'
+      downloadLink: 'https://drive.google.com/uc?export=download&id=1vJD0YOHHw9vq8tabz7k0CNRmPZqecA2c'
     },
     {
       id: 4,
@@ -34,7 +34,7 @@ const DownloadSection = () => {
       description: 'For Android boxes',
       icon: MonitorPlay,
       image: 'https://images.unsplash.com/photo-1593784991095-a205069470b6?w=200&h=150&fit=crop',
-      downloadLink: '#'
+      downloadLink: 'https://drive.google.com/uc?export=download&id=1vJD0YOHHw9vq8tabz7k0CNRmPZqecA2c'
     }
   ];
 
