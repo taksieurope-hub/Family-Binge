@@ -187,7 +187,7 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
 
             {/* Search Results */}
             {showResults && searchResults.length > 0 && (
-              <div className="absolute left-0 right-0 mt-2 bg-gray-950/98 border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50 backdrop-blur-md">
+              <div className="absolute left-0 right-0 mt-2 bg-gray-950 border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50">
                 <div className="px-4 py-2 border-b border-white/5">
                   <span className="text-gray-500 text-xs font-medium uppercase tracking-wider">{searchResults.length} Results</span>
                 </div>

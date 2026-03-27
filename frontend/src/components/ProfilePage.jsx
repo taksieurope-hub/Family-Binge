@@ -296,6 +296,38 @@ const ProfilePage = () => {
         </div>
       </div>
     </div>
+
+      {/* Cancel Subscription Modal */}
+      {showCancelModal && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 px-4">
+          <div className="bg-zinc-900 rounded-3xl p-8 max-w-md w-full border border-white/10 shadow-2xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center">
+                <Crown className="w-6 h-6 text-red-400" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white">Cancel Subscription?</h3>
+                <p className="text-gray-400 text-sm">This cannot be undone</p>
+              </div>
+            </div>
+            <div className="bg-zinc-800 rounded-2xl p-4 mb-6">
+              <p className="text-gray-300 text-sm leading-relaxed">
+                You will keep full access to Family Binge until {formatDate(subExpires)}.
+                After that your account will downgrade and you will need to resubscribe.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Button onClick={() => setShowCancelModal(false)} variant="outline" className="flex-1 bg-white/5 hover:bg-white/10 text-white border-white/20 py-6">
+                Keep Subscription
+              </Button>
+              <Button onClick={handleCancelSubscription} variant="destructive" className="flex-1 py-6" disabled={cancelling}>
+                {cancelling ? "Cancelling..." : "Yes, Cancel"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

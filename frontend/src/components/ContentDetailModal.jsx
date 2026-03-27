@@ -426,9 +426,9 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
                   </div>
 
                   <div className="flex flex-wrap gap-4">
-                    <Button onClick={watchCountdown !== null ? () => { clearInterval(watchCountdownRef.current); setWatchCountdown(null); } : handleWatchNow} className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-8 py-6 text-lg font-semibold rounded-lg">
+                    <Button onClick={handleWatchNow} className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-8 py-6 text-lg font-semibold rounded-lg">
   <Play className="w-6 h-6 fill-white" />
-  {watchCountdown !== null ? `Starting in ${watchCountdown}s... (tap to cancel)` : 'Watch Now'}
+  Watch Now
 </Button>
                     <Button onClick={handlePlayTrailer} disabled={!details.youtube_id} variant="outline" className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white border-white/30 px-8 py-6 text-lg rounded-lg disabled:opacity-50">
                       <Play className="w-6 h-6" />
