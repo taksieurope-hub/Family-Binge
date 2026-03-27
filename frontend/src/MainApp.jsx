@@ -7,6 +7,7 @@ import DownloadSection from "./components/DownloadSection";
 import PricingSection from "./components/PricingSection";
 import FAQSection from "./components/FAQSection";
 import Footer from "./components/Footer";
+import LiveTVSection from "./components/LiveTVSection";
 import VideoPlayer from "./components/VideoPlayer";
 import ContentDetailModal from "./components/ContentDetailModal";
 import DownloadModal from "./components/DownloadModal";
@@ -241,8 +242,7 @@ if (isFreeAccess || hasPaidSub) {
         <ContentSection type="movies" onSelectContent={handleSelectContent} />
       </div>
       <div id="series">
-        <div id="livetv">
-</div>
+        <div id="livetv"><LiveTVSection accessStatus={accessStatus} onExpiredClick={() => setShowPaywall(true)} /></div>
         <ContentSection type="series" onSelectContent={handleSelectContent} />
       </div>
       <div id="download">

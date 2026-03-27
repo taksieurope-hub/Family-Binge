@@ -25,6 +25,7 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
     { id: 'home', label: 'Home' },
 
     { id: 'movies', label: 'Movies' },
+    { id: 'livetv', label: 'Live TV' },
     { id: 'series', label: 'Series' },
     { id: 'download', label: 'Download' },
     { id: 'pricing', label: 'Pricing' },
