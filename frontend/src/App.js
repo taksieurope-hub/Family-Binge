@@ -6,6 +6,7 @@ const LoginPage   = lazy(() => import("./components/LoginPage"));
 const SignupPage  = lazy(() => import("./components/SignupPage"));
 const MainApp     = lazy(() => import("./MainApp"));
 const ProfilePage = lazy(() => import("./components/ProfilePage"));
+const LiveTVPage   = lazy(() => import("./components/LiveTVPage"));
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/signup"  element={<SignupPage />} />
           <Route path="/app"     element={<MainApp />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/livetv"  element={<LiveTVPage />} />
         </Routes>
       </Suspense>
     </Router>
