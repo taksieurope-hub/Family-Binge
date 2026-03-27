@@ -109,6 +109,13 @@ const ProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-black text-white pb-20">
+      {/* Back Button */}
+      <div className="px-6 pt-6">
+        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+          Back
+        </button>
+      </div>
       {/* Trial Expiry Banner */}
       {trialExpired && (
         <div className="bg-red-600 px-6 py-4 flex items-center justify-between gap-4">
