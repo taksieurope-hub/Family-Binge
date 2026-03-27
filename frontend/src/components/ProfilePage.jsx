@@ -12,6 +12,8 @@ const ProfilePage = () => {
   const [history, setHistory] = useState([]);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
