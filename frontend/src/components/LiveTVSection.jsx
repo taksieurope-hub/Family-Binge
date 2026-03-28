@@ -203,6 +203,7 @@ export const channels = [
   { id: 201, name: "KMOS-DT1 PBS Missouri", category: "Education", url: "https://hls-kmosdt.lls.cdn.pbs.org/hls/live/index.m3u8", logo: "https://upload.wikimedia.org/wikipedia/commons/8/89/PBS_logo_2019.svg" },
   { id: 202, name: "E!", category: "Entertainment", url: "https://v14.thetvapp.to/hls/EEast/tracks-v1a1/mono.m3u8?token=K3MVigOs0dQvf6yO8xwShw&expires=1767024287&user_id=MTA3LjE3My4xNDAuMTY0", logo: "https://i.imgur.com/TWFDkap.png" },
   { id: 203, name: "KFMB-DT2 CW San Diego", category: "Entertainment", url: "https://e4.thetvapp.to/hls/cw-kfmbtv2-san-diego-ca/tracks-v1a1/mono.m3u8?token=WT_RYLkdfNj2pORBaghzIA&expires=1767031568&user_id=MTA3LjE3My4xNDAuMTY0", logo: "https://i.imgur.com/GCB3vun.png" },
+  { id: 204, name: "KMTV-DT1 (ABC Omaha)", category: "General", url: "https://content.uplynk.com/4a09fbea28ef4f32bce095e9eae04bd8.m3u8", logo: "https://i.imgur.com/E4PkyqN.png" },
 ];
 
 const categories = ['All', 'News', 'Movies', 'Series', 'Entertainment', 'Comedy', 'Sports', 'Business', 'Documentary', 'Nature', 'Travel', 'Cooking', 'Family', 'Science', 'Religious', 'Animation', 'Music', 'Lifestyle', 'Kids', 'Outdoor', 'Weather', 'Shopping', 'Classic', 'Auto', 'Education', 'Cooking', 'General', 'Entertainment'];
