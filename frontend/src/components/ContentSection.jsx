@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { Play, Star, ChevronLeft, ChevronRight, Film, Tv, Loader2, X, Clock } from 'lucide-react';
-import { movieAPI, seriesAPI } from '../services/api';
+import { movieAPI, seriesAPI, bollywoodAPI } from '../services/api';
 import { getWatchHistory, removeFromWatchHistory } from './ContentDetailModal';
 
 const ContentRow = ({ title, icon: Icon, items, onSelectContent, loading }) => {
@@ -198,32 +198,37 @@ const ContentSection = ({ type = 'movies', onSelectContent }) => {
   const [trending, setTrending] = useState([]);
   const [popular, setPopular] = useState([]);
   const [topRated, setTopRated] = useState([]);
+  const [bollywood, setBollywood] = useState([]);
+  const [hindiSeries, setHindiSeries] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const Icon = type === 'movies' ? Film : Tv;
-
   useEffect(() => {
     const fetchContent = async () => {
       setLoading(true);
       try {
         const api = type === 'movies' ? movieAPI : seriesAPI;
-        
         const [trendingRes, popularRes, topRatedRes] = await Promise.all([
           api.getTrending(1),
           api.getPopular(1),
           api.getTopRated(1),
         ]);
-
         setTrending(trendingRes.data.items || []);
         setPopular(popularRes.data.items || []);
         setTopRated(topRatedRes.data.items || []);
+        if (type === 'movies') {
+          const [bollywoodRes, hindiSeriesRes] = await Promise.all([
+            bollywoodAPI.getTrending(1),
+            bollywoodAPI.getHindiSeries(1),
+          ]);
+          setBollywood(bollywoodRes.data.items || []);
+          setHindiSeries(hindiSeriesRes.data.items || []);
+        }
       } catch (error) {
         console.error(`Error fetching ${type}:`, error);
       } finally {
         setLoading(false);
       }
     };
-
     fetchContent();
   }, [type]);
 
@@ -256,9 +261,28 @@ const ContentSection = ({ type = 'movies', onSelectContent }) => {
           onSelectContent={onSelectContent}
           loading={loading}
         />
+        {type === 'movies' && bollywood.length > 0 && (
+          <ContentRow
+            title="🎬 Bollywood Trending"
+            icon={Film}
+            items={bollywood}
+            onSelectContent={onSelectContent}
+            loading={loading}
+          />
+        )}
+        {type === 'movies' && hindiSeries.length > 0 && (
+          <ContentRow
+            title="📺 Hindi Series"
+            icon={Tv}
+            items={hindiSeries}
+            onSelectContent={onSelectContent}
+            loading={loading}
+          />
+        )}
       </div>
     </section>
   );
 };
 
 export default ContentSection;
+

@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://family-binge-backend.onrender.com";
+﻿const API_BASE_URL = "https://family-binge-backend.onrender.com";
 
 // Backend already returns formatted items from tmdb_service.py
 // List endpoints: { items: [...], total_pages: N, page: N }
@@ -61,6 +61,12 @@ export const movieAPI = {
   getDetails:   (id)       => fetchDetails(`${API_BASE_URL}/api/content/movies/${id}`),
   search: (query, page=1)  => fetchSearch(`${API_BASE_URL}/api/content/movies/search/${encodeURIComponent(query)}?page=${page}`),
 };
+export const bollywoodAPI = {
+  getPopular:  (page = 1) => fetchList(`${API_BASE_URL}/api/content/movies/bollywood/popular?page=${page}`),
+  getTrending: (page = 1) => fetchList(`${API_BASE_URL}/api/content/movies/bollywood/trending?page=${page}`),
+  getHindiSeries:        (page = 1) => fetchList(`${API_BASE_URL}/api/content/series/hindi/popular?page=${page}`),
+  getHindiSeriesTrending:(page = 1) => fetchList(`${API_BASE_URL}/api/content/series/hindi/trending?page=${page}`),
+};
 
 export const seriesAPI = {
   getTrending: (page = 1) => fetchList(`${API_BASE_URL}/api/content/series/trending?page=${page}`),
@@ -74,3 +80,4 @@ export const searchAPI = {
   searchAll: (query, page=1) => fetchSearch(`${API_BASE_URL}/api/content/search?q=${encodeURIComponent(query)}&page=${page}`),
   search:    (query, page=1) => fetchSearch(`${API_BASE_URL}/api/content/search?q=${encodeURIComponent(query)}&page=${page}`),
 };
+

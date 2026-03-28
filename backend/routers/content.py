@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Query, HTTPException
+﻿from fastapi import APIRouter, Query, HTTPException
 from fastapi.responses import StreamingResponse
 from typing import Optional, List
 from pydantic import BaseModel
@@ -12,7 +12,8 @@ from services.tmdb_service import (
     get_movie_details, get_series_details,
     search_movies, search_series, search_multi,
     get_movie_genres, get_tv_genres,
-    get_movies_by_genre, get_series_by_genre
+    get_movies_by_genre, get_series_by_genre,
+    get_bollywood_movies, get_bollywood_trending, get_hindi_series, get_hindi_series_trending
 )
 
 from services.iptv_service import (
@@ -144,6 +145,32 @@ async def search_all(q: str = Query(..., min_length=1), page: int = Query(1, ge=
     results, total_pages = await search_multi(q, page)
     return ContentListResponse(items=results, total_pages=total_pages, page=page)
 
+
+# ============ BOLLYWOOD / HINDI ENDPOINTS ============
+
+@router.get("/movies/bollywood/popular")
+async def bollywood_popular(page: int = Query(1, ge=1, le=500)):
+    """Get popular Bollywood/Hindi movies"""
+    movies, total_pages = await get_bollywood_movies(page)
+    return ContentListResponse(items=movies, total_pages=total_pages, page=page)
+
+@router.get("/movies/bollywood/trending")
+async def bollywood_trending(page: int = Query(1, ge=1, le=500)):
+    """Get trending Bollywood/Hindi movies"""
+    movies, total_pages = await get_bollywood_trending(page)
+    return ContentListResponse(items=movies, total_pages=total_pages, page=page)
+
+@router.get("/series/hindi/popular")
+async def hindi_series_popular(page: int = Query(1, ge=1, le=500)):
+    """Get popular Hindi TV series"""
+    series, total_pages = await get_hindi_series(page)
+    return ContentListResponse(items=series, total_pages=total_pages, page=page)
+
+@router.get("/series/hindi/trending")
+async def hindi_series_trending(page: int = Query(1, ge=1, le=500)):
+    """Get trending Hindi TV series"""
+    series, total_pages = await get_hindi_series_trending(page)
+    return ContentListResponse(items=series, total_pages=total_pages, page=page)
 # ============ LIVE TV ENDPOINTS ============
 
 @router.get("/livetv/channels")
@@ -236,7 +263,7 @@ async def proxy_hls_stream(url: str = Query(..., description="HLS stream URL to 
                     }
                 )
             else:
-                # Binary segment (TS, AAC, etc.) — stream it directly
+                # Binary segment (TS, AAC, etc.) â€” stream it directly
                 return StreamingResponse(
                     iter([response.content]),
                     media_type=content_type,
@@ -249,3 +276,4 @@ async def proxy_hls_stream(url: str = Query(..., description="HLS stream URL to 
         raise HTTPException(status_code=504, detail="Stream timeout - channel may be unavailable")
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"Failed to fetch stream: {str(e)}")
+

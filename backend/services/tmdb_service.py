@@ -1,4 +1,4 @@
-import os
+﻿import os
 import httpx
 from typing import Optional, List, Dict, Any
 import logging
@@ -294,3 +294,31 @@ def format_series_details(series: dict) -> dict:
         "type": "series"
     }
 
+
+async def get_bollywood_movies(page: int = 1):
+    """Get popular Hindi/Bollywood movies"""
+    data = await tmdb_request("/discover/movie", {"with_original_language": "hi", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_movies(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_bollywood_trending(page: int = 1):
+    """Get trending Hindi movies"""
+    data = await tmdb_request("/trending/movie/week", {"with_original_language": "hi", "page": page})
+    if data and "results" in data:
+        return format_movies(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_hindi_series(page: int = 1):
+    """Get popular Hindi TV series"""
+    data = await tmdb_request("/discover/tv", {"with_original_language": "hi", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_series(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_hindi_series_trending(page: int = 1):
+    """Get trending Hindi TV series"""
+    data = await tmdb_request("/trending/tv/week", {"with_original_language": "hi", "page": page})
+    if data and "results" in data:
+        return format_series(data["results"]), data.get("total_pages", 1)
+    return [], 1
