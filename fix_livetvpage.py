@@ -1,4 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
+﻿import pathlib
+
+src = pathlib.Path(r'C:\Users\edahl\Desktop\Family Binge\frontend\src\components\LiveTVPage.jsx')
+
+new_content = '''import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Tv, Menu, X, Search, Trash2 } from 'lucide-react';
 import { channels } from './LiveTVSection';
@@ -228,9 +232,13 @@ const LiveTVPage = () => {
           )}
         </div>
       </div>
-      <style>{'@keyframes spin { to { transform: rotate(360deg); } } ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: #111; } ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }'}</style>
+      <style>{\'@keyframes spin { to { transform: rotate(360deg); } } ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: #111; } ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }\'}</style>
     </div>
   );
 };
 
 export default LiveTVPage;
+'''
+
+src.write_text(new_content, encoding='utf-8')
+print('Done! LiveTVPage.jsx fully rewritten.')
