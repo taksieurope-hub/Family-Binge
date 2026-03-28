@@ -21,12 +21,12 @@ const ProfilePage = () => {
 
   useEffect(() => {
     const loadHidden = async () => {
-      const user = auth.currentUser;
-      if (!user) return;
+      const u = auth.currentUser;
+      if (!u) { setTimeout(loadHidden, 500); return; }
       try {
-        const snap = await getDoc(doc(db, 'hidden_channels', user.uid));
+        const snap = await getDoc(doc(db, 'hidden_channels', u.uid));
         if (snap.exists()) setHiddenChannels(snap.data().ids || []);
-      } catch(e) {}
+      } catch(e) { console.error('loadHidden error', e); }
     };
     loadHidden();
   }, []);
@@ -34,14 +34,14 @@ const ProfilePage = () => {
   const unhideChannel = async (id) => {
     const next = hiddenChannels.filter(i => i !== id);
     setHiddenChannels(next);
-    const user = auth.currentUser;
-    if (user) await setDoc(doc(db, 'hidden_channels', user.uid), { ids: next });
+    const u = auth.currentUser;
+    if (u) await setDoc(doc(db, 'hidden_channels', u.uid), { ids: next });
   };
 
   const unhideAll = async () => {
     setHiddenChannels([]);
-    const user = auth.currentUser;
-    if (user) await setDoc(doc(db, 'hidden_channels', user.uid), { ids: [] });
+    const u = auth.currentUser;
+    if (u) await setDoc(doc(db, 'hidden_channels', u.uid), { ids: [] });
   };
 
   useEffect(() => {
