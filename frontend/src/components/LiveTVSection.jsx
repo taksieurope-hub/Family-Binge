@@ -421,8 +421,6 @@ export const channels = [
   { id: 419, name: "FYI", category: "Lifestyle", logo: "https://i.imgur.com/Oq4JkOn.png", streams: ["https://amg01113-aenetworks-fyi-samsungus.amagi.tv/playlist.m3u8", "https://fyi-samsungus.amagi.tv/playlist.m3u8"] },
 ];
 
-const categories = ['All', ...Array.from(new Set(visibleChannels.map(c => c.category))).sort()];
-
 const colorMap = {
   News: 'from-blue-700 to-blue-900', Movies: 'from-violet-700 to-purple-900', Series: 'from-amber-600 to-orange-700',
   Entertainment: 'from-pink-600 to-rose-700', Comedy: 'from-yellow-500 to-orange-500', Sports: 'from-green-600 to-emerald-700',
@@ -457,6 +455,7 @@ const LiveTVSection = ({ accessStatus, onExpiredClick }) => {
   };
 
   const visibleChannels = channels.filter(c => !deletedIds.includes(c.id));
+  const categories = ['All', ...Array.from(new Set(visibleChannels.map(c => c.category))).sort()];
   const videoRef = useRef(null);
   const hlsRef = useRef(null);
 
