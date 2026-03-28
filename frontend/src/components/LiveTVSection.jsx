@@ -632,9 +632,7 @@ const LiveTVSection = ({ accessStatus, onExpiredClick }) => {
                 <button
                   onClick={(e) => handleDelete(e, channel.id)}
                   className="absolute top-1 right-1 z-20 w-6 h-6 bg-red-600 hover:bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg"
-                  title="Hide this channel">
-                  ✕
-                </button>
+                  title="Hide this channel">X</button>
               )}
             </button>
           ))}
