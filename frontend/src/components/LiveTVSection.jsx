@@ -421,7 +421,7 @@ export const channels = [
   { id: 419, name: "FYI", category: "Lifestyle", logo: "https://i.imgur.com/Oq4JkOn.png", streams: ["https://amg01113-aenetworks-fyi-samsungus.amagi.tv/playlist.m3u8", "https://fyi-samsungus.amagi.tv/playlist.m3u8"] },
 ];
 
-const categories = ['All', 'News', 'Movies', 'Series', 'Entertainment', 'Comedy', 'Sports', 'Business', 'Documentary', 'Nature', 'Travel', 'Cooking', 'Family', 'Science', 'Religious', 'Animation', 'Music', 'Lifestyle', 'Kids', 'Outdoor', 'Weather', 'Shopping', 'Classic', 'Auto', 'Education', 'General'];
+const categories = ['All', ...Array.from(new Set(visibleChannels.map(c => c.category))).sort()];
 
 const colorMap = {
   News: 'from-blue-700 to-blue-900', Movies: 'from-violet-700 to-purple-900', Series: 'from-amber-600 to-orange-700',
@@ -435,7 +435,7 @@ const LiveTVSection = ({ accessStatus, onExpiredClick }) => {
   const [selectedChannel, setSelectedChannel] = useState(null);
   const [streamIndex, setStreamIndex] = useState(0);
   const [activeCategory, setActiveCategory] = useState('All');
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState('All');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [deletedIds, setDeletedIds] = useState(() => {
