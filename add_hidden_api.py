@@ -1,30 +1,9 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-import os
+﻿import pathlib
 
-app = FastAPI(title="Family Binge API")
+src = pathlib.Path(r'C:\Users\edahl\Desktop\Family Binge\backend\server.py')
+content = src.read_text(encoding='utf-8')
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "https://family-binge-9lws.onrender.com",
-        "http://localhost:3000",
-        "http://localhost:3001",
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-@app.get("/")
-async def root():
-    return {"message": "Family Binge API running"}
-
-from routers.content import router as content_router
-from routers.payment import router as payment_router
-app.include_router(payment_router, prefix="/api")
-app.include_router(content_router, prefix="/api/content")
-
+new_routes = '''
 from fastapi import Request
 from firebase_admin import firestore
 
@@ -49,3 +28,9 @@ async def save_hidden_channels(user_id: str, request: Request):
         return {"success": True}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+'''
+
+from fastapi import HTTPException
+content += new_routes
+src.write_text(content, encoding='utf-8')
+print('Done! Hidden channels endpoints added.')

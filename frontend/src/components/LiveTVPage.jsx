@@ -2,6 +2,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Tv, Menu, X, Search, Trash2 } from 'lucide-react';
 import { channels } from './LiveTVSection';
+import { useAuth } from '../services/AuthContext';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { db } from '../services/firebase';
 
 const LiveTVPage = () => {
   const navigate = useNavigate();
@@ -15,9 +18,19 @@ const LiveTVPage = () => {
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
   const [deleteMode, setDeleteMode] = useState(false);
-  const [deletedIds, setDeletedIds] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('fb_deleted') || '[]'); } catch(e) { return []; }
-  });
+  const { user } = useAuth();
+  const [deletedIds, setDeletedIds] = useState([]);
+
+  useEffect(() => {
+    if (!user) return;
+    const load = async () => {
+      try {
+        const snap = await getDoc(doc(db, 'hidden_channels', user.uid));
+        if (snap.exists()) setDeletedIds(snap.data().ids || []);
+      } catch(e) {}
+    };
+    load();
+  }, [user]);
 
   const visibleChannels = channels.filter(c => !deletedIds.includes(c.id));
   const categories = ['All', ...Array.from(new Set(visibleChannels.map(c => c.category))).sort()];
@@ -32,12 +45,12 @@ const LiveTVPage = () => {
     if (!window.confirm('Hide this channel?')) return;
     const next = [...deletedIds, id];
     setDeletedIds(next);
-    localStorage.setItem('fb_deleted', JSON.stringify(next));
+    if (user) setDoc(doc(db, 'hidden_channels', user.uid), { ids: next });
   };
 
   const handleRestoreAll = () => {
     setDeletedIds([]);
-    localStorage.removeItem('fb_deleted');
+    if (user) setDoc(doc(db, 'hidden_channels', user.uid), { ids: [] });
   };
 
   const loadStream = (channel, idx = 0) => {
