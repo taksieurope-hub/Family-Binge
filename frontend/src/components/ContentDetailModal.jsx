@@ -35,6 +35,7 @@ export const removeFromWatchHistory = (id, type) => {
 
 const VIDEO_SOURCES = [
   { name: 'VidSrc Pro',  getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrc.pro/embed/tv/${id}/${s}/${e}` : `https://vidsrc.pro/embed/movie/${id}` },
+  { name: 'Embed.su',    getUrl: (type, id, s, e) => type === 'series' ? `https://embed.su/embed/tv/${id}/${s}/${e}` : `https://embed.su/embed/movie/${id}` },
   { name: 'VidSrc CC',   getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}` : `https://vidsrc.cc/v2/embed/movie/${id}` },
   { name: 'VidSrc XYZ',  getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrc.xyz/embed/tv/${id}/${s}/${e}` : `https://vidsrc.xyz/embed/movie/${id}` },
   { name: 'Smashy',      getUrl: (type, id, s, e) => type === 'series' ? `https://player.smashy.stream/tv/${id}?s=${s}&e=${e}` : `https://player.smashy.stream/movie/${id}` },
@@ -233,13 +234,30 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
   };
 
   const handleIframeLoad = () => {
+    if (autoSwitchTimeoutRef.current) clearTimeout(autoSwitchTimeoutRef.current);
     setPlayerReady(true);
     setIsAutoSwitching(false);
-    // Enter fullscreen when player is ready
     setTimeout(() => enterFullscreen(), 300);
-    // Start auto-next timer for series
     startAutoNextTimer(details, selectedSeason, selectedEpisode);
   };
+
+  // Auto-switch to next source after 8 seconds if not ready
+  useEffect(() => {
+    if (!isPlaying) return;
+    if (playerReady) return;
+    if (autoSwitchTimeoutRef.current) clearTimeout(autoSwitchTimeoutRef.current);
+    autoSwitchTimeoutRef.current = setTimeout(() => {
+      if (!playerReady) {
+        const next = currentSourceIndex + 1;
+        if (next < VIDEO_SOURCES.length) {
+          setCurrentSourceIndex(next);
+          setPlayerReady(false);
+          setIsAutoSwitching(true);
+        }
+      }
+    }, 8000);
+    return () => { if (autoSwitchTimeoutRef.current) clearTimeout(autoSwitchTimeoutRef.current); };
+  }, [isPlaying, currentSourceIndex, playerReady]);
 
   // Dismiss next overlay without skipping
   const handleDismissNext = () => {
