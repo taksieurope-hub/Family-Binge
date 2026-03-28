@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+﻿import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Tv, Menu, X, Search, Trash2 } from 'lucide-react';
 import { channels } from './LiveTVSection';
@@ -192,7 +192,7 @@ const LiveTVPage = () => {
                       <Tv size={12} color={isActive ? '#3b82f6' : '#444'} style={{ flexShrink: 0 }} />
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: 13, fontWeight: isActive ? 600 : 400, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{ch.name}</div>
-                        <div style={{ fontSize: 10, color: '#555', marginTop: 1 }}>CH {ch.id} · {ch.category}</div>
+                        <div style={{ fontSize: 10, color: '#555', marginTop: 1 }}>CH {ch.id} Â· {ch.category}</div>
                       </div>
                       {isActive && <span style={{ fontSize: 9, color: '#ef4444', flexShrink: 0 }}>LIVE</span>}
                     </button>
@@ -223,7 +223,7 @@ const LiveTVPage = () => {
             </div>
           )}
           {activeChannel && (
-            <video ref={videoRef} style={{ width: '100%', height: '100%', objectFit: 'contain' }} controls playsInline />
+            <video ref={videoRef} style={{ width: '100%', height: '100%', objectFit: 'contain' }} controls playsInline autoPlay />
           )}
           {loading && (
             <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.85)', gap: 12 }}>
@@ -247,3 +247,5 @@ const LiveTVPage = () => {
 };
 
 export default LiveTVPage;
+
+
