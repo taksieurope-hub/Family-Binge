@@ -64,7 +64,18 @@ const LiveTVPage = () => {
       hlsRef.current = hls;
       hls.loadSource(url);
       hls.attachMedia(videoRef.current);
-      hls.on(window.Hls.Events.MANIFEST_PARSED, () => { setLoading(false); videoRef.current?.play().catch(() => {}); });
+      hls.on(window.Hls.Events.MANIFEST_PARSED, () => {
+        setLoading(false);
+        const vid = videoRef.current;
+        if (!vid) return;
+        const tryPlay = () => {
+          vid.muted = true;
+          vid.play().then(() => { vid.muted = false; }).catch(() => {});
+          vid.removeEventListener('canplay', tryPlay);
+        };
+        if (vid.readyState >= 3) { tryPlay(); }
+        else { vid.addEventListener('canplay', tryPlay); }
+      });
       hls.on(window.Hls.Events.ERROR, (_, data) => {
         if (data.fatal) {
           const next = idx + 1;
@@ -74,7 +85,13 @@ const LiveTVPage = () => {
       });
     } else if (videoRef.current?.canPlayType('application/vnd.apple.mpegurl')) {
       videoRef.current.src = url;
-      videoRef.current.onloadedmetadata = () => { setLoading(false); videoRef.current?.play().catch(() => {}); };
+      videoRef.current.onloadedmetadata = () => {
+        setLoading(false);
+        const vid = videoRef.current;
+        if (!vid) return;
+        vid.muted = true;
+        vid.play().then(() => { vid.muted = false; }).catch(() => {});
+      };
       videoRef.current.onerror = () => {
         const next = idx + 1;
         if (next < channel.streams.length) loadStream(channel, next);
@@ -223,7 +240,7 @@ const LiveTVPage = () => {
             </div>
           )}
           {activeChannel && (
-            <video ref={videoRef} style={{ width: '100%', height: '100%', objectFit: 'contain' }} controls playsInline autoPlay />
+            <video ref={videoRef} style={{ width: '100%', height: '100%', objectFit: 'contain' }} controls playsInline muted />
           )}
           {loading && (
             <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.85)', gap: 12 }}>
