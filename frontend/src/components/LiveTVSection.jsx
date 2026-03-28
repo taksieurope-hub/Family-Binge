@@ -278,7 +278,7 @@ export const channels = [
   { id: 276, name: "30A Investment Pitch", category: "Business", url: "https://d1h1d6qoy9vnra.cloudfront.net/v1/master/9d062541f2ff39b5c0f48b743c6411d25f62fc25/30A-Plex/172.m3u8", logo: "https://i.imgur.com/Lf8WBQK.png" },
 ];
 
-const categories = ['All', 'News', 'Movies', 'Series', 'Entertainment', 'Comedy', 'Sports', 'Business', 'Documentary', 'Nature', 'Travel', 'Cooking', 'Family', 'Science', 'Religious', 'Animation', 'Music', 'Lifestyle', 'Kids', 'Outdoor', 'Weather', 'Shopping', 'Classic', 'Auto', 'Education', 'Cooking', 'General', 'Entertainment'];
+const categories = ['All', 'News', 'Movies', 'Series', 'Entertainment', 'Comedy', 'Sports', 'Business', 'Documentary', 'Nature', 'Travel', 'Cooking', 'Family', 'Science', 'Religious', 'Animation', 'Music', 'Lifestyle', 'Kids', 'Outdoor', 'Weather', 'Shopping', 'Classic', 'Auto', 'Education', 'General'];
 
 const colorMap = {
   News: 'from-blue-700 to-blue-900', Movies: 'from-violet-700 to-purple-900', Series: 'from-amber-600 to-orange-700',
@@ -295,6 +295,25 @@ const LiveTVSection = ({ accessStatus, onExpiredClick }) => {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [deletedIds, setDeletedIds] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('fb_deleted') || '[]'); } catch(e) { return []; }
+  });
+  const [showDelete, setShowDelete] = useState(false);
+
+  const handleDelete = (e, id) => {
+    e.stopPropagation();
+    if (!window.confirm('Permanently hide this channel?')) return;
+    const next = [...deletedIds, id];
+    setDeletedIds(next);
+    localStorage.setItem('fb_deleted', JSON.stringify(next));
+  };
+
+  const handleRestoreAll = () => {
+    setDeletedIds([]);
+    localStorage.removeItem('fb_deleted');
+  };
+
+  const visibleChannels = channels.filter(c => !deletedIds.includes(c.id));
   const videoRef = useRef(null);
   const hlsRef = useRef(null);
 
@@ -412,8 +431,8 @@ const LiveTVSection = ({ accessStatus, onExpiredClick }) => {
             className="w-full pl-10 pr-4 py-2.5 bg-zinc-800 border border-white/10 rounded-xl text-white placeholder-gray-500 text-sm focus:outline-none focus:border-purple-500" />
         </div>
 
-        <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-          {['All', ...categories].filter((v, i, a) => a.indexOf(v) === i).map(cat => {
+        <div className="flex gap-2 mb-3 overflow-x-auto pb-2">
+          {categories.map(cat => {
             const count = cat === 'All' ? visibleChannels.length : visibleChannels.filter(c => c.category === cat).length;
             if (count === 0) return null;
             return (
@@ -423,6 +442,19 @@ const LiveTVSection = ({ accessStatus, onExpiredClick }) => {
               </button>
             );
           })}
+        </div>
+        <div className="flex items-center gap-3 mb-6">
+          <button onClick={() => setShowDelete(d => !d)}
+            className={`px-4 py-2 rounded-full text-xs font-medium transition-all flex-shrink-0 ${showDelete ? 'bg-red-600 text-white' : 'bg-zinc-800 text-gray-400 hover:text-red-400 hover:bg-zinc-700'}`}>
+            {showDelete ? '✕ Hide Delete Buttons' : '🗑 Manage Channels'}
+          </button>
+          {deletedIds.length > 0 && (
+            <button onClick={handleRestoreAll}
+              className="px-4 py-2 rounded-full text-xs font-medium bg-green-700 text-white hover:bg-green-600 transition-all flex-shrink-0">
+              ↩ Restore {deletedIds.length} hidden channel{deletedIds.length > 1 ? 's' : ''}
+            </button>
+          )}
+          {showDelete && <span className="text-xs text-red-400">Click ✕ on any channel to permanently hide it</span>}
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
@@ -454,6 +486,14 @@ const LiveTVSection = ({ accessStatus, onExpiredClick }) => {
                 <p className="text-white text-xs font-semibold truncate">{channel.name}</p>
                 <p className="text-gray-500 text-xs mt-0.5">{channel.category}</p>
               </div>
+              {showDelete && (
+                <button
+                  onClick={(e) => handleDelete(e, channel.id)}
+                  className="absolute top-1 right-1 z-20 w-6 h-6 bg-red-600 hover:bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg"
+                  title="Hide this channel">
+                  ✕
+                </button>
+              )}
             </button>
           ))}
         </div>
