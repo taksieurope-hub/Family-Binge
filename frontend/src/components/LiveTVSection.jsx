@@ -433,7 +433,7 @@ const LiveTVSection = ({ accessStatus, onExpiredClick }) => {
   const [selectedChannel, setSelectedChannel] = useState(null);
   const [streamIndex, setStreamIndex] = useState(0);
   const [activeCategory, setActiveCategory] = useState('All');
-  const [search, setSearch] = useState('All');
+  const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [deletedIds, setDeletedIds] = useState(() => {
