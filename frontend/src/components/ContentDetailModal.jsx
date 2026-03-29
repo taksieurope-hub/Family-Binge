@@ -2,12 +2,11 @@
 import { X, Play, Star, Clock, Calendar, Users, ChevronRight, Loader2, Tv, Film, AlertCircle, RefreshCw, SkipForward, Captions, Share2, Check } from 'lucide-react';
 import { Button } from './ui/button';
 import { movieAPI, seriesAPI } from '../services/api';
+import { auth } from '../services/firebase';
 
 const getWatchHistoryKey = () => {
-  try {
-    const uid = window.__firebase_auth_uid__ || 'guest';
-    return `familybinge_watch_history_${uid}`;
-  } catch { return 'familybinge_watch_history_guest'; }
+  const uid = auth.currentUser?.uid || 'guest';
+  return "familybinge_watch_history_" + uid;
 };
 
 export const getWatchHistory = () => {
@@ -528,3 +527,6 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
 };
 
 export default ContentDetailModal;
+
+
+
