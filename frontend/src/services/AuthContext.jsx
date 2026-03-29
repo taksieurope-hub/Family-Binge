@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+﻿import React, { createContext, useContext, useEffect, useState } from 'react';
 import { auth, db } from '../services/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
-      setUser(firebaseUser);
+      setUser(firebaseUser); window.__firebase_auth_uid__ = firebaseUser?.uid || null;
       if (firebaseUser) {
         const snap = await getDoc(doc(db, 'users', firebaseUser.uid));
         if (snap.exists()) setUserData(snap.data());

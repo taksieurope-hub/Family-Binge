@@ -1,13 +1,18 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+﻿import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { X, Play, Star, Clock, Calendar, Users, ChevronRight, Loader2, Tv, Film, AlertCircle, RefreshCw, SkipForward, Captions, Share2, Check } from 'lucide-react';
 import { Button } from './ui/button';
 import { movieAPI, seriesAPI } from '../services/api';
 
-const WATCH_HISTORY_KEY = 'familybinge_watch_history';
+const getWatchHistoryKey = () => {
+  try {
+    const uid = window.__firebase_auth_uid__ || 'guest';
+    return `familybinge_watch_history_${uid}`;
+  } catch { return 'familybinge_watch_history_guest'; }
+};
 
 export const getWatchHistory = () => {
   try {
-    const history = localStorage.getItem(WATCH_HISTORY_KEY);
+    const history = localStorage.getItem(getWatchHistoryKey());
     return history ? JSON.parse(history) : [];
   } catch { return []; }
 };
@@ -22,14 +27,14 @@ export const saveToWatchHistory = (content, season = 1, episode = 1, progress = 
       rating: content.rating, season, episode, progress, lastWatched: Date.now(),
     };
     if (existingIndex >= 0) { history[existingIndex] = historyItem; } else { history.unshift(historyItem); }
-    localStorage.setItem(WATCH_HISTORY_KEY, JSON.stringify(history.slice(0, 20)));
+    localStorage.setItem(getWatchHistoryKey(), JSON.stringify(history.slice(0, 20)));
   } catch (e) { console.error('Error saving watch history:', e); }
 };
 
 export const removeFromWatchHistory = (id, type) => {
   try {
     const history = getWatchHistory().filter(h => !(h.id === id && h.type === type));
-    localStorage.setItem(WATCH_HISTORY_KEY, JSON.stringify(history));
+    localStorage.setItem(getWatchHistoryKey(), JSON.stringify(history));
   } catch (e) { console.error('Error removing from watch history:', e); }
 };
 
@@ -276,8 +281,8 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
             <div className="min-w-0">
               <h2 className="text-white font-semibold text-sm truncate">{details?.title}</h2>
               <div className="flex items-center gap-2 text-xs text-gray-400">
-                <span>{details?.type === 'series' ? `Season ${selectedSeason} · Episode ${selectedEpisode}` : details?.year}</span>
-                <span className="text-gray-600">·</span>
+                <span>{details?.type === 'series' ? `Season ${selectedSeason} Â· Episode ${selectedEpisode}` : details?.year}</span>
+                <span className="text-gray-600">Â·</span>
                 <span className="text-purple-400 font-medium">Auto</span>
                 {!playerReady && (
                   <span className="flex items-center gap-1 text-yellow-400">
@@ -285,7 +290,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
                     Finding best server...
                   </span>
                 )}
-                {playerReady && <span className="text-green-400">● Playing</span>}
+                {playerReady && <span className="text-green-400">â— Playing</span>}
               </div>
             </div>
           </div>
@@ -356,7 +361,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
             <div className="absolute bottom-8 right-8 z-20 bg-black/90 border border-white/10 rounded-2xl p-5 flex flex-col gap-3 min-w-[260px] shadow-2xl">
               <p className="text-gray-400 text-xs uppercase tracking-widest">Up Next</p>
               <p className="text-white font-semibold">
-                {details?.title} — Episode {selectedEpisode + 1}
+                {details?.title} â€” Episode {selectedEpisode + 1}
               </p>
               <div className="w-full bg-white/10 rounded-full h-1.5">
                 <div
