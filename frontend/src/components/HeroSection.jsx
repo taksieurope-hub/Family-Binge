@@ -16,14 +16,22 @@ const HeroSection = ({ setActiveSection, onPlayVideo, onSelectContent }) => {
         const res = await movieAPI.getNowPlaying(1);
         if (res.data.items?.length > 0) {
           const top5 = res.data.items.slice(0, 5);
+          // Show content immediately with basic info
+          setFeaturedMovies(top5.map(m => ({ ...m, type: 'movie' })));
+          setLoading(false);
+          
+          // Then fetch details in background for trailers
           const detailPromises = top5.map(m => movieAPI.getDetails(m.id).catch(() => null));
           const details = await Promise.all(detailPromises);
           const valid = details.filter(Boolean).map(r => r.data);
-          setFeaturedMovies(valid);
+          if (valid.length > 0) {
+            setFeaturedMovies(valid);
+          }
+        } else {
+          setLoading(false);
         }
       } catch (error) {
         console.error('Error fetching featured movies:', error);
-      } finally {
         setLoading(false);
       }
     };

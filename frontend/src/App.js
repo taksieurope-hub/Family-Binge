@@ -1,5 +1,6 @@
-import React, { lazy, Suspense } from "react";
+import React, { lazy, Suspense, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { prefetchContent } from "./services/api";
 
 const LandingPage = lazy(() => import("./components/LandingPage"));
 const LoginPage   = lazy(() => import("./components/LoginPage"));
@@ -9,6 +10,11 @@ const ProfilePage = lazy(() => import("./components/ProfilePage"));
 const LiveTVPage   = lazy(() => import("./components/LiveTVPage"));
 
 function App() {
+  // Prefetch content on app load for faster experience
+  useEffect(() => {
+    prefetchContent();
+  }, []);
+
   return (
     <Router>
       <Suspense fallback={<div style={{background:"#000",height:"100vh"}} />}>

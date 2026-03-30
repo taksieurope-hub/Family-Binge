@@ -12,13 +12,13 @@ import ContentDetailModal from "./components/ContentDetailModal";
 import DownloadModal from "./components/DownloadModal";
 import { auth, db } from "./services/firebase";
 import { doc, getDoc } from "firebase/firestore";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { Crown, AlertTriangle, X } from "lucide-react";
 import { registerDevice, getDeviceId } from "./services/deviceService";
 import DeviceBlockedModal from "./components/DeviceBlockedModal";
 
 // ── Paywall Modal ──────────────────────────────────────────────────────────────
-const PaywallModal = ({ onClose, onGoToPricing, trialEnds }) => {
+const PaywallModal = ({ onClose, onGoToPricing, trialEnds, onLogout }) => {
   const formatDate = (val) => {
     if (!val) return '';
     const d = val?.toDate ? val.toDate() : new Date(val);
@@ -29,46 +29,48 @@ const PaywallModal = ({ onClose, onGoToPricing, trialEnds }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[200] bg-black/90 flex items-center justify-center p-6">
-      <div className="max-w-md w-full bg-zinc-900 rounded-3xl p-10 text-center relative">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
-        >
-          <X className="w-5 h-5 text-white" />
-        </button>
-
-        <div className="w-20 h-20 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-          <AlertTriangle className="w-10 h-10 text-red-400" />
+    <div className="fixed inset-0 z-[200] bg-black/95 flex items-center justify-center p-6">
+      <div className="max-w-md w-full bg-gradient-to-b from-zinc-800 to-zinc-900 rounded-3xl p-10 text-center relative border border-zinc-700">
+        <div className="w-24 h-24 bg-gradient-to-br from-red-500/30 to-orange-500/30 rounded-full flex items-center justify-center mx-auto mb-6">
+          <AlertTriangle className="w-12 h-12 text-red-400" />
         </div>
 
-        <h2 className="text-3xl font-bold text-white mb-3">Trial Expired</h2>
+        <h2 className="text-3xl font-bold text-white mb-3">Your Free Trial Has Ended</h2>
 
         {trialEnds && (
-          <p className="text-gray-400 text-sm mb-2">
-            Your free trial ended on{" "}
+          <p className="text-gray-400 text-sm mb-4">
+            Trial expired on{" "}
             <span className="text-white font-semibold">{formatDate(trialEnds)}</span>
           </p>
         )}
 
-        <p className="text-gray-400 mb-8">
-          Subscribe to unlock unlimited movies, series, and Live TV.
+        <p className="text-gray-300 mb-8 text-lg">
+          Subscribe now to continue watching unlimited movies, series, and Live TV.
         </p>
 
         <button
           onClick={onGoToPricing}
-          className="w-full py-5 bg-purple-600 hover:bg-purple-700 text-white text-lg font-bold rounded-2xl transition-colors flex items-center justify-center gap-2"
+          className="w-full py-5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-lg font-bold rounded-2xl transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2 shadow-lg shadow-purple-500/30"
         >
-          <Crown className="w-5 h-5" />
+          <Crown className="w-6 h-6" />
           View Plans & Subscribe
         </button>
 
         <button
           onClick={onClose}
-          className="mt-4 text-gray-500 hover:text-gray-300 text-sm transition-colors"
+          className="mt-4 w-full py-3 text-gray-400 hover:text-white text-sm transition-colors border border-zinc-700 rounded-xl hover:bg-zinc-800"
         >
-          Maybe later (browse only)
+          Browse Only (Limited Access)
         </button>
+
+        {onLogout && (
+          <button
+            onClick={onLogout}
+            className="mt-3 text-gray-500 hover:text-gray-300 text-xs transition-colors"
+          >
+            Switch Account
+          </button>
+        )}
       </div>
     </div>
   );
@@ -80,7 +82,7 @@ const TrialBanner = ({ trialEnds, onUpgrade, onDismiss }) => {
     if (!val) return '';
     const d = val?.toDate ? val.toDate() : new Date(val);
     return d.toLocaleDateString('en-ZA', {
-      weekday: 'long', month: 'long', day: 'numeric',
+      weekday: 'short', month: 'short', day: 'numeric',
       hour: '2-digit', minute: '2-digit'
     });
   };
@@ -88,30 +90,68 @@ const TrialBanner = ({ trialEnds, onUpgrade, onDismiss }) => {
   const getDaysLeft = (val) => {
     if (!val) return 0;
     const d = val?.toDate ? val.toDate() : new Date(val);
-    return Math.max(0, Math.ceil((d - new Date()) / (1000 * 60 * 60 * 24)));
+    const diffMs = d - new Date();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    return { days: Math.max(0, diffDays), hours: Math.max(0, diffHours % 24) };
   };
 
-  const daysLeft = getDaysLeft(trialEnds);
+  const timeLeft = getDaysLeft(trialEnds);
+  const isUrgent = timeLeft.days <= 1;
 
   return (
-    <div className={`w-full px-6 py-3 flex items-center justify-between gap-4 ${daysLeft <= 1 ? 'bg-red-600' : 'bg-orange-500'}`}>
+    <div className={`w-full px-4 py-3 flex items-center justify-between gap-3 ${isUrgent ? 'bg-gradient-to-r from-red-600 to-orange-600' : 'bg-gradient-to-r from-orange-500 to-yellow-500'}`}>
       <div className="flex items-center gap-3 min-w-0">
-        <AlertTriangle className="w-5 h-5 text-white flex-shrink-0" />
+        <div className={`p-1.5 rounded-full ${isUrgent ? 'bg-white/20' : 'bg-black/20'}`}>
+          <AlertTriangle className="w-4 h-4 text-white" />
+        </div>
         <p className="text-white text-sm font-medium truncate">
-          {daysLeft === 0
-            ? `⚠️ Trial expires today at ${(trialEnds?.toDate ? trialEnds.toDate() : new Date(trialEnds)).toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit' })}`
-            : `Free trial expires ${formatDate(trialEnds)} — ${daysLeft} day${daysLeft !== 1 ? 's' : ''} left`
+          {timeLeft.days === 0
+            ? `Trial expires in ${timeLeft.hours} hours!`
+            : `${timeLeft.days} day${timeLeft.days !== 1 ? 's' : ''} left in your free trial`
           }
+          <span className="hidden sm:inline text-white/80"> — Upgrade to keep watching</span>
         </p>
       </div>
       <div className="flex items-center gap-2 flex-shrink-0">
         <button
           onClick={onUpgrade}
-          className="bg-white text-orange-600 font-bold text-sm px-4 py-1.5 rounded-xl hover:bg-gray-100 transition-colors flex items-center gap-1"
+          className={`font-bold text-sm px-4 py-1.5 rounded-xl transition-all flex items-center gap-1 ${isUrgent ? 'bg-white text-red-600 hover:bg-gray-100' : 'bg-black/30 text-white hover:bg-black/40'}`}
         >
           <Crown className="w-4 h-4" /> Upgrade
         </button>
-        <button onClick={onDismiss} className="text-white/70 hover:text-white">
+        <button onClick={onDismiss} className="text-white/70 hover:text-white p-1">
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// ── Guest Banner (shown to non-logged in users) ───────────────────────────────
+const GuestBanner = ({ onSignup, onLogin, onDismiss }) => {
+  return (
+    <div className="w-full px-4 py-3 flex items-center justify-between gap-3 bg-gradient-to-r from-purple-600 to-pink-600">
+      <div className="flex items-center gap-3 min-w-0">
+        <Crown className="w-5 h-5 text-white flex-shrink-0" />
+        <p className="text-white text-sm font-medium truncate">
+          Sign up for a <span className="font-bold">3-day free trial</span> — Unlimited movies, series & Live TV!
+        </p>
+      </div>
+      <div className="flex items-center gap-2 flex-shrink-0">
+        <button
+          onClick={onSignup}
+          className="bg-white text-purple-600 font-bold text-sm px-4 py-1.5 rounded-xl hover:bg-gray-100 transition-all"
+        >
+          Start Free Trial
+        </button>
+        <button
+          onClick={onLogin}
+          className="text-white/90 hover:text-white text-sm font-medium px-3 py-1.5"
+        >
+          Login
+        </button>
+        <button onClick={onDismiss} className="text-white/70 hover:text-white p-1">
           <X className="w-4 h-4" />
         </button>
       </div>
@@ -131,11 +171,17 @@ function MainApp() {
   const [userData, setUserData] = useState(null);
   const [accessStatus, setAccessStatus] = useState('loading');
   const [deviceBlocked, setDeviceBlocked] = useState(false);
-  const [deviceType, setDeviceType] = useState(null); // 'loading' | 'full' | 'trial' | 'expired' | 'guest'
+  const [deviceType, setDeviceType] = useState(null);
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    navigate('/login');
+  };
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (!user) {
+        // Not logged in - allow guest browsing but show limited access
         setAccessStatus('guest');
         return;
       }
@@ -151,25 +197,28 @@ function MainApp() {
             : data.subscriptionExpires ? new Date(data.subscriptionExpires) : null;
 
           const hasPaidSub = data.plan && data.plan !== 'free_trial' && subExpires && subExpires > now;
-const isFreeAccess = data.role === 'admin' || data.role === 'family';
+          const isFreeAccess = data.role === 'admin' || data.role === 'family';
 
-if (isFreeAccess || hasPaidSub) {
-  setAccessStatus('full');
-} else if (trialEnds > now) {
-  setAccessStatus('trial');
-} else {
-  setAccessStatus('expired');
-}
+          if (isFreeAccess || hasPaidSub) {
+            setAccessStatus('full');
+          } else if (trialEnds > now) {
+            setAccessStatus('trial');
+          } else {
+            setAccessStatus('expired');
+            // Auto-show paywall when trial is expired
+            setShowPaywall(true);
+          }
 
-// Register device and check limit
-if (isFreeAccess || hasPaidSub || trialEnds > now) {
-  const result = await registerDevice(user.uid);
-  if (result.status === 'limit_reached') {
-    setDeviceBlocked(true);
-    setDeviceType(result.device_type);
-  }
-}
+          // Register device and check limit
+          if (isFreeAccess || hasPaidSub || trialEnds > now) {
+            const result = await registerDevice(user.uid);
+            if (result.status === 'limit_reached') {
+              setDeviceBlocked(true);
+              setDeviceType(result.device_type);
+            }
+          }
         } else {
+          // User exists in Firebase Auth but no Firestore doc - treat as guest
           setAccessStatus('guest');
         }
       } catch (e) {
@@ -227,10 +276,21 @@ if (isFreeAccess || hasPaidSub || trialEnds > now) {
     const d = val?.toDate ? val.toDate() : new Date(val);
     return Math.max(0, Math.ceil((d - new Date()) / (1000 * 60 * 60 * 24)));
   };
-  const showTrialBanner = accessStatus === 'trial' && showBanner && getDaysLeft(trialEnds) <= 2;
+  // Show banner for all trial users (since trial is only 3 days)
+  const showTrialBanner = accessStatus === 'trial' && showBanner;
+  const showGuestBanner = accessStatus === 'guest' && showBanner;
 
   return (
     <div className="App min-h-screen bg-black">
+      {/* Guest signup banner */}
+      {showGuestBanner && (
+        <GuestBanner
+          onSignup={() => navigate('/signup')}
+          onLogin={() => navigate('/login')}
+          onDismiss={() => setShowBanner(false)}
+        />
+      )}
+
       {/* Trial expiry banner */}
       {showTrialBanner && (
         <TrialBanner
@@ -294,6 +354,7 @@ if (isFreeAccess || hasPaidSub || trialEnds > now) {
           onClose={() => setShowPaywall(false)}
           onGoToPricing={handleGoToPricing}
           trialEnds={trialEnds}
+          onLogout={handleLogout}
         />
       )}
     </div>

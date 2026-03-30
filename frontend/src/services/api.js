@@ -1,56 +1,86 @@
-﻿const API_BASE_URL = "https://family-binge-backend.onrender.com";
+const API_BASE_URL = "https://family-binge-backend.onrender.com";
 
-// Backend already returns formatted items from tmdb_service.py
-// List endpoints: { items: [...], total_pages: N, page: N }
-// Detail endpoints: single formatted object with poster/backdrop/cast/similar etc.
+// Simple in-memory cache with 5-minute TTL
+const cache = new Map();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
-const fetchList = (url) =>
-  fetch(url)
-    .then(r => r.json())
-    .then(data => {
-      // Handle both { items: [] } and { results: [] } formats
-      const items = data.items || data.results || [];
-      // Ensure genre_ids are preserved for filtering
-      const processed = items.map(item => ({
-        ...item,
-        // Keep genre_ids if present, otherwise derive from genres
-        genre_ids: item.genre_ids || (item.genres ? item.genres.map(g => typeof g === 'object' ? g.id : g) : []),
-        type: item.type || (item.name && !item.title ? 'series' : 'movie'),
-      }));
-      return { data: { items: processed, total_pages: data.total_pages || 1 } };
-    });
+const getCached = (key) => {
+  const item = cache.get(key);
+  if (item && Date.now() - item.timestamp < CACHE_TTL) {
+    return item.data;
+  }
+  cache.delete(key);
+  return null;
+};
 
-const fetchDetails = (url) =>
-  fetch(url)
-    .then(r => {
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      return r.json();
-    })
-    .then(data => ({
-      data: {
-        ...data,
-        type: data.type || (data.name && !data.title ? 'series' : 'movie'),
-        genre_ids: data.genre_ids || (data.genres ? data.genres.map(g => typeof g === 'object' ? g.id : g) : []),
-      }
-    }));
+const setCache = (key, data) => {
+  cache.set(key, { data, timestamp: Date.now() });
+};
 
-const fetchSearch = (url) =>
-  fetch(url)
-    .then(r => r.json())
-    .then(data => {
-      const items = data.items || data.results || [];
-      return {
-        data: {
-          items: items
-            .filter(i => i.poster)
-            .map(item => ({
-              ...item,
-              type: item.type || (item.media_type === 'tv' ? 'series' : 'movie'),
-              genre_ids: item.genre_ids || (item.genres ? item.genres.map(g => typeof g === 'object' ? g.id : g) : []),
-            }))
-        }
-      };
-    });
+const fetchList = async (url) => {
+  const cached = getCached(url);
+  if (cached) return cached;
+
+  const response = await fetch(url);
+  const data = await response.json();
+  const items = data.items || data.results || [];
+  const processed = items.map(item => ({
+    ...item,
+    genre_ids: item.genre_ids || (item.genres ? item.genres.map(g => typeof g === 'object' ? g.id : g) : []),
+    type: item.type || (item.name && !item.title ? 'series' : 'movie'),
+  }));
+  const result = { data: { items: processed, total_pages: data.total_pages || 1 } };
+  setCache(url, result);
+  return result;
+};
+
+const fetchDetails = async (url) => {
+  const cached = getCached(url);
+  if (cached) return cached;
+
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  const data = await response.json();
+  const result = {
+    data: {
+      ...data,
+      type: data.type || (data.name && !data.title ? 'series' : 'movie'),
+      genre_ids: data.genre_ids || (data.genres ? data.genres.map(g => typeof g === 'object' ? g.id : g) : []),
+    }
+  };
+  setCache(url, result);
+  return result;
+};
+
+const fetchSearch = async (url) => {
+  const response = await fetch(url);
+  const data = await response.json();
+  const items = data.items || data.results || [];
+  return {
+    data: {
+      items: items
+        .filter(i => i.poster)
+        .map(item => ({
+          ...item,
+          type: item.type || (item.media_type === 'tv' ? 'series' : 'movie'),
+          genre_ids: item.genre_ids || (item.genres ? item.genres.map(g => typeof g === 'object' ? g.id : g) : []),
+        }))
+    }
+  };
+};
+
+// Prefetch common content on app load
+export const prefetchContent = async () => {
+  try {
+    await Promise.all([
+      movieAPI.getTrending(1),
+      movieAPI.getPopular(1),
+      seriesAPI.getTrending(1),
+    ]);
+  } catch (e) {
+    console.log('Prefetch failed:', e);
+  }
+};
 
 export const movieAPI = {
   getTrending:  (page = 1) => fetchList(`${API_BASE_URL}/api/content/movies/trending?page=${page}`),
