@@ -1,14 +1,23 @@
-﻿import React from 'react';
-import { X } from 'lucide-react';
+﻿import React, { useState } from 'react';
+import { X, ChevronDown } from 'lucide-react';
+
+const SERVERS = [
+  { name: 'Server 1', url: (id) => `https://vidsrc.xyz/embed/movie/${id}` },
+  { name: 'Server 2', url: (id) => `https://vidsrc.to/embed/movie/${id}` },
+  { name: 'Server 3', url: (id) => `https://vidsrc.me/embed/movie?tmdb=${id}` },
+  { name: 'Server 4', url: (id) => `https://multiembed.mov/?video_id=${id}&tmdb=1` },
+  { name: 'Server 5', url: (id) => `https://autoembed.cc/movie/tmdb/${id}` },
+];
 
 const VideoPlayer = ({ videoId, onClose }) => {
+  const [serverIndex, setServerIndex] = useState(0);
+
   if (!videoId) return null;
 
-  // YouTube IDs are 11 chars, movie IDs from TMDB are numeric
   const isYouTube = videoId && !/^\d+$/.test(videoId);
   const src = isYouTube
     ? `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`
-    : `https://vidsrc.xyz/embed/movie/${videoId}`;
+    : SERVERS[serverIndex].url(videoId);
 
   return (
     <div
@@ -21,20 +30,43 @@ const VideoPlayer = ({ videoId, onClose }) => {
       >
         <X className="w-6 h-6 text-white" />
       </button>
+
       <div
-        className="w-full max-w-5xl aspect-video rounded-xl overflow-hidden shadow-2xl"
+        className="w-full max-w-5xl flex flex-col gap-3"
         onClick={(e) => e.stopPropagation()}
       >
-        <iframe
-          src={src}
-          title="Video Player"
-          className="w-full h-full"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        />
+        {!isYouTube && (
+          <div className="flex gap-2 flex-wrap justify-center">
+            {SERVERS.map((s, i) => (
+              <button
+                key={i}
+                onClick={() => setServerIndex(i)}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                  i === serverIndex
+                    ? 'bg-white text-black'
+                    : 'bg-white/10 text-white hover:bg-white/20'
+                }`}
+              >
+                {s.name}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div className="aspect-video rounded-xl overflow-hidden shadow-2xl">
+          <iframe
+            key={src}
+            src={src}
+            title="Video Player"
+            className="w-full h-full"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
       </div>
+
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-gray-400 text-sm">
-        Press ESC or click outside to close
+        If video doesn't load, try another server
       </div>
     </div>
   );
