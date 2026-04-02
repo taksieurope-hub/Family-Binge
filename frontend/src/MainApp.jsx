@@ -402,12 +402,15 @@ function MainApp() {
       )}
       {contentFilter === "georgian" && (
         <>
-          <KartuliSection onSelectContent={handleSelectContent} filterMode="georgian" />
           <OneTVPlaySection onSelectContent={handleSelectContent} />
+          <KartuliSection onSelectContent={handleSelectContent} filterMode="georgian" />
         </>
       )}
       {contentFilter === "russian" && (
-        <KartuliSection onSelectContent={handleSelectContent} filterMode="russian" />
+        <>
+          <OneTVPlaySection onSelectContent={handleSelectContent} />
+          <KartuliSection onSelectContent={handleSelectContent} filterMode="russian" />
+        </>
       )}
       <InviteSection />
       <div id="download">
