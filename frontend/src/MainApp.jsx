@@ -7,6 +7,7 @@ import DownloadSection from "./components/DownloadSection";
 import PricingSection from "./components/PricingSection";
 import FAQSection from "./components/FAQSection";
 import Footer from "./components/Footer";
+import ReferralBanner from "./components/ReferralBanner";
 import VideoPlayer from "./components/VideoPlayer";
 import ContentDetailModal from "./components/ContentDetailModal";
 import DownloadModal from "./components/DownloadModal";
@@ -345,6 +346,7 @@ function MainApp() {
         />
       )}
 
+      {accessStatus !== "expired" && accessStatus !== "guest" && <ReferralBanner />}
       <Navbar
         activeSection={activeSection}
         setActiveSection={setActiveSection}

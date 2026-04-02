@@ -3,10 +3,23 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { PayPalButtons, PayPalScriptProvider } from '@paypal/react-paypal-js';
 import { auth, db } from '../services/firebase';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, getDoc } from 'firebase/firestore';
 
 const PricingSection = () => {
   const navigate = useNavigate();
+  const [referralCredit, setReferralCredit] = React.useState(0);
+
+  React.useEffect(() => {
+    const fetchCredit = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+      const snap = await getDoc(doc(db, 'users', user.uid));
+      if (snap.exists()) {
+        setReferralCredit(snap.data().referralCredit || 0);
+      }
+    };
+    fetchCredit();
+  }, []);
 
   const plans = [
     {
@@ -52,9 +65,10 @@ const PricingSection = () => {
   // Fetch current USD/ZAR rate
   const rateRes = await fetch('https://open.er-api.com/v6/latest/ZAR');
   const rateData = await rateRes.json();
-  const zarToUsd = rateData.rates.USD; // e.g. 0.055
+  const zarToUsd = rateData.rates.USD;
 
-  const usdAmount = (plan.price * zarToUsd).toFixed(2);
+  const discountedPrice = Math.max(0, plan.price - referralCredit);
+  const usdAmount = (discountedPrice * zarToUsd).toFixed(2);
 
   const res = await fetch('https://family-binge-backend.onrender.com/api/payment/create-order', {
     method: 'POST',
@@ -78,6 +92,14 @@ const PricingSection = () => {
           body: JSON.stringify({ user_id: user.uid, plan: plan.id, order_id: data.orderID })
         });
       }
+      // Clear used referral credit
+      if (referralCredit > 0) {
+        const user2 = auth.currentUser;
+        if (user2) {
+          await updateDoc(doc(db, 'users', user2.uid), { referralCredit: 0 });
+          setReferralCredit(0);
+        }
+      }
       alert('Payment successful! Plan: ' + plan.name);
       window.location.href = '/app';
     }
@@ -88,6 +110,12 @@ const PricingSection = () => {
       <section id="pricing" className="py-20 bg-zinc-900">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-4xl font-bold text-center mb-4">Choose Your Plan</h2>
+          {referralCredit > 0 && (
+            <div className="max-w-md mx-auto mb-8 bg-green-500/10 border border-green-500/30 rounded-2xl px-6 py-4 text-center">
+              <p className="text-green-400 font-bold text-lg">You have R{referralCredit} referral credit!</p>
+              <p className="text-gray-400 text-sm mt-1">This will be automatically deducted from your next payment.</p>
+            </div>
+          )}
           <p className="text-center text-gray-400 mb-12">3-day free trial • Cancel anytime</p>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -101,9 +129,11 @@ const PricingSection = () => {
 
                 <h3 className="text-2xl font-semibold">{plan.name}</h3>
                 <div className="mt-4">
-                  <span className="text-6xl font-bold">{plan.billing.split('/')[0]}</span>
+                  <span className="text-6xl font-bold">{referralCredit > 0 ? 'R' + Math.max(0, plan.price - referralCredit) : plan.billing.split('/')[0]}</span>
+                  {referralCredit > 0 && <span className="ml-2 text-lg text-gray-500 line-through">R{plan.price}</span>}
                 </div>
                 <p className="text-gray-400 text-sm">{plan.billing}</p>
+                {referralCredit > 0 && <p className="text-green-400 text-xs mt-1">R{referralCredit} referral discount applied!</p>}
 
                 <div className="my-8 space-y-3 text-sm">
                   <p><strong>Devices:</strong> {plan.devices}</p>

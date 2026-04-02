@@ -108,6 +108,33 @@ async def activate_plan(request: ActivatePlanRequest):
         "extraDevices": 0,
         "updatedAt": now
     })
+
+    # Referral reward: give referrer 5 extra days if this user was referred
+    try:
+        user_doc = db.collection("users").document(request.user_id).get()
+        if user_doc.exists:
+            user_data = user_doc.to_dict()
+            referred_by = user_data.get("referredBy")
+            if referred_by:
+                referrer_ref = db.collection("users").document(referred_by)
+                referrer_doc = referrer_ref.get()
+                if referrer_doc.exists:
+                    referrer_data = referrer_doc.to_dict()
+                    # Get referrer current expiry or now
+                    current_expires = referrer_data.get("subscriptionExpires")
+                    if current_expires and hasattr(current_expires, "replace"):
+                        base = current_expires
+                    else:
+                        base = now
+                    referrer_ref.update({
+                        "referralCredit": firestore.Increment(5),
+                        "referralCount": firestore.Increment(1),
+                    })
+                    # Mark so we dont double-reward
+                    db.collection("users").document(request.user_id).update({"referralRewarded": True})
+    except Exception as e:
+        print(f"Referral reward error: {e}")
+
     return {"success": True, "expires": expires.isoformat(), "maxTVs": plan["maxTVs"], "maxPhones": plan["maxPhones"]}
 
 @router.post("/add-extra-device")
