@@ -216,7 +216,7 @@ function MainApp() {
 
           // Register device and check limit
           if (isFreeAccess || hasPaidSub || trialEnds > now) {
-            const result = await registerDevice(user.uid);
+            const result = await registerDevice(user.uid).catch(() => ({}));
             if (result.status === 'limit_reached') {
               setDeviceBlocked(true);
               setDeviceType(result.device_type);
