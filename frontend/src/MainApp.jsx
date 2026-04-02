@@ -22,6 +22,7 @@ import { Crown, AlertTriangle, X } from "lucide-react";
 import { registerDevice, getDeviceId } from "./services/deviceService";
 import DeviceBlockedModal from "./components/DeviceBlockedModal";
 import NPSSurvey from "./components/NPSSurvey";
+import AnnouncementBanner from "./components/AnnouncementBanner";
 
 // ── Paywall Modal ──────────────────────────────────────────────────────────────
 const PaywallModal = ({ onClose, onGoToPricing, trialEnds, onLogout }) => {
@@ -340,6 +341,7 @@ function MainApp() {
   return (
     <div className="App min-h-screen bg-black">
       <NPSSurvey />
+      <AnnouncementBanner />
       {/* Guest signup banner */}
       {showGuestBanner && (
         <GuestBanner
