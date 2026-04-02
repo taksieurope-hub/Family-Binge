@@ -198,20 +198,14 @@ function MainApp() {
           setUserData(data);
           console.log("USER ROLE:", data.role, "PLAN:", data.plan, "ALL:", JSON.stringify(data));
           const isFreeAccess = data.role === 'admin' || data.role === 'family';
-
-          if (isFreeAccess) {
-            setAccessStatus('full');
-          } else {
-
           const now = new Date();
           const trialEnds = data.trialEnds?.toDate ? data.trialEnds.toDate() : new Date(data.trialEnds);
           const subExpires = data.subscriptionExpires?.toDate
             ? data.subscriptionExpires.toDate()
             : data.subscriptionExpires ? new Date(data.subscriptionExpires) : null;
-
           const hasPaidSub = data.plan && data.plan !== 'free_trial' && subExpires && subExpires > now;
 
-          if (hasPaidSub) {
+          if (isFreeAccess || hasPaidSub) {
             setAccessStatus('full');
           } else if (trialEnds > now) {
             setAccessStatus('trial');
