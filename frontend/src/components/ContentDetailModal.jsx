@@ -301,35 +301,6 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
             onLoad={handleIframeLoad}
           />
 
-          {/* Auto Next Episode Overlay */}
-          {showNextOverlay && details?.type === 'series' && (
-            <div className="absolute bottom-8 right-8 z-20 bg-black/90 border border-white/10 rounded-2xl p-5 flex flex-col gap-3 min-w-[260px] shadow-2xl">
-              <p className="text-gray-400 text-xs uppercase tracking-widest">Up Next</p>
-              <p className="text-white font-semibold">
-                {details?.title} â€” Episode {selectedEpisode + 1}
-              </p>
-              <div className="w-full bg-white/10 rounded-full h-1.5">
-                <div
-                  className="bg-purple-500 h-1.5 rounded-full transition-all duration-1000"
-                  style={{ width: `${((AUTO_NEXT_COUNTDOWN - nextCountdown) / AUTO_NEXT_COUNTDOWN) * 100}%` }}
-                />
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={handleNext}
-                  className="flex-1 bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold py-2 px-4 rounded-xl transition-colors"
-                >
-                  Play Now
-                </button>
-                <button
-                  onClick={handleDismissNext}
-                  className="flex-1 bg-white/10 hover:bg-white/20 text-white text-sm py-2 px-4 rounded-xl transition-colors"
-                >
-                  Cancel ({nextCountdown}s)
-                </button>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     );
