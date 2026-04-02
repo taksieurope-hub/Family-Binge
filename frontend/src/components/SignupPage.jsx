@@ -43,7 +43,6 @@ const SignupPage = () => {
         referredBy: new URLSearchParams(location.search).get('ref') || null,
         sessionToken: '',
         sessionAt: null,
-        referredBy: new URLSearchParams(location.search).get('ref') || null,
       });
 
       const sessionToken = Math.random().toString(36).substring(2) + Date.now().toString(36);

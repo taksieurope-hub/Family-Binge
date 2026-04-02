@@ -361,6 +361,7 @@ function MainApp() {
       <div id="movies">
         <ContentSection type="movies" onSelectContent={handleSelectContent} />
       </div>
+      <div id="livetv"><LiveTVSection onSelectContent={handleSelectContent} /></div>
       <div id="kartuli"><KartuliSection onSelectContent={handleSelectContent} /></div>
       <div id="series">
         <ContentSection type="series" onSelectContent={handleSelectContent} />
