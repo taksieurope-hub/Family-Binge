@@ -83,40 +83,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
     } catch (e) { console.log('Fullscreen not available'); }
   }, []);
 
-  // Clear auto-next timers
-  const clearNextTimers = useCallback(() => {
-    if (episodeTimerRef.current) clearTimeout(episodeTimerRef.current);
-    if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
-    setShowNextOverlay(false);
-    setNextCountdown(AUTO_NEXT_COUNTDOWN);
-  }, []);
 
-  // Start auto-next countdown (only for series)
-  const startAutoNextTimer = useCallback((detailsData, season, episode) => {
-    if (!detailsData || detailsData.type !== 'series') return;
-    clearNextTimers();
-    episodeTimerRef.current = setTimeout(() => {
-      setShowNextOverlay(true);
-      setNextCountdown(AUTO_NEXT_COUNTDOWN);
-      let count = AUTO_NEXT_COUNTDOWN;
-      countdownIntervalRef.current = setInterval(() => {
-        count -= 1;
-        setNextCountdown(count);
-        if (count <= 0) {
-          clearInterval(countdownIntervalRef.current);
-          // Auto advance
-          const nextEp = episode + 1;
-          setSelectedEpisode(nextEp);
-          setCurrentSourceIndex(0);
-          setPlayerReady(false);
-          setIsAutoSwitching(true);
-          setShowNextOverlay(false);
-          saveToWatchHistory(detailsData, season, nextEp, 0);
-          window.dispatchEvent(new Event('watchHistoryUpdated'));
-        }
-      }, 1000);
-    }, EPISODE_DURATION_MS);
-  }, [clearNextTimers]);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -172,7 +139,6 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
   setCurrentSourceIndex(0);
   setPlayerReady(false);
   setIsAutoSwitching(true);
-  clearNextTimers();
   if (details) {
     saveToWatchHistory(details, selectedSeason, selectedEpisode, 0);
     window.dispatchEvent(new Event('watchHistoryUpdated'));
@@ -206,27 +172,6 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
     if (details?.youtube_id) onPlayVideo(details.youtube_id);
   };
 
-  const handleNext = useCallback(() => {
-    if (!details) return;
-    clearNextTimers();
-    if (details.type === 'series') {
-      const nextEpisode = selectedEpisode + 1;
-      setSelectedEpisode(nextEpisode);
-      setCurrentSourceIndex(0);
-      setPlayerReady(false);
-      setIsAutoSwitching(true);
-      saveToWatchHistory(details, selectedSeason, nextEpisode, 0);
-      window.dispatchEvent(new Event('watchHistoryUpdated'));
-    } else {
-      if (details.similar && details.similar.length > 0) {
-        const nextMovie = details.similar[0];
-        onClose();
-        setTimeout(() => {
-          window.dispatchEvent(new CustomEvent('selectContent', { detail: nextMovie }));
-        }, 100);
-      }
-    }
-  }, [details, selectedEpisode, selectedSeason, onClose]);
 
   const getStreamUrl = () => {
     if (!details) return null;
@@ -238,9 +183,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
     if (autoSwitchTimeoutRef.current) clearTimeout(autoSwitchTimeoutRef.current);
     setPlayerReady(true);
     setIsAutoSwitching(false);
-    setTimeout(() => enterFullscreen(), 300);
-    startAutoNextTimer(details, selectedSeason, selectedEpisode);
-  };
+    setTimeout(() => enterFullscreen(), 300);  };
 
   // Auto-switch to next source after 8 seconds if not ready
   useEffect(() => {
@@ -264,10 +207,6 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
     return () => { if (autoSwitchTimeoutRef.current) clearTimeout(autoSwitchTimeoutRef.current); };
   }, [isPlaying, currentSourceIndex, playerReady]);
 
-  // Dismiss next overlay without skipping
-  const handleDismissNext = () => {
-    clearNextTimers();
-  };
 
   if (isPlaying) {
     return (
@@ -323,11 +262,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
               </div>
             )}
 
-            <Button onClick={handleNext} className="hidden sm:flex items-center gap-1.5 bg-white/10 hover:bg-white/20 text-white border-0 px-3 py-1.5 text-xs font-medium rounded-lg">
-              <SkipForward className="w-3.5 h-3.5" /> Next
-            </Button>
-
-            <button onClick={() => { setIsPlaying(false); clearNextTimers(); }} className="p-2 bg-white/10 hover:bg-red-500/80 rounded-lg transition-colors">
+            <button onClick={() => { setIsPlaying(false); }} className="p-2 bg-white/10 hover:bg-red-500/80 rounded-lg transition-colors">
               <X className="w-4 h-4 text-white" />
             </button>
           </div>
@@ -348,7 +283,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
               </div>
               <h2 className="text-white text-2xl font-bold mb-3">Content Not Available</h2>
               <p className="text-gray-400 text-sm max-w-md">This title is not yet available on our database. We are working on adding it in the near future.</p>
-              <button onClick={() => { setIsPlaying(false); clearNextTimers(); }} className="mt-8 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-medium transition-colors">
+              <button onClick={() => { setIsPlaying(false); }} className="mt-8 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-medium transition-colors">
                 Go Back
               </button>
             </div>
