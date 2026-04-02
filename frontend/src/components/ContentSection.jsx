@@ -249,30 +249,32 @@ const ContentSection = ({ type = 'movies', onSelectContent, filterMode }) => {
         {/* Continue Watching - only show on movies section */}
         {type === 'movies' && <ContinueWatchingRow onSelectContent={onSelectContent} />}
 
-        <ContentRow
-          title={type === 'movies' ? 'Trending Movies' : 'Trending Series'}
-          icon={Icon}
-          items={trending}
-          onSelectContent={onSelectContent}
-          loading={loadingTrending}
-        />
-
-        <ContentRow
-          title={type === 'movies' ? 'Popular Movies' : 'Popular Series'}
-          icon={Icon}
-          items={popular}
-          onSelectContent={onSelectContent}
-          loading={loadingPopular}
-        />
-
-        <ContentRow
-          title={type === 'movies' ? 'Top Rated Movies' : 'Top Rated Series'}
-          icon={Icon}
-          items={topRated}
-          onSelectContent={onSelectContent}
-          loading={loadingTopRated}
-        />
-        {type === 'movies' && filterMode !== 'english' && (bollywood.length > 0 || loadingBollywood) && (
+        {filterMode !== 'bollywood' && filterMode !== 'hindi' && (
+          <>
+            <ContentRow
+              title={type === 'movies' ? 'Trending Movies' : 'Trending Series'}
+              icon={Icon}
+              items={trending}
+              onSelectContent={onSelectContent}
+              loading={loadingTrending}
+            />
+            <ContentRow
+              title={type === 'movies' ? 'Popular Movies' : 'Popular Series'}
+              icon={Icon}
+              items={popular}
+              onSelectContent={onSelectContent}
+              loading={loadingPopular}
+            />
+            <ContentRow
+              title={type === 'movies' ? 'Top Rated Movies' : 'Top Rated Series'}
+              icon={Icon}
+              items={topRated}
+              onSelectContent={onSelectContent}
+              loading={loadingTopRated}
+            />
+          </>
+        )}
+        {filterMode === 'bollywood' && type === 'movies' && (
           <ContentRow
             title="Bollywood Trending"
             icon={Film}
@@ -281,7 +283,7 @@ const ContentSection = ({ type = 'movies', onSelectContent, filterMode }) => {
             loading={loadingBollywood}
           />
         )}
-        {type === 'movies' && filterMode !== 'english' && (hindiSeries.length > 0 || loadingHindi) && (
+        {filterMode === 'hindi' && type === 'movies' && (
           <ContentRow
             title="Hindi Series"
             icon={Tv}
