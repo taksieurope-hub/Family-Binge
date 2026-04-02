@@ -8,6 +8,7 @@ import PricingSection from "./components/PricingSection";
 import FAQSection from "./components/FAQSection";
 import KartuliSection from "./components/KartuliSection";
 import OneTVPlaySection from "./components/OneTVPlaySection";
+import IMovsSection from "./components/IMovsSection";
 import Footer from "./components/Footer";
 import ReferralBanner from "./components/ReferralBanner";
 import InviteSection from "./components/InviteSection";
@@ -404,6 +405,7 @@ function MainApp() {
         <>
           <OneTVPlaySection onSelectContent={handleSelectContent} />
           <KartuliSection onSelectContent={handleSelectContent} filterMode="georgian" />
+          <IMovsSection />
         </>
       )}
       {contentFilter === "russian" && (

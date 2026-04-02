@@ -6,3 +6,4 @@ bcrypt
 python-jose[cryptography]
 firebase-admin
 python-dotenv
+beautifulsoup4
