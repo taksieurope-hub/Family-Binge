@@ -52,10 +52,6 @@ const VIDEO_SOURCES = [
   { name: 'SuperEmbed',    getUrl: (type, id, s, e) => type === 'series' ? `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s}&e=${e}` : `https://multiembed.mov/?video_id=${id}&tmdb=1` },
 ];
 
-// Auto next episode countdown (seconds before end of episode)
-const AUTO_NEXT_COUNTDOWN = 15;
-// Approximate episode duration in ms (40 min) - triggers the "Up Next" overlay
-const EPISODE_DURATION_MS = 40 * 60 * 1000;
 
 const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExpiredClick }) => {
   const [details, setDetails] = useState(null);
@@ -70,14 +66,10 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
   const watchCountdownRef = useRef(null);
   const [shareCopied, setShareCopied] = useState(false);
   const [subtitlesEnabled, setSubtitlesEnabled] = useState(true);
-  const [showNextOverlay, setShowNextOverlay] = useState(false);
-  const [nextCountdown, setNextCountdown] = useState(AUTO_NEXT_COUNTDOWN);
   const iframeRef = useRef(null);
   const playerContainerRef = useRef(null);
   const autoSwitchTimeoutRef = useRef(null);
   const shouldAutoPlayRef = useRef(false);
-  const episodeTimerRef = useRef(null);
-  const countdownIntervalRef = useRef(null);
 
   // Fullscreen helper
   const enterFullscreen = useCallback(() => {
@@ -165,9 +157,8 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
 
     return () => {
       if (autoSwitchTimeoutRef.current) clearTimeout(autoSwitchTimeoutRef.current);
-      clearNextTimers();
     };
-  }, [content, clearNextTimers]);
+  }, [content]);
 
 
 
@@ -235,7 +226,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
         }, 100);
       }
     }
-  }, [details, selectedEpisode, selectedSeason, onClose, clearNextTimers]);
+  }, [details, selectedEpisode, selectedSeason, onClose]);
 
   const getStreamUrl = () => {
     if (!details) return null;
@@ -313,8 +304,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
                   setCurrentSourceIndex(0);
                   setPlayerReady(false);
                   setIsAutoSwitching(true);
-                  clearNextTimers();
-                  saveToWatchHistory(details, ns, selectedEpisode, 0);
+                              saveToWatchHistory(details, ns, selectedEpisode, 0);
                   window.dispatchEvent(new Event('watchHistoryUpdated'));
                 }} className="bg-white/10 text-white px-2.5 py-1.5 rounded-lg border border-white/15 text-xs font-medium cursor-pointer hover:bg-white/20">
                   {Array.from({ length: details?.seasons || 1 }, (_, i) => <option key={i+1} value={i+1} className="bg-gray-900">Season {i+1}</option>)}
@@ -325,8 +315,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
                   setCurrentSourceIndex(0);
                   setPlayerReady(false);
                   setIsAutoSwitching(true);
-                  clearNextTimers();
-                  saveToWatchHistory(details, selectedSeason, ne, 0);
+                              saveToWatchHistory(details, selectedSeason, ne, 0);
                   window.dispatchEvent(new Event('watchHistoryUpdated'));
                 }} className="bg-white/10 text-white px-2.5 py-1.5 rounded-lg border border-white/15 text-xs font-medium cursor-pointer hover:bg-white/20">
                   {Array.from({ length: 50 }, (_, i) => <option key={i+1} value={i+1} className="bg-gray-900">Ep {i+1}</option>)}
