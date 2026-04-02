@@ -7,6 +7,7 @@ import DownloadSection from "./components/DownloadSection";
 import PricingSection from "./components/PricingSection";
 import FAQSection from "./components/FAQSection";
 import KartuliSection from "./components/KartuliSection";
+import OneTVPlaySection from "./components/OneTVPlaySection";
 import Footer from "./components/Footer";
 import ReferralBanner from "./components/ReferralBanner";
 import InviteSection from "./components/InviteSection";
@@ -399,6 +400,7 @@ function MainApp() {
       )}
       {contentFilter === "georgian" && (
         <KartuliSection onSelectContent={handleSelectContent} filterMode="georgian" />
+        <OneTVPlaySection onSelectContent={handleSelectContent} />
       )}
       {contentFilter === "russian" && (
         <KartuliSection onSelectContent={handleSelectContent} filterMode="russian" />
