@@ -215,8 +215,6 @@ function MainApp() {
             setShowPaywall(true);
           }
 
-          } // end non-free-access check
-
           // Register device and check limit
           if (isFreeAccess || hasPaidSub || trialEnds > now) {
             const result = await registerDevice(user.uid);
