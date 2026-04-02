@@ -60,7 +60,12 @@ const KartuliSection = ({ onSelectContent }) => {
   const [activeTab, setActiveTab] = useState('all');
 
   useEffect(() => {
-    const load = async () => {
+    const handleWatch = (item) => {
+    const query = encodeURIComponent(item.title);
+    window.open('https://movies.ge/search/?q=' + query, '_blank');
+  };
+
+  const load = async () => {
       setLoading(true);
       try {
         const [gm, gs, rm, rs] = await Promise.all([
@@ -119,14 +124,14 @@ const KartuliSection = ({ onSelectContent }) => {
         {/* Content */}
         {(activeTab === 'all' || activeTab === 'geo') && (
           <>
-            <ContentRow title="Georgian Movies" icon={Film} items={geoMovies} onSelectContent={onSelectContent} loading={loading} accent="bg-red-600" />
-            <ContentRow title="Georgian Series" icon={Tv} items={geoSeries} onSelectContent={onSelectContent} loading={loading} accent="bg-red-600" />
+            <ContentRow title="Georgian Movies" icon={Film} items={geoMovies} onSelectContent={handleWatch} loading={loading} accent="bg-red-600" />
+            <ContentRow title="Georgian Series" icon={Tv} items={geoSeries} onSelectContent={handleWatch} loading={loading} accent="bg-red-600" />
           </>
         )}
         {(activeTab === 'all' || activeTab === 'ru') && (
           <>
-            <ContentRow title="Russian Movies" icon={Film} items={ruMovies} onSelectContent={onSelectContent} loading={loading} accent="bg-orange-600" />
-            <ContentRow title="Russian Series" icon={Tv} items={ruSeries} onSelectContent={onSelectContent} loading={loading} accent="bg-orange-600" />
+            <ContentRow title="Russian Movies" icon={Film} items={ruMovies} onSelectContent={handleWatch} loading={loading} accent="bg-orange-600" />
+            <ContentRow title="Russian Series" icon={Tv} items={ruSeries} onSelectContent={handleWatch} loading={loading} accent="bg-orange-600" />
           </>
         )}
 
