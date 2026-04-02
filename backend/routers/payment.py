@@ -168,9 +168,11 @@ async def register_device(request: RegisterDeviceRequest):
         raise HTTPException(status_code=404, detail="User not found")
     
     data = user.to_dict()
-    registered = data.get("registeredDevices", [])
-    max_tvs = data.get("maxTVs", 1)
-    max_phones = data.get("maxPhones", 1)
+    registered = data.get("registeredDevices") or []
+    if not isinstance(registered, list):
+        registered = []
+    max_tvs = int(data.get("maxTVs") or 1)
+    max_phones = int(data.get("maxPhones") or 1)
     
     # Check if device already registered
     existing = [d for d in registered if d["device_id"] == request.device_id]
