@@ -52,19 +52,7 @@ const LiveTVPage = () => {
     load();
   }, [user]);
 
-  if (accessBlocked) return (
-    <div className="fixed inset-0 bg-black flex flex-col items-center justify-center p-6 text-center">
-      <div className="text-6xl mb-4">??</div>
-      <h2 className="text-white text-2xl font-bold mb-2">Subscription Required</h2>
-      <p className="text-gray-400 mb-6">Your free trial has ended. Subscribe to keep watching Live TV.</p>
-      <button onClick={() => navigate('/app#pricing')} className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl transition-colors">
-        View Plans
-      </button>
-      <button onClick={() => navigate('/app')} className="mt-3 text-gray-500 hover:text-white text-sm transition-colors">
-        Go Back
-      </button>
-    </div>
-  );
+
 
   const visibleChannels = channels.filter(c => !deletedIds.includes(c.id));
   const categories = ['All', ...Array.from(new Set(visibleChannels.map(c => c.category))).sort()];
@@ -140,6 +128,16 @@ const LiveTVPage = () => {
     window.addEventListener('resize', handleResize);
     return () => { hlsRef.current?.destroy(); window.removeEventListener('resize', handleResize); };
   }, []);
+
+  if (accessBlocked) return (
+    <div className="fixed inset-0 bg-black flex flex-col items-center justify-center p-6 text-center">
+      <div className="text-6xl mb-4">??</div>
+      <h2 className="text-white text-2xl font-bold mb-2">Subscription Required</h2>
+      <p className="text-gray-400 mb-6">Your free trial has ended. Subscribe to keep watching Live TV.</p>
+      <button onClick={() => navigate('/app#pricing')} className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl transition-colors">View Plans</button>
+      <button onClick={() => navigate('/app')} className="mt-3 text-gray-500 hover:text-white text-sm transition-colors">Go Back</button>
+    </div>
+  );
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#0a0a0a', color: '#fff', fontFamily: 'sans-serif', overflow: 'hidden' }}>
