@@ -1,3 +1,4 @@
+import asyncio
 ﻿import os
 import httpx
 from typing import Optional, List, Dict, Any
@@ -325,18 +326,37 @@ async def get_hindi_series_trending(page: int = 1):
 
 
 async def get_georgian_movies(page: int = 1):
-    """Get popular Georgian movies"""
-    data = await tmdb_request("/discover/movie", {"with_original_language": "ka", "sort_by": "popularity.desc", "page": page})
-    if data and "results" in data:
-        return format_movies(data["results"]), data.get("total_pages", 1)
-    return [], 1
+    """Get Georgian movies - language ka + origin country GE, merged and deduped"""
+    ka_lang, ge_country, ge_ru = await asyncio.gather(
+        tmdb_request("/discover/movie", {"with_original_language": "ka", "sort_by": "popularity.desc", "page": page}),
+        tmdb_request("/discover/movie", {"with_origin_country": "GE", "sort_by": "popularity.desc", "page": page}),
+        tmdb_request("/discover/movie", {"with_origin_country": "GE", "with_original_language": "ru", "sort_by": "vote_count.desc", "page": page}),
+    )
+    seen, results = set(), []
+    for dataset in [ka_lang, ge_country, ge_ru]:
+        if dataset and "results" in dataset:
+            for m in dataset["results"]:
+                if m["id"] not in seen:
+                    seen.add(m["id"])
+                    results.append(m)
+    results.sort(key=lambda x: x.get("popularity", 0), reverse=True)
+    return format_movies(results), 1
 
 async def get_georgian_series(page: int = 1):
-    """Get popular Georgian TV series"""
-    data = await tmdb_request("/discover/tv", {"with_original_language": "ka", "sort_by": "popularity.desc", "page": page})
-    if data and "results" in data:
-        return format_series(data["results"]), data.get("total_pages", 1)
-    return [], 1
+    """Get Georgian TV series - language ka + origin country GE, merged and deduped"""
+    ka_lang, ge_country = await asyncio.gather(
+        tmdb_request("/discover/tv", {"with_original_language": "ka", "sort_by": "popularity.desc", "page": page}),
+        tmdb_request("/discover/tv", {"with_origin_country": "GE", "sort_by": "popularity.desc", "page": page}),
+    )
+    seen, results = set(), []
+    for dataset in [ka_lang, ge_country]:
+        if dataset and "results" in dataset:
+            for s in dataset["results"]:
+                if s["id"] not in seen:
+                    seen.add(s["id"])
+                    results.append(s)
+    results.sort(key=lambda x: x.get("popularity", 0), reverse=True)
+    return format_series(results), 1
 
 async def get_russian_movies(page: int = 1):
     """Get popular Russian movies"""
