@@ -20,6 +20,7 @@ const LiveTVPage = () => {
   const [deleteMode, setDeleteMode] = useState(false);
   const { user } = useAuth();
   const [accessBlocked, setAccessBlocked] = useState(false);
+  const [deletedIds, setDeletedIds] = useState([]);
 
   useEffect(() => {
     if (!user) { navigate('/login'); return; }
@@ -39,7 +40,6 @@ const LiveTVPage = () => {
     };
     checkAccess();
   }, [user, navigate]);
-  const [deletedIds, setDeletedIds] = useState([]);
 
   useEffect(() => {
     if (!user) return;
