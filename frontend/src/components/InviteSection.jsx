@@ -43,7 +43,7 @@ const InviteSection = ({ compact = false }) => {
           </div>
           <div>
             <h3 className="font-bold text-white">Invite Friends & Family</h3>
-            <p className="text-gray-400 text-xs">Share your referral link</p>
+            <p className="text-gray-400 text-xs">You get <span className="text-green-400 font-semibold">R5 off</span> - Friend gets <span className="text-yellow-400 font-semibold">3 days free</span></p>
           </div>
         </div>
         <div className="flex items-center gap-2 bg-zinc-900 rounded-xl px-3 py-2 mb-3 border border-white/10">
@@ -71,7 +71,7 @@ const InviteSection = ({ compact = false }) => {
           <Share2 className="w-8 h-8 text-purple-400" />
         </div>
         <h2 className="text-3xl font-bold text-white mb-3">Share with Friends & Family</h2>
-        <p className="text-gray-400 mb-8">Invite the people you love to watch together on Family Binge.</p>
+        <div className="flex justify-center gap-6 mb-8"><div className="bg-green-500/10 border border-green-500/30 rounded-2xl px-6 py-4 text-center"><p className="text-green-400 text-2xl font-bold">R5 off</p><p className="text-gray-400 text-sm mt-1">You earn per signup</p></div><div className="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl px-6 py-4 text-center"><p className="text-yellow-300 text-2xl font-bold">3 days free</p><p className="text-gray-400 text-sm mt-1">Your friend receives</p></div></div><p className="text-gray-400 mb-6">Share your link - the more friends who sign up, the more you save. Stacks up!</p>
         <div className="flex items-center gap-3 bg-zinc-800 rounded-2xl px-5 py-4 mb-6 border border-white/10">
           <span className="text-gray-300 text-sm truncate flex-1">{referralLink}</span>
           <button onClick={handleCopy} className="text-purple-400 hover:text-purple-300 flex-shrink-0 flex items-center gap-1 text-sm font-medium">

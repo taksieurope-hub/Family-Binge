@@ -23,7 +23,7 @@ const ReferralBanner = () => {
   return (
     <div className="w-full bg-gradient-to-r from-purple-900/90 to-pink-900/90 border-b border-purple-500/20 px-4 py-2.5 flex items-center justify-between gap-4 flex-wrap">
       <p className="text-white text-sm font-medium flex-1">
-        <span className="text-purple-300 font-bold">Refer a friend</span> - earn <span className="text-green-400 font-bold">R5 off</span> your next subscription for every friend who subscribes. Stacks up!
+        <span className="text-purple-300 font-bold">Refer a friend</span> - earn <span className="text-green-400 font-bold">R5 off</span> your next subscription &amp; your friend gets <span className="text-yellow-300 font-bold">3 days free</span>. Stacks up!
       </p>
       <div className="flex items-center gap-2 flex-shrink-0">
         <button

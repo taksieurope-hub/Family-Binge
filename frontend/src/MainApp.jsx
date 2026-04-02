@@ -9,6 +9,7 @@ import FAQSection from "./components/FAQSection";
 import KartuliSection from "./components/KartuliSection";
 import Footer from "./components/Footer";
 import ReferralBanner from "./components/ReferralBanner";
+import InviteSection from "./components/InviteSection";
 import VideoPlayer from "./components/VideoPlayer";
 import ContentDetailModal from "./components/ContentDetailModal";
 import DownloadModal from "./components/DownloadModal";
@@ -401,6 +402,7 @@ function MainApp() {
       {contentFilter === "russian" && (
         <KartuliSection onSelectContent={handleSelectContent} filterMode="russian" />
       )}
+      <InviteSection />
       <div id="download">
         <DownloadSection />
       </div>
