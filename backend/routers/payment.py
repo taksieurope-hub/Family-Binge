@@ -158,6 +158,8 @@ async def add_extra_device(request: AddDeviceRequest):
 
 @router.post("/register-device")
 async def register_device(request: RegisterDeviceRequest):
+    import traceback
+    try:
     if not firebase_admin._apps:
         raise HTTPException(status_code=500, detail="Firebase not initialized")
     
@@ -199,6 +201,9 @@ async def register_device(request: RegisterDeviceRequest):
     registered.append(new_device)
     user_ref.update({"registeredDevices": registered})
     return {"success": True, "status": "registered"}
+    except Exception as e:
+        print("REGISTER DEVICE ERROR:", traceback.format_exc())
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.delete("/remove-device/{user_id}/{device_id}")
 async def remove_device(user_id: str, device_id: str):
