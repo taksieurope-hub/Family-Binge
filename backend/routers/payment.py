@@ -160,47 +160,40 @@ async def add_extra_device(request: AddDeviceRequest):
 async def register_device(request: RegisterDeviceRequest):
     import traceback
     try:
-    if not firebase_admin._apps:
-        raise HTTPException(status_code=500, detail="Firebase not initialized")
-    
-    db = firestore.client()
-    user_ref = db.collection("users").document(request.user_id)
-    user = user_ref.get()
-    if not user.exists:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    data = user.to_dict()
-    registered = data.get("registeredDevices") or []
-    if not isinstance(registered, list):
-        registered = []
-    max_tvs = int(data.get("maxTVs") or 1)
-    max_phones = int(data.get("maxPhones") or 1)
-    
-    # Check if device already registered
-    existing = [d for d in registered if isinstance(d, dict) and d.get("device_id") == request.device_id]
-    if existing:
-        return {"success": True, "status": "already_registered"}
-    
-    # Count current devices by type
-    tvs = [d for d in registered if isinstance(d, dict) and d.get("device_type") == "tv"]
-    phones = [d for d in registered if isinstance(d, dict) and d.get("device_type") == "phone"]
-    
-    if request.device_type == "tv" and len(tvs) >= max_tvs:
-        return {"success": False, "status": "limit_reached", "device_type": "tv", "limit": max_tvs}
-    if request.device_type == "phone" and len(phones) >= max_phones:
-        return {"success": False, "status": "limit_reached", "device_type": "phone", "limit": max_phones}
-    
-    # Register device
-    from datetime import datetime
-    new_device = {
-        "device_id": request.device_id,
-        "device_type": request.device_type,
-        "device_name": request.device_name,
-        "registered_at": datetime.utcnow().isoformat()
-    }
-    registered.append(new_device)
-    user_ref.update({"registeredDevices": registered})
-    return {"success": True, "status": "registered"}
+        if not firebase_admin._apps:
+            raise HTTPException(status_code=500, detail="Firebase not initialized")
+        db = firestore.client()
+        user_ref = db.collection("users").document(request.user_id)
+        user = user_ref.get()
+        if not user.exists:
+            raise HTTPException(status_code=404, detail="User not found")
+        data = user.to_dict()
+        registered = data.get("registeredDevices") or []
+        if not isinstance(registered, list):
+            registered = []
+        max_tvs = int(data.get("maxTVs") or 1)
+        max_phones = int(data.get("maxPhones") or 1)
+        existing = [d for d in registered if isinstance(d, dict) and d.get("device_id") == request.device_id]
+        if existing:
+            return {"success": True, "status": "already_registered"}
+        tvs = [d for d in registered if isinstance(d, dict) and d.get("device_type") == "tv"]
+        phones = [d for d in registered if isinstance(d, dict) and d.get("device_type") == "phone"]
+        if request.device_type == "tv" and len(tvs) >= max_tvs:
+            return {"success": False, "status": "limit_reached", "device_type": "tv", "limit": max_tvs}
+        if request.device_type == "phone" and len(phones) >= max_phones:
+            return {"success": False, "status": "limit_reached", "device_type": "phone", "limit": max_phones}
+        from datetime import datetime
+        new_device = {
+            "device_id": request.device_id,
+            "device_type": request.device_type,
+            "device_name": request.device_name,
+            "registered_at": datetime.utcnow().isoformat()
+        }
+        registered.append(new_device)
+        user_ref.update({"registeredDevices": registered})
+        return {"success": True, "status": "registered"}
+    except HTTPException:
+        raise
     except Exception as e:
         print("REGISTER DEVICE ERROR:", traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e))
