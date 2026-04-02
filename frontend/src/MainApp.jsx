@@ -197,6 +197,12 @@ function MainApp() {
           const data = snap.data();
           setUserData(data);
           console.log("USER ROLE:", data.role, "PLAN:", data.plan, "ALL:", JSON.stringify(data));
+          const isFreeAccess = data.role === 'admin' || data.role === 'family';
+
+          if (isFreeAccess) {
+            setAccessStatus('full');
+          } else {
+
           const now = new Date();
           const trialEnds = data.trialEnds?.toDate ? data.trialEnds.toDate() : new Date(data.trialEnds);
           const subExpires = data.subscriptionExpires?.toDate
@@ -204,9 +210,8 @@ function MainApp() {
             : data.subscriptionExpires ? new Date(data.subscriptionExpires) : null;
 
           const hasPaidSub = data.plan && data.plan !== 'free_trial' && subExpires && subExpires > now;
-          const isFreeAccess = data.role === 'admin' || data.role === 'family';
 
-          if (isFreeAccess || hasPaidSub) {
+          if (hasPaidSub) {
             setAccessStatus('full');
           } else if (trialEnds > now) {
             setAccessStatus('trial');
@@ -215,6 +220,8 @@ function MainApp() {
             // Auto-show paywall when trial is expired
             setShowPaywall(true);
           }
+
+          } // end non-free-access check
 
           // Register device and check limit
           if (isFreeAccess || hasPaidSub || trialEnds > now) {
