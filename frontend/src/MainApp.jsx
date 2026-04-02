@@ -365,6 +365,7 @@ function MainApp() {
         onPlayVideo={handlePlayVideo}
         onSelectContent={handleSelectContent}
       />
+      <InviteSection compact />
       {/* Content Filter Bar */}
       <div id="movies" className="sticky top-16 z-40 bg-black/95 backdrop-blur-sm border-b border-zinc-800">
         <div className="flex gap-2 px-4 py-3 overflow-x-auto scrollbar-hide">

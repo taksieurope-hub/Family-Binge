@@ -274,6 +274,18 @@ export const channels = [
   { id: 365, name: "Young Hollywood", category: "Entertainment", logo: "https://i.imgur.com/X27MGHd.png", streams: ["https://younghollywood-rakuten-samsung.amagi.tv/playlist.m3u8", "https://younghollywood-vizio.amagi.tv/playlist.m3u8"] },
   { id: 366, name: "Rakuten Viki", category: "Entertainment", logo: "https://i.imgur.com/pbyd1g2.png", streams: ["https://newidco-rakutenviki-1-us.roku.wurl.tv/playlist.m3u8", "https://newidco-rakutenviki-3-es.rakuten.wurl.tv/playlist.m3u8"] },
   { id: 367, name: "Right Now TV", category: "Entertainment", logo: "https://xstreamcp-assets-msp.streamready.in/assets/DISTROTV/LIVECHANNEL/666988e8bac4421ebc533626/images/logo_20231219_221555_29.png", streams: ["https://d35j504z0x2vu2.cloudfront.net/v1/master/0bc8e8376bd8417a1b6761138aa41c26c7309312/right-now-tv/playlist.m3u8", "https://a-cdn.klowdtv.com/live2/rightnowtv_720p/playlist.m3u8"] },
+  { id: 400, name: "Rustavi 2",   category: "News",          lang: "georgian", logo: null, streams: ["https://stream.rustavitv.ge/rustavitv/tracks-v1a1/mono.m3u8"] },
+  { id: 401, name: "Imedi TV",    category: "News",          lang: "georgian", logo: null, streams: ["https://imedimux.live.tv.ge/imedimux/tracks-v1a1/mono.m3u8"] },
+  { id: 402, name: "GPB First",   category: "Entertainment", lang: "georgian", logo: null, streams: ["https://gpb-ch1.live.tv.ge/gpb-ch1/tracks-v1a1/mono.m3u8"] },
+  { id: 403, name: "Maestro",     category: "Entertainment", lang: "georgian", logo: null, streams: ["https://maestro.live.tv.ge/maestro/tracks-v1a1/mono.m3u8"] },
+  { id: 404, name: "Pirveli",     category: "Entertainment", lang: "georgian", logo: null, streams: ["https://pirveli.live.tv.ge/pirveli/tracks-v1a1/mono.m3u8"] },
+  { id: 405, name: "Mtavari",     category: "News",          lang: "georgian", logo: null, streams: ["https://mtavari.live.tv.ge/mtavari/tracks-v1a1/mono.m3u8"] },
+  { id: 406, name: "Formula TV",  category: "Entertainment", lang: "georgian", logo: null, streams: ["https://formula.live.tv.ge/formula/tracks-v1a1/mono.m3u8"] },
+  { id: 407, name: "Mze TV",      category: "Entertainment", lang: "georgian", logo: null, streams: ["https://mze.live.tv.ge/mze/tracks-v1a1/mono.m3u8"] },
+  { id: 408, name: "Kavkasia",    category: "News",          lang: "georgian", logo: null, streams: ["https://kavkasia.live.tv.ge/kavkasia/tracks-v1a1/mono.m3u8"] },
+  { id: 409, name: "GDS",         category: "Documentary",   lang: "georgian", logo: null, streams: ["https://gds.live.tv.ge/gds/tracks-v1a1/mono.m3u8"] },
+  { id: 410, name: "Obiektivi",   category: "News",          lang: "georgian", logo: null, streams: ["https://obiektivi.live.tv.ge/obiektivi/tracks-v1a1/mono.m3u8"] },
+  { id: 411, name: "TV Adjara",   category: "Entertainment", lang: "georgian", logo: null, streams: ["https://adjara.live.tv.ge/adjara/tracks-v1a1/mono.m3u8"] },
   { id: 368, name: "The Nest", category: "Entertainment", logo: "https://iili.io/JGqD21e.png", streams: ["https://fast-channels.sinclairstoryline.com/THENEST/index.m3u8"] },
 ];
 const LiveTVSection = ({ onSelectContent }) => {
