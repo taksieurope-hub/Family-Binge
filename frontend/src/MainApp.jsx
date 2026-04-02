@@ -168,8 +168,7 @@ function MainApp() {
   const [contentFilter, setContentFilter] = useState("english");
   const filters = [
     { id: "english", label: "English" },
-    { id: "bollywood", label: "Bollywood" },
-    { id: "hindi", label: "Hindi Series" },
+    { id: "bollywood", label: "Hindi / Bollywood" },
     { id: "georgian", label: "Georgian" },
     { id: "russian", label: "Russian" },
   ];
@@ -391,10 +390,10 @@ function MainApp() {
         </>
       )}
       {contentFilter === "bollywood" && (
-        <ContentSection type="movies" onSelectContent={handleSelectContent} filterMode="bollywood" />
-      )}
-      {contentFilter === "hindi" && (
-        <ContentSection type="series" onSelectContent={handleSelectContent} filterMode="hindi" />
+        <>
+          <ContentSection type="movies" onSelectContent={handleSelectContent} filterMode="bollywood" />
+          <ContentSection type="series" onSelectContent={handleSelectContent} filterMode="hindi" />
+        </>
       )}
       {contentFilter === "georgian" && (
         <KartuliSection onSelectContent={handleSelectContent} filterMode="georgian" />
