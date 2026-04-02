@@ -175,13 +175,13 @@ async def register_device(request: RegisterDeviceRequest):
     max_phones = int(data.get("maxPhones") or 1)
     
     # Check if device already registered
-    existing = [d for d in registered if d["device_id"] == request.device_id]
+    existing = [d for d in registered if isinstance(d, dict) and d.get("device_id") == request.device_id]
     if existing:
         return {"success": True, "status": "already_registered"}
     
     # Count current devices by type
-    tvs = [d for d in registered if d["device_type"] == "tv"]
-    phones = [d for d in registered if d["device_type"] == "phone"]
+    tvs = [d for d in registered if isinstance(d, dict) and d.get("device_type") == "tv"]
+    phones = [d for d in registered if isinstance(d, dict) and d.get("device_type") == "phone"]
     
     if request.device_type == "tv" and len(tvs) >= max_tvs:
         return {"success": False, "status": "limit_reached", "device_type": "tv", "limit": max_tvs}
