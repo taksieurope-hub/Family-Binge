@@ -20,6 +20,7 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { Crown, AlertTriangle, X } from "lucide-react";
 import { registerDevice, getDeviceId } from "./services/deviceService";
 import DeviceBlockedModal from "./components/DeviceBlockedModal";
+import NPSSurvey from "./components/NPSSurvey";
 
 // ── Paywall Modal ──────────────────────────────────────────────────────────────
 const PaywallModal = ({ onClose, onGoToPricing, trialEnds, onLogout }) => {
@@ -337,6 +338,7 @@ function MainApp() {
 
   return (
     <div className="App min-h-screen bg-black">
+      <NPSSurvey />
       {/* Guest signup banner */}
       {showGuestBanner && (
         <GuestBanner
