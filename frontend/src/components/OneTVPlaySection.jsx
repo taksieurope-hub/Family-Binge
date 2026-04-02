@@ -102,7 +102,7 @@ const OneTVPlaySection = ({ onSelectContent }) => {
                     </div>
                   </div>
                   <p className="text-white text-sm font-semibold truncate">{movie.title}</p>
-                  <p className="text-gray-400 text-xs">{movie.year}{movie.imdb ? ` · ${movie.imdb}` : ""}</p>
+                  <p className="text-gray-400 text-xs">{movie.year}{movie.imdb ? ` ï¿½ ${movie.imdb}` : ""}</p>
                 </div>
               ))}
             </div>
