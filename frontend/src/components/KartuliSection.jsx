@@ -61,7 +61,7 @@ const KartuliSection = ({ onSelectContent }) => {
 
   const handleWatch = (item) => {
     const query = encodeURIComponent(item.title);
-    window.open('https://movies.ge/search/?q=' + query, '_blank');
+    window.open('https://www.google.com/search?q=' + query + '+watch+online+georgian', '_blank');
   };
 
   useEffect(() => {
