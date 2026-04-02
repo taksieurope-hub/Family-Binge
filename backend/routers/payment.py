@@ -106,6 +106,7 @@ async def activate_plan(request: ActivatePlanRequest):
         "maxPhones": plan["maxPhones"],
         "registeredDevices": [],
         "extraDevices": 0,
+        "referralCredit": 0,
         "updatedAt": now
     })
 

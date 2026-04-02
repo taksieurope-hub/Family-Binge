@@ -35,7 +35,7 @@ const PricingSection = () => {
       id: "standard",
       name: "Standard",
       price: 249,
-      billing: "R249 / 3 months (≈ R83/month)",
+      billing: "R249 / 3 months (~ R83/month)",
       devices: "1 TV + 1 Phone (Upgraded)",
       quality: "Full HD Quality",
       popular: true
@@ -44,7 +44,7 @@ const PricingSection = () => {
       id: "premium",
       name: "Premium (The High Roller)",
       price: 399,
-      billing: "R399 / 6 months (≈ R66/month)",
+      billing: "R399 / 6 months (~ R66/month)",
       devices: "2 TV + 2 Phones (Upgraded)",
       quality: "4K Quality",
       popular: false
@@ -53,7 +53,7 @@ const PricingSection = () => {
       id: "annual",
       name: "Annual (The Best Value) Family",
       price: 599,
-      billing: "R599 / 12 months (≈ R50/month)",
+      billing: "R599 / 12 months (~ R50/month)",
       devices: "5 TV + 5 Phones",
       quality: "4K Quality",
       popular: false,
@@ -116,7 +116,7 @@ const PricingSection = () => {
               <p className="text-gray-400 text-sm mt-1">This will be automatically deducted from your next payment.</p>
             </div>
           )}
-          <p className="text-center text-gray-400 mb-12">3-day free trial • Cancel anytime</p>
+          <p className="text-center text-gray-400 mb-12">3-day free trial - Cancel anytime</p>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {plans.map(plan => (
