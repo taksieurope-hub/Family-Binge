@@ -13,7 +13,8 @@ from services.tmdb_service import (
     search_movies, search_series, search_multi,
     get_movie_genres, get_tv_genres,
     get_movies_by_genre, get_series_by_genre,
-    get_bollywood_movies, get_bollywood_trending, get_hindi_series, get_hindi_series_trending
+    get_bollywood_movies, get_bollywood_trending, get_hindi_series, get_hindi_series_trending,
+    get_georgian_movies, get_georgian_series, get_russian_movies, get_russian_series, get_georgian_trending_movies
 )
 
 from services.iptv_service import (
@@ -22,6 +23,38 @@ from services.iptv_service import (
 )
 
 router = APIRouter(tags=["content"])
+# ============ GEORGIAN / KARTULI ENDPOINTS ============
+@router.get("/movies/georgian/popular")
+async def georgian_movies(page: int = Query(1, ge=1, le=500)):
+    """Get popular Georgian movies"""
+    movies, total_pages = await get_georgian_movies(page)
+    return ContentListResponse(items=movies, total_pages=total_pages, page=page)
+
+@router.get("/movies/georgian/trending")
+async def georgian_movies_trending(page: int = Query(1, ge=1, le=500)):
+    """Get trending Georgian + Russian movies"""
+    movies, total_pages = await get_georgian_trending_movies(page)
+    return ContentListResponse(items=movies, total_pages=total_pages, page=page)
+
+@router.get("/movies/russian/popular")
+async def russian_movies(page: int = Query(1, ge=1, le=500)):
+    """Get popular Russian movies"""
+    movies, total_pages = await get_russian_movies(page)
+    return ContentListResponse(items=movies, total_pages=total_pages, page=page)
+
+@router.get("/series/georgian/popular")
+async def georgian_series(page: int = Query(1, ge=1, le=500)):
+    """Get popular Georgian series"""
+    series, total_pages = await get_georgian_series(page)
+    return ContentListResponse(items=series, total_pages=total_pages, page=page)
+
+@router.get("/series/russian/popular")
+async def russian_series(page: int = Query(1, ge=1, le=500)):
+    """Get popular Russian series"""
+    series, total_pages = await get_russian_series(page)
+    return ContentListResponse(items=series, total_pages=total_pages, page=page)
+
+
 
 # Response Models
 class ContentListResponse(BaseModel):

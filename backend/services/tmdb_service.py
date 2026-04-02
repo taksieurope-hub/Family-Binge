@@ -323,3 +323,43 @@ async def get_hindi_series_trending(page: int = 1):
         return format_series(data["results"]), data.get("total_pages", 1)
     return [], 1
 
+
+async def get_georgian_movies(page: int = 1):
+    """Get popular Georgian movies"""
+    data = await tmdb_request("/discover/movie", {"with_original_language": "ka", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_movies(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_georgian_series(page: int = 1):
+    """Get popular Georgian TV series"""
+    data = await tmdb_request("/discover/tv", {"with_original_language": "ka", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_series(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_russian_movies(page: int = 1):
+    """Get popular Russian movies"""
+    data = await tmdb_request("/discover/movie", {"with_original_language": "ru", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_movies(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_russian_series(page: int = 1):
+    """Get popular Russian TV series"""
+    data = await tmdb_request("/discover/tv", {"with_original_language": "ru", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_series(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_georgian_trending_movies(page: int = 1):
+    """Get trending Georgian + Russian movies combined"""
+    ka = await tmdb_request("/discover/movie", {"with_original_language": "ka", "sort_by": "vote_count.desc", "page": page})
+    ru = await tmdb_request("/discover/movie", {"with_original_language": "ru", "sort_by": "popularity.desc", "page": page})
+    results = []
+    if ka and "results" in ka:
+        results += ka["results"]
+    if ru and "results" in ru:
+        results += ru["results"]
+    results.sort(key=lambda x: x.get("popularity", 0), reverse=True)
+    return format_movies(results[:20]), 1

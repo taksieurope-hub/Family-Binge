@@ -111,3 +111,11 @@ export const searchAPI = {
   search:    (query, page=1) => fetchSearch(`${API_BASE_URL}/api/content/search?q=${encodeURIComponent(query)}&page=${page}`),
 };
 
+
+export const georgianAPI = {
+  getMovies:        (page = 1) => fetchList(`${API_BASE_URL}/api/content/movies/georgian/popular?page=${page}`),
+  getTrendingMovies:(page = 1) => fetchList(`${API_BASE_URL}/api/content/movies/georgian/trending?page=${page}`),
+  getRussianMovies: (page = 1) => fetchList(`${API_BASE_URL}/api/content/movies/russian/popular?page=${page}`),
+  getSeries:        (page = 1) => fetchList(`${API_BASE_URL}/api/content/series/georgian/popular?page=${page}`),
+  getRussianSeries: (page = 1) => fetchList(`${API_BASE_URL}/api/content/series/russian/popular?page=${page}`),
+};
