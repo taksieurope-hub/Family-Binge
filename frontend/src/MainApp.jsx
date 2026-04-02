@@ -6,6 +6,8 @@ import ContentSection from "./components/ContentSection";
 import DownloadSection from "./components/DownloadSection";
 import PricingSection from "./components/PricingSection";
 import FAQSection from "./components/FAQSection";
+import LiveTVSection from "./components/LiveTVSection";
+import KartuliSection from "./components/KartuliSection";
 import Footer from "./components/Footer";
 import ReferralBanner from "./components/ReferralBanner";
 import VideoPlayer from "./components/VideoPlayer";
