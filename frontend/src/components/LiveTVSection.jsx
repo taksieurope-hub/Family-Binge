@@ -276,3 +276,105 @@ export const channels = [
   { id: 367, name: "Right Now TV", category: "Entertainment", logo: "https://xstreamcp-assets-msp.streamready.in/assets/DISTROTV/LIVECHANNEL/666988e8bac4421ebc533626/images/logo_20231219_221555_29.png", streams: ["https://d35j504z0x2vu2.cloudfront.net/v1/master/0bc8e8376bd8417a1b6761138aa41c26c7309312/right-now-tv/playlist.m3u8", "https://a-cdn.klowdtv.com/live2/rightnowtv_720p/playlist.m3u8"] },
   { id: 368, name: "The Nest", category: "Entertainment", logo: "https://iili.io/JGqD21e.png", streams: ["https://fast-channels.sinclairstoryline.com/THENEST/index.m3u8"] },
 ];
+const LiveTVSection = ({ onSelectContent }) => {
+  const [search, setSearch] = useState('');
+  const [activeCategory, setActiveCategory] = useState('All');
+  const [activeChannel, setActiveChannel] = useState(null);
+  const [streamIndex, setStreamIndex] = useState(0);
+  const videoRef = useRef(null);
+  const hlsRef = useRef(null);
+
+  const categories = ['All', ...Array.from(new Set(channels.map(c => c.category))).sort()];
+  const filtered = channels.filter(c =>
+    (activeCategory === 'All' || c.category === activeCategory) &&
+    c.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  useEffect(() => {
+    if (!activeChannel) return;
+    const url = activeChannel.streams[streamIndex];
+    if (!url) return;
+    if (hlsRef.current) { hlsRef.current.destroy(); hlsRef.current = null; }
+    const video = videoRef.current;
+    if (!video) return;
+    if (Hls.isSupported()) {
+      const hls = new Hls();
+      hlsRef.current = hls;
+      hls.loadSource(url);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.ERROR, () => {
+        if (streamIndex + 1 < activeChannel.streams.length) setStreamIndex(i => i + 1);
+      });
+      video.play().catch(() => {});
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = url;
+      video.play().catch(() => {});
+    }
+    return () => { if (hlsRef.current) { hlsRef.current.destroy(); hlsRef.current = null; } };
+  }, [activeChannel, streamIndex]);
+
+  const selectChannel = (ch) => { setActiveChannel(ch); setStreamIndex(0); };
+
+  return (
+    <div className="min-h-screen bg-black py-20 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex items-center gap-4 mb-8">
+          <div className="bg-gradient-to-br from-blue-600 to-cyan-500 p-3 rounded-xl shadow-lg">
+            <Tv className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h2 className="text-3xl font-black text-white">Live <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">TV</span></h2>
+            <p className="text-gray-400 text-sm">{channels.length} free channels worldwide</p>
+          </div>
+        </div>
+
+        {activeChannel && (
+          <div className="mb-8 bg-zinc-900 rounded-2xl overflow-hidden border border-zinc-700">
+            <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-700">
+              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+              <span className="text-white font-semibold">{activeChannel.name}</span>
+              <span className="text-gray-500 text-sm ml-auto">{activeChannel.category}</span>
+              <button onClick={() => setActiveChannel(null)} className="text-gray-500 hover:text-white ml-2 text-sm">?</button>
+            </div>
+            <video ref={videoRef} controls autoPlay className="w-full aspect-video bg-black" />
+          </div>
+        )}
+
+        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text" placeholder="Search channels..."
+              value={search} onChange={e => setSearch(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 bg-zinc-800 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+            {categories.map(cat => (
+              <button key={cat} onClick={() => setActiveCategory(cat)}
+                className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-semibold transition-all ${activeCategory === cat ? 'bg-blue-600 text-white' : 'bg-zinc-800 text-gray-400 hover:text-white'}`}>
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          {filtered.map(ch => (
+            <button key={ch.id} onClick={() => selectChannel(ch)}
+              className={`p-4 rounded-xl border transition-all text-left ${activeChannel?.id === ch.id ? 'border-blue-500 bg-blue-500/10' : 'border-zinc-700 bg-zinc-900 hover:border-zinc-500'}`}>
+              {ch.logo
+                ? <img src={ch.logo} alt={ch.name} className="w-10 h-10 object-contain mb-2 rounded" onError={e => e.target.style.display='none'} />
+                : <div className="w-10 h-10 bg-zinc-700 rounded mb-2 flex items-center justify-center"><Tv className="w-5 h-5 text-gray-500" /></div>
+              }
+              <p className="text-white text-xs font-semibold truncate">{ch.name}</p>
+              <p className="text-gray-500 text-xs truncate">{ch.category}</p>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default LiveTVSection;
