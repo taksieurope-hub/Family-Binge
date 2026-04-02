@@ -61,7 +61,7 @@ const KartuliSection = ({ onSelectContent }) => {
 
   const handleWatch = (item) => {
     const query = encodeURIComponent(item.title);
-    window.open('https://www.google.com/search?q=' + query + '+watch+online+georgian', '_blank');
+    window.open('https://myvideo.ge/search?q=' + query, '_blank');
   };
 
   useEffect(() => {
@@ -115,14 +115,14 @@ const KartuliSection = ({ onSelectContent }) => {
         </div>
         {(activeTab === 'all' || activeTab === 'geo') && (
           <>
-            <ContentRow title="Georgian Movies" icon={Film} items={geoMovies} onSelectContent={handleWatch} loading={loading} accent="bg-red-600" />
-            <ContentRow title="Georgian Series" icon={Tv} items={geoSeries} onSelectContent={handleWatch} loading={loading} accent="bg-red-600" />
+            <ContentRow title="Georgian Movies" icon={Film} items={geoMovies} onSelectContent={onSelectContent} loading={loading} accent="bg-red-600" />
+            <ContentRow title="Georgian Series" icon={Tv} items={geoSeries} onSelectContent={onSelectContent} loading={loading} accent="bg-red-600" />
           </>
         )}
         {(activeTab === 'all' || activeTab === 'ru') && (
           <>
-            <ContentRow title="Russian Movies" icon={Film} items={ruMovies} onSelectContent={handleWatch} loading={loading} accent="bg-orange-600" />
-            <ContentRow title="Russian Series" icon={Tv} items={ruSeries} onSelectContent={handleWatch} loading={loading} accent="bg-orange-600" />
+            <ContentRow title="Russian Movies" icon={Film} items={ruMovies} onSelectContent={onSelectContent} loading={loading} accent="bg-orange-600" />
+            <ContentRow title="Russian Series" icon={Tv} items={ruSeries} onSelectContent={onSelectContent} loading={loading} accent="bg-orange-600" />
           </>
         )}
         {!loading && geoMovies.length === 0 && geoSeries.length === 0 && ruMovies.length === 0 && ruSeries.length === 0 && (
