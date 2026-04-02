@@ -35,7 +35,8 @@ const LiveTVPage = () => {
         const now = new Date();
         const trialActive = data.trialEndsAt && trialEnd > now;
         const subActive = status === 'active' && data.subscriptionEndsAt && subEnd > now;
-        if (!trialActive && !subActive) setAccessBlocked(true);
+        const isFamilyRole = data.role === 'family';
+        if (!trialActive && !subActive && !isFamilyRole) setAccessBlocked(true);
       } catch(e) { console.error(e); }
     };
     checkAccess();
