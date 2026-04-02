@@ -279,16 +279,21 @@ export const channels = [
 const LiveTVSection = ({ onSelectContent }) => {
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
+  const [liveLang, setLiveLang] = useState('english');
   const [activeChannel, setActiveChannel] = useState(null);
   const [streamIndex, setStreamIndex] = useState(0);
   const videoRef = useRef(null);
   const hlsRef = useRef(null);
 
-  const categories = ['All', ...Array.from(new Set(channels.map(c => c.category))).sort()];
-  const filtered = channels.filter(c =>
+
+  const langChannels = liveLang === 'georgian'
+    ? channels.filter(c => c.lang === 'georgian')
+    : channels.filter(c => c.lang !== 'georgian');
+  const filtered = langChannels.filter(c =>
     (activeCategory === 'All' || c.category === activeCategory) &&
     c.name.toLowerCase().includes(search.toLowerCase())
   );
+  const categories = ['All', ...Array.from(new Set(langChannels.map(c => c.category))).sort()];
 
   useEffect(() => {
     if (!activeChannel) return;
@@ -324,7 +329,17 @@ const LiveTVSection = ({ onSelectContent }) => {
           </div>
           <div>
             <h2 className="text-3xl font-black text-white">Live <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">TV</span></h2>
-            <p className="text-gray-400 text-sm">{channels.length} free channels worldwide</p>
+            <p className="text-gray-400 text-sm">{langChannels.length} channels</p>
+          </div>
+          <div className="ml-auto flex gap-2">
+            <button onClick={() => { setLiveLang('english'); setActiveCategory('All'); }}
+              className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${liveLang === 'english' ? 'bg-blue-600 text-white' : 'bg-zinc-800 text-gray-300 hover:text-white'}`}>
+              English
+            </button>
+            <button onClick={() => { setLiveLang('georgian'); setActiveCategory('All'); }}
+              className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${liveLang === 'georgian' ? 'bg-red-600 text-white' : 'bg-zinc-800 text-gray-300 hover:text-white'}`}>
+              Georgian
+            </button>
           </div>
         </div>
 
