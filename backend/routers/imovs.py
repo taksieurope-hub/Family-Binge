@@ -19,32 +19,28 @@ async def get_imovs_movies(page: int = 1):
             raise HTTPException(status_code=502, detail=f"imovs returned {r.status_code}")
     soup = BeautifulSoup(r.text, "html.parser")
     movies = []
-    for item in soup.select(".short-item, .th-item, article, .movie-item, .news-item, .mov-item, li, div[class*=item], div[class*=movie], div[class*=film]"):
-        a = item.select_one("a[href]")
-        img = item.select_one("img")
-        title_el = item.select_one(".short-title, .th-title, h2, h3, .title")
-        if not a:
+    seen = set()
+    for a in soup.find_all("a", href=True):
+        href = a["href"]
+        if ".html" not in href:
             continue
-        href = a.get("href", "")
-        if not href:
+        full_url = href if href.startswith("http") else f"https://www.imovs.ge{href}"
+        if full_url in seen:
             continue
-        if "imovs.ge" not in href and not href.startswith("/") and not href.startswith("http"):
-            continue
+        seen.add(full_url)
+        img = a.find("img")
         title = ""
-        if title_el:
-            title = title_el.get_text(strip=True)
-        elif img:
-            title = img.get("alt", "")
-        if not title and a:
+        if img:
+            title = img.get("alt", "").strip()
+        if not title:
             title = a.get_text(strip=True)
+        if not title or len(title) < 3:
+            continue
         poster = ""
         if img:
             poster = img.get("src", "") or img.get("data-src", "") or img.get("data-lazy-src", "")
             if poster and not poster.startswith("http"):
                 poster = "https://www.imovs.ge" + poster
-        full_url = href if href.startswith("http") else f"https://www.imovs.ge{href}"
-        if not title or "imovs" not in full_url:
-            continue
         movies.append({
             "title": title,
             "url": full_url,
