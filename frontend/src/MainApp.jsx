@@ -196,7 +196,6 @@ function MainApp() {
         if (snap.exists()) {
           const data = snap.data();
           setUserData(data);
-          console.log("USER ROLE:", data.role, "PLAN:", data.plan, "ALL:", JSON.stringify(data));
           const isFreeAccess = data.role === 'admin' || data.role === 'family';
           const now = new Date();
           const trialEnds = data.trialEnds?.toDate ? data.trialEnds.toDate() : new Date(data.trialEnds);
