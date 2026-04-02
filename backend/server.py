@@ -1,3 +1,11 @@
+import firebase_admin
+from firebase_admin import credentials
+import os
+
+_cred_path = os.path.join(os.path.dirname(__file__), "serviceAccountKey.json")
+if not firebase_admin._apps:
+    firebase_admin.initialize_app(credentials.Certificate(_cred_path))
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import os
