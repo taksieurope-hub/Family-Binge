@@ -43,8 +43,7 @@ const InviteSection = ({ compact = false }) => {
           </div>
           <div>
             <h3 className="font-bold text-white">Invite Friends & Family</h3>
-            <p className="text-gray-400 text-xs">You get <span className="text-green-400 font-semibold">R5 off</span> - Friend gets <span className="text-yellow-400 font-semibold">3 days free</span></p>
-          </div>
+            <p className="text-gray-400 text-xs">You get <span className="text-green-400 font-semibold">R5 off</span> for every friend that signs up — friend gets <span className="text-yellow-400 font-semibold">3 days free</span></p></div>
         </div>
         <div className="flex items-center gap-2 bg-zinc-900 rounded-xl px-3 py-2 mb-3 border border-white/10">
           <span className="text-gray-400 text-xs truncate flex-1">{referralLink}</span>
