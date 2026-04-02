@@ -41,8 +41,16 @@ const SignupPage = () => {
         subscriptionExpires: null,
         subscriptionPlan: null,
         referredBy: new URLSearchParams(location.search).get('ref') || null,
+        sessionToken: '',
+        sessionAt: null,
+        referredBy: new URLSearchParams(location.search).get('ref') || null,
       });
 
+      const sessionToken = Math.random().toString(36).substring(2) + Date.now().toString(36);
+      await import('firebase/firestore').then(({ doc: _doc, updateDoc }) =>
+        updateDoc(_doc(db, 'users', user.uid), { sessionToken })
+      );
+      localStorage.setItem('fb_session_token', sessionToken);
       navigate('/app');
     } catch (err) {
   console.log('FULL ERROR:', JSON.stringify(err));

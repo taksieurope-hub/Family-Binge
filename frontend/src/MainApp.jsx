@@ -170,6 +170,9 @@ function MainApp() {
   const [showBanner, setShowBanner] = useState(true);
   const [userData, setUserData] = useState(null);
   const [accessStatus, setAccessStatus] = useState('loading');
+  const [sessionWarning, setSessionWarning] = useState(false);
+  const [sessionCountdown, setSessionCountdown] = useState(30);
+  const [sessionKicked, setSessionKicked] = useState(false);
   const [deviceBlocked, setDeviceBlocked] = useState(false);
   const [deviceType, setDeviceType] = useState(null);
 
@@ -228,6 +231,48 @@ function MainApp() {
     });
     return unsub;
   }, []);
+
+  // Session conflict monitor
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (!user) return;
+    const localToken = localStorage.getItem('fb_session_token');
+    if (!localToken) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const snap = await getDoc(doc(db, 'users', user.uid));
+        if (snap.exists()) {
+          const data = snap.data();
+          if (data.sessionToken && data.sessionToken !== localToken) {
+            setSessionWarning(true);
+          }
+        }
+      } catch (e) {}
+    }, 5 * 60 * 1000); // every 5 minutes
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Countdown timer when warning shown
+  useEffect(() => {
+    if (!sessionWarning) return;
+    setSessionCountdown(30);
+    const timer = setInterval(() => {
+      setSessionCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          setSessionWarning(false);
+          setSessionKicked(true);
+          import('firebase/auth').then(({ signOut }) => signOut(auth));
+          localStorage.removeItem('fb_session_token');
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [sessionWarning]);
 
   // Listen for selectContent events from other components
   useEffect(() => {
@@ -356,6 +401,46 @@ function MainApp() {
           trialEnds={trialEnds}
           onLogout={handleLogout}
         />
+      )}
+
+      {/* Session Warning Modal */}
+      {sessionWarning && (
+        <div className="fixed inset-0 z-[300] bg-black/90 flex items-center justify-center p-6">
+          <div className="max-w-md w-full bg-zinc-900 rounded-3xl p-10 text-center border border-orange-500/30">
+            <div className="w-20 h-20 bg-orange-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /></svg>
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-2">Someone else signed in</h2>
+            <p className="text-gray-400 mb-4">Another device has signed into your account. You will be signed out in:</p>
+            <div className="text-6xl font-black text-orange-400 mb-6">{sessionCountdown}</div>
+            <p className="text-gray-500 text-sm">To use Family Binge on multiple screens at the same time, add the Multi-Screen option for just 20 GEL/month extra.</p>
+          </div>
+        </div>
+      )}
+
+      {/* Session Kicked Modal */}
+      {sessionKicked && (
+        <div className="fixed inset-0 z-[300] bg-black/95 flex items-center justify-center p-6">
+          <div className="max-w-md w-full bg-zinc-900 rounded-3xl p-10 text-center border border-red-500/30">
+            <div className="w-20 h-20 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-3">You have been signed out</h2>
+            <p className="text-gray-400 mb-6">Your account was opened on another device. Only one person can use an account at a time.</p>
+            <div className="bg-purple-500/10 border border-purple-500/30 rounded-2xl p-5 mb-6 text-left">
+              <p className="text-purple-300 font-bold mb-1">Want to watch on multiple screens?</p>
+              <p className="text-gray-400 text-sm">Add the <span className="text-white font-semibold">Multi-Screen add-on</span> for just <span className="text-green-400 font-bold">20 GEL/month</span> and allow up to 2 devices at the same time.</p>
+            </div>
+            <div className="flex flex-col gap-3">
+              <button onClick={() => window.location.href = '/login'} className="w-full py-4 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-2xl transition-colors">
+                Sign In Again
+              </button>
+              <button onClick={() => window.location.href = '/login'} className="w-full py-3 text-gray-500 hover:text-gray-300 text-sm transition-colors">
+                Contact Support to Add Multi-Screen
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
