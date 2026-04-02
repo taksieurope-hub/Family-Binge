@@ -365,24 +365,19 @@ function MainApp() {
         onPlayVideo={handlePlayVideo}
         onSelectContent={handleSelectContent}
       />
-﻿      {/* Content Filter Bar */}
+      {/* Content Filter Bar */}
       <div id="movies" className="sticky top-16 z-40 bg-black/95 backdrop-blur-sm border-b border-zinc-800">
         <div className="flex gap-2 px-4 py-3 overflow-x-auto scrollbar-hide">
-          {[
-            { id: "english", label: "English" },
-            { id: "bollywood", label: "Bollywood" },
-            { id: "hindi", label: "Hindi Series" },
-            { id: "georgian", label: "Georgian" },
-            { id: "russian", label: "Russian" },
-          ].map(f => (
+          {filters.map(f => (
             <button
               key={f.id}
               onClick={() => setContentFilter(f.id)}
-              className={lex-shrink-0 px-5 py-2 rounded-full text-sm font-semibold transition-all {
+              className={[
+                "flex-shrink-0 px-5 py-2 rounded-full text-sm font-semibold transition-all",
                 contentFilter === f.id
                   ? "bg-purple-600 text-white shadow-lg shadow-purple-500/30 scale-105"
                   : "bg-zinc-800 text-gray-300 hover:bg-zinc-700 hover:text-white"
-              }}
+              ].join(" ")}
             >
               {f.label}
             </button>
