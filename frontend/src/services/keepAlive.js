@@ -1,4 +1,4 @@
-const BACKEND = "https://family-binge-backend.onrender.com/api";
+const BACKEND = "https://family-binge-backend.onrender.com";
 
 export const startKeepAlive = () => {
   const ping = () => fetch(`${BACKEND}/`).catch(() => {});
