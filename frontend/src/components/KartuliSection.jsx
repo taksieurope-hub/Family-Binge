@@ -59,13 +59,13 @@ const KartuliSection = ({ onSelectContent }) => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('all');
 
-  useEffect(() => {
-    const handleWatch = (item) => {
+  const handleWatch = (item) => {
     const query = encodeURIComponent(item.title);
     window.open('https://movies.ge/search/?q=' + query, '_blank');
   };
 
-  const load = async () => {
+  useEffect(() => {
+    const load = async () => {
       setLoading(true);
       try {
         const [gm, gs, rm, rs] = await Promise.all([
@@ -96,32 +96,23 @@ const KartuliSection = ({ onSelectContent }) => {
   return (
     <div className="min-h-screen bg-black py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-
-        {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <div className="bg-gradient-to-br from-red-600 to-orange-500 p-3 rounded-xl shadow-lg">
             <Tv className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h2 className="text-3xl font-black text-white">Kartuli <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-orange-400">???????</span></h2>
+            <h2 className="text-3xl font-black text-white">Kartuli</h2>
             <p className="text-gray-400 text-sm">Georgian and Russian movies, series and content</p>
           </div>
         </div>
-
-        {/* Tabs */}
         <div className="flex gap-2 mb-8">
           {tabs.map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${activeTab === tab.id ? 'bg-red-600 text-white' : 'bg-zinc-800 text-gray-400 hover:text-white hover:bg-zinc-700'}`}
-            >
+            <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+              className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${activeTab === tab.id ? 'bg-red-600 text-white' : 'bg-zinc-800 text-gray-400 hover:text-white hover:bg-zinc-700'}`}>
               {tab.label}
             </button>
           ))}
         </div>
-
-        {/* Content */}
         {(activeTab === 'all' || activeTab === 'geo') && (
           <>
             <ContentRow title="Georgian Movies" icon={Film} items={geoMovies} onSelectContent={handleWatch} loading={loading} accent="bg-red-600" />
@@ -134,7 +125,6 @@ const KartuliSection = ({ onSelectContent }) => {
             <ContentRow title="Russian Series" icon={Tv} items={ruSeries} onSelectContent={handleWatch} loading={loading} accent="bg-orange-600" />
           </>
         )}
-
         {!loading && geoMovies.length === 0 && geoSeries.length === 0 && ruMovies.length === 0 && ruSeries.length === 0 && (
           <div className="text-center py-20">
             <Film className="w-12 h-12 text-gray-700 mx-auto mb-3" />
