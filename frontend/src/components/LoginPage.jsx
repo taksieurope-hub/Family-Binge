@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Button } from './ui/button';
 import { auth, db } from '../services/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { AlertTriangle, Crown, Clock } from 'lucide-react';
 
 const LoginPage = () => {
@@ -24,10 +24,10 @@ const LoginPage = () => {
       // Fetch user data from Firestore
       // Write unique session token to Firestore
       const sessionToken = Math.random().toString(36).substring(2) + Date.now().toString(36);
-      await updateDoc(doc(db, 'users', user.uid), {
+      await setDoc(doc(db, 'users', user.uid), {
         sessionToken,
         sessionAt: serverTimestamp(),
-      });
+      }, { merge: true });
       localStorage.setItem('fb_session_token', sessionToken);
 
       const snap = await getDoc(doc(db, 'users', user.uid));

@@ -7,6 +7,7 @@ const LoginPage   = lazy(() => import("./components/LoginPage"));
 const SignupPage  = lazy(() => import("./components/SignupPage"));
 const MainApp     = lazy(() => import("./MainApp"));
 const ProfilePage = lazy(() => import("./components/ProfilePage"));
+const KartuliSection = lazy(() => import("./components/KartuliSection"));
 const LiveTVPage   = lazy(() => import("./components/LiveTVPage"));
 
 function App() {
