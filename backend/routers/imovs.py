@@ -2,6 +2,7 @@
 from fastapi import APIRouter, HTTPException
 import httpx
 from bs4 import BeautifulSoup
+import re
 
 router = APIRouter(tags=["imovs"])
 
@@ -9,6 +10,9 @@ HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
     "Accept-Language": "ka,en;q=0.9",
 }
+
+# Movie URLs have a numeric ID at the start: /1234-movie-name.html
+MOVIE_URL_RE = re.compile(r'/\d+-[^/]+\.html$')
 
 @router.get("/imovs/movies")
 async def get_imovs_movies(page: int = 1):
@@ -22,7 +26,7 @@ async def get_imovs_movies(page: int = 1):
     seen = set()
     for a in soup.find_all("a", href=True):
         href = a["href"]
-        if ".html" not in href:
+        if not MOVIE_URL_RE.search(href):
             continue
         full_url = href if href.startswith("http") else f"https://www.imovs.ge{href}"
         if full_url in seen:
@@ -50,6 +54,8 @@ async def get_imovs_movies(page: int = 1):
 
 @router.get("/imovs/stream")
 async def get_imovs_stream(url: str):
+    if not MOVIE_URL_RE.search(url):
+        raise HTTPException(status_code=400, detail="Invalid movie URL")
     async with httpx.AsyncClient(timeout=15, headers=HEADERS, follow_redirects=True) as client:
         r = await client.get(url)
         if r.status_code != 200:
