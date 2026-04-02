@@ -5,13 +5,16 @@ import { movieAPI, seriesAPI } from '../services/api';
 import { auth } from '../services/firebase';
 
 const getWatchHistoryKey = () => {
-  const uid = auth.currentUser?.uid || 'guest';
+  const uid = auth.currentUser?.uid;
+  if (!uid) return null;
   return "familybinge_watch_history_" + uid;
 };
 
 export const getWatchHistory = () => {
   try {
-    const history = localStorage.getItem(getWatchHistoryKey());
+    const key = getWatchHistoryKey();
+    if (!key) return [];
+    const history = localStorage.getItem(key);
     return history ? JSON.parse(history) : [];
   } catch { return []; }
 };
@@ -26,14 +29,18 @@ export const saveToWatchHistory = (content, season = 1, episode = 1, progress = 
       rating: content.rating, season, episode, progress, lastWatched: Date.now(),
     };
     if (existingIndex >= 0) { history[existingIndex] = historyItem; } else { history.unshift(historyItem); }
-    localStorage.setItem(getWatchHistoryKey(), JSON.stringify(history.slice(0, 20)));
+    const key = getWatchHistoryKey();
+    if (!key) return;
+    localStorage.setItem(key, JSON.stringify(history.slice(0, 20)));
   } catch (e) { console.error('Error saving watch history:', e); }
 };
 
 export const removeFromWatchHistory = (id, type) => {
   try {
+    const key = getWatchHistoryKey();
+    if (!key) return;
     const history = getWatchHistory().filter(h => !(h.id === id && h.type === type));
-    localStorage.setItem(getWatchHistoryKey(), JSON.stringify(history));
+    localStorage.setItem(key, JSON.stringify(history));
   } catch (e) { console.error('Error removing from watch history:', e); }
 };
 
