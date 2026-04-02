@@ -51,13 +51,13 @@ const ContentRow = ({ title, icon: Icon, items, onSelectContent, loading, accent
   );
 };
 
-const KartuliSection = ({ onSelectContent }) => {
+const KartuliSection = ({ onSelectContent, filterMode }) => {
   const [geoMovies, setGeoMovies] = useState([]);
   const [geoSeries, setGeoSeries] = useState([]);
   const [ruMovies, setRuMovies] = useState([]);
   const [ruSeries, setRuSeries] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('all');
+  const [activeTab, setActiveTab] = useState(filterMode === 'russian' ? 'ru' : filterMode === 'georgian' ? 'geo' : 'all');
 
   const handleWatch = (item) => {
     const query = encodeURIComponent(item.title);

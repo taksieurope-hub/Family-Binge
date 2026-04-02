@@ -194,7 +194,7 @@ const ContinueWatchingRow = ({ onSelectContent }) => {
     </div>
   );
 };
-const ContentSection = ({ type = 'movies', onSelectContent }) => {
+const ContentSection = ({ type = 'movies', onSelectContent, filterMode }) => {
   const [trending, setTrending] = useState([]);
   const [popular, setPopular] = useState([]);
   const [topRated, setTopRated] = useState([]);
@@ -272,7 +272,7 @@ const ContentSection = ({ type = 'movies', onSelectContent }) => {
           onSelectContent={onSelectContent}
           loading={loadingTopRated}
         />
-        {type === 'movies' && (bollywood.length > 0 || loadingBollywood) && (
+        {type === 'movies' && filterMode !== 'english' && (bollywood.length > 0 || loadingBollywood) && (
           <ContentRow
             title="Bollywood Trending"
             icon={Film}
@@ -281,7 +281,7 @@ const ContentSection = ({ type = 'movies', onSelectContent }) => {
             loading={loadingBollywood}
           />
         )}
-        {type === 'movies' && (hindiSeries.length > 0 || loadingHindi) && (
+        {type === 'movies' && filterMode !== 'english' && (hindiSeries.length > 0 || loadingHindi) && (
           <ContentRow
             title="Hindi Series"
             icon={Tv}

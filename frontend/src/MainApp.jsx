@@ -6,7 +6,6 @@ import ContentSection from "./components/ContentSection";
 import DownloadSection from "./components/DownloadSection";
 import PricingSection from "./components/PricingSection";
 import FAQSection from "./components/FAQSection";
-import LiveTVSection from "./components/LiveTVSection";
 import KartuliSection from "./components/KartuliSection";
 import Footer from "./components/Footer";
 import ReferralBanner from "./components/ReferralBanner";
@@ -166,6 +165,14 @@ const GuestBanner = ({ onSignup, onLogin, onDismiss }) => {
 function MainApp() {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState("home");
+  const [contentFilter, setContentFilter] = useState("english");
+  const filters = [
+    { id: "english", label: "English" },
+    { id: "bollywood", label: "Bollywood" },
+    { id: "hindi", label: "Hindi Series" },
+    { id: "georgian", label: "Georgian" },
+    { id: "russian", label: "Russian" },
+  ];
   const [activeVideo, setActiveVideo] = useState(null);
   const [selectedContent, setSelectedContent] = useState(null);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
@@ -358,14 +365,48 @@ function MainApp() {
         onPlayVideo={handlePlayVideo}
         onSelectContent={handleSelectContent}
       />
-      <div id="movies">
-        <ContentSection type="movies" onSelectContent={handleSelectContent} />
+﻿      {/* Content Filter Bar */}
+      <div id="movies" className="sticky top-16 z-40 bg-black/95 backdrop-blur-sm border-b border-zinc-800">
+        <div className="flex gap-2 px-4 py-3 overflow-x-auto scrollbar-hide">
+          {[
+            { id: "english", label: "English" },
+            { id: "bollywood", label: "Bollywood" },
+            { id: "hindi", label: "Hindi Series" },
+            { id: "georgian", label: "Georgian" },
+            { id: "russian", label: "Russian" },
+          ].map(f => (
+            <button
+              key={f.id}
+              onClick={() => setContentFilter(f.id)}
+              className={lex-shrink-0 px-5 py-2 rounded-full text-sm font-semibold transition-all {
+                contentFilter === f.id
+                  ? "bg-purple-600 text-white shadow-lg shadow-purple-500/30 scale-105"
+                  : "bg-zinc-800 text-gray-300 hover:bg-zinc-700 hover:text-white"
+              }}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
       </div>
-      <div id="livetv"><LiveTVSection onSelectContent={handleSelectContent} /></div>
-      <div id="kartuli"><KartuliSection onSelectContent={handleSelectContent} /></div>
-      <div id="series">
-        <ContentSection type="series" onSelectContent={handleSelectContent} />
-      </div>
+      {contentFilter === "english" && (
+        <>
+          <ContentSection type="movies" onSelectContent={handleSelectContent} filterMode="english" />
+          <ContentSection type="series" onSelectContent={handleSelectContent} filterMode="english" />
+        </>
+      )}
+      {contentFilter === "bollywood" && (
+        <ContentSection type="movies" onSelectContent={handleSelectContent} filterMode="bollywood" />
+      )}
+      {contentFilter === "hindi" && (
+        <ContentSection type="series" onSelectContent={handleSelectContent} filterMode="hindi" />
+      )}
+      {contentFilter === "georgian" && (
+        <KartuliSection onSelectContent={handleSelectContent} filterMode="georgian" />
+      )}
+      {contentFilter === "russian" && (
+        <KartuliSection onSelectContent={handleSelectContent} filterMode="russian" />
+      )}
       <div id="download">
         <DownloadSection />
       </div>
