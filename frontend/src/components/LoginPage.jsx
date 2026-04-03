@@ -162,6 +162,9 @@ const LoginPage = () => {
             <p className="text-red-400 text-sm">{error}</p>
           </div>
         )}
+        <div className="mb-6 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-xl text-center">
+          <p className="text-yellow-400 text-sm">Due to database upgrades, please sign up again. We apologize for the inconvenience this upgrade may have caused while we aim to improve your experience.</p>
+        </div>
         <form onSubmit={handleSubmit} className="space-y-6">
           <input
             type="email"
