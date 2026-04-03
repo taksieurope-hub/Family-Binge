@@ -286,6 +286,16 @@ function MainApp() {
     return () => clearInterval(timer);
   }, [sessionWarning]);
 
+  // Handle mobile back button - prevent going to login
+  useEffect(() => {
+    window.history.pushState(null, '', window.location.pathname);
+    const handlePop = () => {
+      window.history.pushState(null, '', window.location.pathname);
+    };
+    window.addEventListener('popstate', handlePop);
+    return () => window.removeEventListener('popstate', handlePop);
+  }, []);
+
   // Listen for selectContent events from other components
   useEffect(() => {
     const handler = (e) => setSelectedContent(e.detail);
