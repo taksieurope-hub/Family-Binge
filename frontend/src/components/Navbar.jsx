@@ -237,6 +237,25 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
                   <span>{item.label}</span>
                 </button>
               ))}
+              <div className="border-t border-white/10 mt-1" />
+              <button
+                onClick={() => { navigate('/profile'); setMobileMenuOpen(false); }}
+                className="flex items-center gap-3 px-5 py-3.5 text-gray-400 hover:text-white hover:bg-white/5 transition-colors border-b border-white/5"
+              >
+                <User className="w-4 h-4" /> My Profile
+              </button>
+              <button
+                onClick={() => scrollToSection('pricing')}
+                className="flex items-center gap-3 px-5 py-3.5 text-purple-400 hover:text-purple-300 hover:bg-purple-500/10 transition-colors border-b border-white/5 font-semibold"
+              >
+                Free Trial
+              </button>
+              <button
+                onClick={async () => { await signOut(auth); window.location.href = "/"; }}
+                className="flex items-center gap-3 px-5 py-3.5 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors"
+              >
+                Sign Out
+              </button>
             </div>
           </div>
         )}
