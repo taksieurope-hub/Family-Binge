@@ -137,7 +137,7 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
             </button>
 
             {/* User Menu */}
-            <div ref={userMenuRef} className="hidden sm:block relative">
+            <div ref={userMenuRef} className="relative">
               <button onClick={() => setUserMenuOpen(!userMenuOpen)} className="flex items-center gap-2 px-3 py-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-xl transition-all">
                 <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
                   <User className="w-4 h-4 text-white" />
