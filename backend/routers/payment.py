@@ -1,4 +1,6 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
+from routers.mongo_sync import sync_user
+from fastapi import HTTPException
 from pydantic import BaseModel
 import httpx
 import os
@@ -136,6 +138,7 @@ async def activate_plan(request: ActivatePlanRequest):
     except Exception as e:
         print(f"Referral reward error: {e}")
 
+    sync_user({"uid": request.user_id, "plan": request.plan, "subscriptionExpires": expires.isoformat(), "maxTVs": plan["maxTVs"], "maxPhones": plan["maxPhones"]})
     return {"success": True, "expires": expires.isoformat(), "maxTVs": plan["maxTVs"], "maxPhones": plan["maxPhones"]}
 
 @router.post("/add-extra-device")
@@ -192,6 +195,7 @@ async def register_device(request: RegisterDeviceRequest):
         }
         registered.append(new_device)
         user_ref.update({"registeredDevices": registered})
+        sync_user({"uid": request.user_id, "registeredDevices": registered})
         return {"success": True, "status": "registered"}
     except HTTPException:
         raise
