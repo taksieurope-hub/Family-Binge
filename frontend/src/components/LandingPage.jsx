@@ -8,10 +8,6 @@ const LandingPage = () => {
   const navigate = useNavigate();
 
   return (
-    <>
-      <div className="fixed top-0 left-0 right-0 z-[100] bg-yellow-500/90 text-black text-center py-2 px-4 text-sm font-medium">
-        Due to database upgrades, please sign up again. We apologize for any inconvenience while we improve your experience.
-      </div>
     <div className="min-h-screen bg-black text-white">
       <nav className="fixed top-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-white/10">
         <div className="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
@@ -56,7 +52,6 @@ const LandingPage = () => {
       </div>
       <InviteSection />
     </div>
-    </>
   );
 };
 
