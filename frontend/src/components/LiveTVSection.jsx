@@ -309,7 +309,7 @@ const LiveTVSection = ({ onSelectContent }) => {
 
   useEffect(() => {
     if (!activeChannel) return;
-    const url = activeChannel.streams[streamIndex
+    const url = activeChannel.streams[streamIndex];
   { id: 321, name: 'Comedy Central',      category: 'Comedy',        logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Comedy_Central_logo.svg/200px-Comedy_Central_logo.svg.png', streams: ['http://23.237.104.106:8080/USA_COMEDY_CENTRAL/index.m3u8'] },
   { id: 322, name: 'Nickelodeon',         category: 'Family',        logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Nickelodeon_2009_logo.svg/200px-Nickelodeon_2009_logo.svg.png', streams: ['http://23.237.104.106:8080/USA_NICKELODEON/index.m3u8'] },
   { id: 323, name: 'Disney Channel',      category: 'Family',        logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Disney_Channel_2014.svg/200px-Disney_Channel_2014.svg.png', streams: ['http://104.255.88.155/disney/playlist.m3u8', 'https://moviezona593.com:8443/play/cO7SMyYsfVeNHbC5IQqRpHzyzgpISTmz_ch_ZVKDwht95XgI8UhySeZgp7szKj3V/m3u8'] },
