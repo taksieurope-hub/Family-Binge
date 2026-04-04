@@ -363,8 +363,43 @@ const ProfilePage = () => {
           </div>
         )}
 
-        {/* Invite Friends */}
-        <InviteSection compact />
+        {/* Promo Code & Invite */}
+        {userData?.referralCode && (
+          <div className="mt-10 bg-zinc-900 rounded-3xl p-6 border border-purple-500/20">
+            <h2 className="text-lg font-bold text-white mb-1">Your Referral Code</h2>
+            <p className="text-gray-400 text-sm mb-4">Share this code - when 2 friends sign up you unlock your bonus trial</p>
+            <div className="flex items-center gap-3 bg-zinc-800 rounded-2xl px-5 py-4 border border-white/10">
+              <span className="text-purple-400 font-bold text-xl tracking-widest flex-1">{userData.referralCode}</span>
+              <button
+                onClick={() => { navigator.clipboard.writeText(userData.referralCode); alert('Code copied!'); }}
+                className="text-xs bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl transition-colors font-semibold"
+              >
+                Copy
+              </button>
+            </div>
+            {userData?.promoDays > 0 && (
+              <div className="mt-4 flex items-center gap-3">
+                <div className="flex-1 bg-zinc-800 rounded-xl px-4 py-3">
+                  <p className="text-gray-400 text-xs">Referrals</p>
+                  <p className="text-white font-bold text-lg">{userData.promoReferrals || 0} / 2</p>
+                </div>
+                <div className="flex-1 bg-zinc-800 rounded-xl px-4 py-3">
+                  <p className="text-gray-400 text-xs">Bonus trial</p>
+                  <p className="text-purple-400 font-bold text-lg">{userData.promoDays} days</p>
+                </div>
+                <div className="flex-1 bg-zinc-800 rounded-xl px-4 py-3">
+                  <p className="text-gray-400 text-xs">Status</p>
+                  <p className={`font-bold text-lg ${userData.promoUnlocked ? 'text-green-400' : 'text-yellow-400'}`}>
+                    {userData.promoUnlocked ? 'Unlocked!' : 'Pending'}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+        <div className="mt-6">
+          <InviteSection compact />
+        </div>
 
         {/* Logout */}
         <div className="mt-12 flex justify-center">

@@ -15,6 +15,7 @@ const SignupPage = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [promoInfo, setPromoInfo] = useState(null);
+  const [promoCode, setPromoCode] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -63,14 +64,25 @@ const SignupPage = () => {
         promoDays: promoDays,
         promoLabel: promoLabel,
         promoReferrals: 0,
+        promoUnlocked: false,
+        referralCode: 'FAM-' + Math.random().toString(36).substring(2, 7).toUpperCase(),
         subscriptionPlan: null,
         referredBy: new URLSearchParams(location.search).get('ref') || null,
         sessionToken: '',
         sessionAt: null,
       });
 
+      // Handle manual promo code entry
+      let referredBy = new URLSearchParams(location.search).get('ref');
+      if (!referredBy && promoCode.trim()) {
+        try {
+          const { collection: _col, query: _q, where: _where, getDocs: _getDocs } = await import('firebase/firestore');
+          const codeQuery = _q(_col(db, 'users'), _where('referralCode', '==', promoCode.trim().toUpperCase()));
+          const codeSnap = await _getDocs(codeQuery);
+          if (!codeSnap.empty) { referredBy = codeSnap.docs[0].id; }
+        } catch(e) { console.error('Promo code lookup error:', e); }
+      }
       // If referred, update referrer's promo referral count
-      const referredBy = new URLSearchParams(location.search).get('ref');
       if (referredBy) {
         try {
           const { doc: rDoc, getDoc: rGet, updateDoc: rUpdate, Timestamp: rTs } = await import('firebase/firestore');
@@ -168,6 +180,15 @@ const SignupPage = () => {
       <div className="max-w-md w-full bg-zinc-900 rounded-3xl p-10">
         <h1 className="text-4xl font-bold text-center mb-2">Join Family Binge</h1>
         <p className="text-center text-gray-400 mb-8">3 days free • Cancel anytime</p>
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder="Promo code (optional)"
+            value={promoCode}
+            onChange={e => setPromoCode(e.target.value.toUpperCase())}
+            className="w-full px-6 py-3 bg-zinc-800/50 border border-purple-500/30 rounded-2xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 placeholder-gray-500"
+          />
+        </div>
         {error && (
           <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 mb-6">
             <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0" />
