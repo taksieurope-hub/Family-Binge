@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "Family Binge TV",
   "short_name": "FamilyBinge",
   "description": "Unlimited Movies, Series & Live TV",
@@ -9,13 +9,13 @@
   "orientation": "any",
   "icons": [
     {
-      "src": "https://i.imgur.com/8mZxKpP.png",
+      "src": "/logo192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "https://i.imgur.com/8mZxKpP.png",
+      "src": "/logo512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
@@ -23,8 +23,8 @@
   ],
   "screenshots": [
     {
-      "src": "https://i.imgur.com/8mZxKpP.png",
-      "sizes": "1280x720",
+      "src": "/logo512.png",
+      "sizes": "1024x1024",
       "type": "image/png",
       "form_factor": "wide"
     }
