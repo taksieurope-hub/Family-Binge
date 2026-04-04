@@ -3,11 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#0a0a12" />
     <meta name="description" content="Watch unlimited movies, series and live TV on Family Binge." />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/logo192.png" />
+    <link rel="manifest" href="/manifest.json" />
     <title>Family Binge</title>
-
-    <!-- Preconnect for faster video & image loading -->
     <link rel="preconnect" href="https://image.tmdb.org" />
     <link rel="preconnect" href="https://api.themoviedb.org" />
     <link rel="dns-prefetch" href="https://image.tmdb.org" />
@@ -16,6 +17,6 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-    <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').then(()=>console.log('SW registered')).catch(e=>console.log('SW failed',e))}</script>
+    <script>if("serviceWorker" in navigator){navigator.serviceWorker.register("/sw.js").then(()=>console.log("SW registered")).catch(e=>console.log("SW failed",e))}</script>
   </body>
 </html>
