@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import Hls from 'hls.js';
 import { Tv, Radio, Globe, Search } from 'lucide-react';
 
+const PROXY = 'https://family-binge-backend.onrender.com/api/proxy?url=';
+const proxyUrl = (url) => url ? PROXY + encodeURIComponent(url) : url;
+
 export const channels = [
   { id: 1,  name: 'Al Jazeera English',   category: 'News',          logo: null,                                                                                streams: ['https://live-hls-aje-ak.getaj.net/AJE/01.m3u8'] },
   { id: 2,  name: 'TRT World',            category: 'News',          logo: null,                                                                                streams: ['https://tv-trtworld.medya.trt.com.tr/master_1080.m3u8'] },
@@ -309,7 +312,7 @@ const LiveTVSection = ({ onSelectContent }) => {
 
   useEffect(() => {
     if (!activeChannel) return;
-    const url = activeChannel.streams[streamIndex];
+    const url = proxyUrl(activeChannel.streams[streamIndex]);
     if (!url) return;
     if (hlsRef.current) { hlsRef.current.destroy(); hlsRef.current = null; }
     const video = videoRef.current;

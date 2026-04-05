@@ -8,3 +8,4 @@ firebase-admin
 python-dotenv
 beautifulsoup4
 pymongo[srv]
+httpx 

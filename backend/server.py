@@ -64,3 +64,22 @@ async def save_hidden_channels(user_id: str, request: Request):
         return {"success": True}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+import httpx
+from fastapi import HTTPException
+from fastapi.responses import StreamingResponse
+
+@app.get("/api/proxy")
+async def proxy_stream(url: str):
+    try:
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(url, headers={
+                "User-Agent": "Mozilla/5.0",
+                "Referer": "https://eic.lgchhomeapp.lgtvcommon.com"
+            }, follow_redirects=True)
+            return StreamingResponse(
+                iter([resp.content]),
+                media_type=resp.headers.get("content-type", "application/octet-stream")
+            )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
