@@ -67,19 +67,36 @@ async def save_hidden_channels(user_id: str, request: Request):
 
 import httpx
 from fastapi import HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, Response
 
 @app.get("/api/proxy")
 async def proxy_stream(url: str):
     try:
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(follow_redirects=True) as client:
             resp = await client.get(url, headers={
                 "User-Agent": "Mozilla/5.0",
-                "Referer": "https://eic.lgchhomeapp.lgtvcommon.com"
-            }, follow_redirects=True)
-            return StreamingResponse(
-                iter([resp.content]),
-                media_type=resp.headers.get("content-type", "application/octet-stream")
-            )
+                "Referer": "https://eic.lgchhomeapp.lgtvcommon.com",
+                "Origin": "https://eic.lgchhomeapp.lgtvcommon.com"
+            })
+            content_type = resp.headers.get("content-type", "")
+            
+            # If it's an m3u8 playlist, rewrite all URLs inside it
+            if "mpegurl" in content_type or url.endswith(".m3u8"):
+                text = resp.text
+                base_url = url.rsplit("/", 1)[0]
+                lines = []
+                for line in text.splitlines():
+                    if line and not line.startswith("#"):
+                        if line.startswith("http"):
+                            line = f"/api/proxy?url={line}"
+                        else:
+                            line = f"/api/proxy?url={base_url}/{line}"
+                    lines.append(line)
+                rewritten = "\n".join(lines)
+                return Response(content=rewritten, media_type="application/vnd.apple.mpegurl",
+                               headers={"Access-Control-Allow-Origin": "*"})
+            
+            return Response(content=resp.content, media_type=content_type,
+                          headers={"Access-Control-Allow-Origin": "*"})
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
