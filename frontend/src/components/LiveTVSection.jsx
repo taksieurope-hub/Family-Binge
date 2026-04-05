@@ -592,7 +592,7 @@ const LiveTVSection = ({ onSelectContent }) => {
   { id: 1240, name: 'Tennis+', category: 'Sports', logo: null, streams: ['https://e3.thetvapp.to/hls/tennis-channel/index.m3u8'] },
   { id: 1241, name: 'The Home Channel', category: 'Lifestyle', logo: null, streams: [] },
   { id: 1242, name: 'TLC Entertainment', category: 'Entertainment', logo: null, streams: ['https://e3.thetvapp.to/hls/tlc/index.m3u8'] },
-  { id: 1243, name: 'SWiTCH'D ON', category: 'Entertainment', logo: null, streams: [] },
+  { id: 1243, name: "SWiTCH'D ON", category: 'Entertainment', logo: null, streams: [] },
   { id: 1244, name: 'TNT Sports 1', category: 'Sports', logo: null, streams: [] },
   { id: 1245, name: 'TNT Sports 2', category: 'Sports', logo: null, streams: [] },
   { id: 1246, name: 'TNT Sports 3', category: 'Sports', logo: null, streams: [] },
