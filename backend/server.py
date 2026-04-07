@@ -39,7 +39,9 @@ from routers.payment import router as payment_router
 app.include_router(payment_router, prefix="/api")
 app.include_router(content_router, prefix="/api")
 app.include_router(content_router, prefix="/api/content")
+app.include_router(content_router, prefix="")
 app.include_router(imovs_router, prefix="/api/content")
+app.include_router(imovs_router, prefix="")
 
 from fastapi import Request
 from firebase_admin import firestore
