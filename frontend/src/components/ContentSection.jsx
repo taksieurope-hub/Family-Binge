@@ -114,17 +114,23 @@ const CategoryRow = ({ title, fetchFn, onSelectContent, icon }) => {
 
   useEffect(() => {
     setLoading(true);
-    fetchFn(1).then(res => {
-      const newItems = (res.data.items || []).filter(item => {
-        const key = `${item.type}-${item.id}`;
-        if (seenIds.current.has(key)) return false;
-        seenIds.current.add(key);
-        return true;
-      });
-      setItems(newItems);
-      const totalPages = res.data.total_pages || 1;
-      if (1 >= totalPages || newItems.length === 0) setHasMore(false);
-    }).catch(() => setHasMore(false))
+    const pagesToFetch = Array.from({ length: 10 }, (_, i) => i + 1);
+    Promise.all(pagesToFetch.map(p => fetchFn(p).catch(() => null)))
+      .then(results => {
+        const allItems = [];
+        results.forEach(res => {
+          if (!res) return;
+          (res.data.items || []).forEach(item => {
+            const key = `${item.type}-${item.id}`;
+            if (!seenIds.current.has(key)) {
+              seenIds.current.add(key);
+              allItems.push(item);
+            }
+          });
+        });
+        setItems(allItems);
+        setHasMore(false);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -219,7 +225,6 @@ const MOVIE_CATEGORIES = [
   { key: "hbo",          title: "HBO",                   fn: (p) => api.getMoviesHBO(p) },
   { key: "prime",        title: "Prime Video",           fn: (p) => api.getMoviesPrime(p) },
   { key: "disney",       title: "Disney+",               fn: (p) => api.getMoviesDisney(p) },
-  { key: "newlyadded",   title: "Newly Added",           fn: (p) => api.getMoviesNewlyAdded(p) },
   { key: "korea",        title: "K-Cinema",              fn: (p) => api.getMoviesKorea(p) },
   { key: "tyler",        title: "Tyler Perry",           fn: (p) => api.getMoviesTylerPerry(p) },
   { key: "documentary",  title: "Documentary",           fn: (p) => api.getMoviesDocumentary(p) },
@@ -243,7 +248,6 @@ const SERIES_CATEGORIES = [
   { key: "hbo",          title: "HBO",                  fn: (p) => api.getSeriesHBO(p) },
   { key: "prime",        title: "Prime Video",          fn: (p) => api.getSeriesPrime(p) },
   { key: "disney",       title: "Disney+",              fn: (p) => api.getSeriesDisney(p) },
-  { key: "newlyadded",   title: "Newly Added",          fn: (p) => api.getSeriesNewlyAdded(p) },
   { key: "korea",        title: "K-Cinema",             fn: (p) => api.getSeriesKorea(p) },
   { key: "tyler",        title: "Tyler Perry",          fn: (p) => api.getSeriesTylerPerry(p) },
   { key: "documentary",  title: "Documentary",          fn: (p) => api.getSeriesDocumentary(p) },
