@@ -208,7 +208,13 @@ function MainApp() {
           setUserData(data);
           const isFreeAccess = data.role === 'admin' || data.role === 'family';
           const now = new Date();
-          const trialEnds = data.trialEnds?.toDate ? data.trialEnds.toDate() : new Date(data.trialEnds);
+          const baseTrialEnds = data.trialEnds?.toDate ? data.trialEnds.toDate() : new Date(data.trialEnds);
+          const promoDays = data.promoDays || 0;
+          const promoReferrals = data.promoReferrals || 0;
+          const promoQualifies = data.promoUnlocked || promoReferrals >= 2;
+          const trialEnds = promoQualifies && promoDays > 0
+            ? new Date(baseTrialEnds.getTime() + promoDays * 24 * 60 * 60 * 1000)
+            : baseTrialEnds;
           const subExpires = data.subscriptionExpires?.toDate
             ? data.subscriptionExpires.toDate()
             : data.subscriptionExpires ? new Date(data.subscriptionExpires) : null;
