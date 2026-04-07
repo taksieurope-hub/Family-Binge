@@ -187,10 +187,9 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
   };
 
   const handleIframeLoad = () => {
-    if (autoSwitchTimeoutRef.current) clearTimeout(autoSwitchTimeoutRef.current);
-    setPlayerReady(true);
-    setIsAutoSwitching(false);
-    setTimeout(() => enterFullscreen(), 300);  };
+    // Don't mark as ready - let the timeout keep switching until user sees content
+    setTimeout(() => enterFullscreen(), 300);
+};
 
   // Auto-switch to next source after 8 seconds if not ready
   useEffect(() => {
@@ -210,7 +209,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
           setCurrentSourceIndex(-1);
         }
       }
-    }, 8000);
+    }, 15000);
     return () => { if (autoSwitchTimeoutRef.current) clearTimeout(autoSwitchTimeoutRef.current); };
   }, [isPlaying, currentSourceIndex, playerReady]);
 
