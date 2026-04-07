@@ -560,3 +560,21 @@ async def series_newly_added(page: int = Query(1, ge=1, le=500)):
 async def series_franchise(page: int = Query(1, ge=1, le=500)):
     items, total_pages = await get_series_franchise(page)
     return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+# ============ DETAIL ENDPOINTS (must be last) ============
+
+@router.get("/movies/{movie_id}")
+async def movie_details(movie_id: int):
+    """Get detailed movie information including trailer"""
+    details = await get_movie_details(movie_id)
+    if not details:
+        raise HTTPException(status_code=404, detail="Movie not found")
+    return details
+
+@router.get("/series/{series_id}")
+async def series_details(series_id: int):
+    """Get detailed series information including trailer"""
+    details = await get_series_details(series_id)
+    if not details:
+        raise HTTPException(status_code=404, detail="Series not found")
+    return details
