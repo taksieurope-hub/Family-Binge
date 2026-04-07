@@ -250,6 +250,10 @@ function MainApp() {
     if (!user) return;
     const localToken = localStorage.getItem('fb_session_token');
     if (!localToken) return;
+    // Don't kick trial users or family/admin roles
+    const role = userData?.role;
+    const plan = userData?.plan;
+    if (role === 'family' || role === 'admin' || plan === 'free_trial') return;
 
     const interval = setInterval(async () => {
       try {
