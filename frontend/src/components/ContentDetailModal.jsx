@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { X, Play, Star, Clock, Calendar, Users, ChevronRight, Loader2, Tv, Film, AlertCircle, RefreshCw, SkipForward, Captions, Share2, Check } from 'lucide-react';
 import { Button } from './ui/button';
-import { movieAPI, seriesAPI } from '../services/api';
+import * as api from '../api';
 import { auth } from '../services/firebase';
 
 const getWatchHistoryKey = () => {
@@ -98,9 +98,13 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
       if (!content) return;
       setLoading(true);
       try {
-        const api = content.type === 'series' ? seriesAPI : movieAPI;
-        const res = await api.getDetails(content.id);
+        // Use api.js directly - works for both movies and series
+        const res = content.type === 'series'
+          ? await api.getSeriesDetail(content.id)
+          : await api.getMovieDetail(content.id);
         const data = res.data;
+        // Ensure type is set correctly on the details object
+        data.type = content.type;
         setDetails(data);
 
         const history = getWatchHistory();
@@ -185,7 +189,6 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
     return source.getUrl(details.type, details.id, selectedSeason, selectedEpisode);
   };
 
-  // FIX 1: Mark player as ready when iframe loads — stops the cycling
   const handleIframeLoad = () => {
     setPlayerReady(true);
     setIsAutoSwitching(false);
@@ -193,7 +196,6 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
     setTimeout(() => enterFullscreen(), 300);
   };
 
-  // Manual "Try Next Server" handler
   const handleNextSource = () => {
     const next = (currentSourceIndex + 1) % VIDEO_SOURCES.length;
     setCurrentSourceIndex(next);
@@ -201,7 +203,6 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
     setIsAutoSwitching(true);
   };
 
-  // FIX 2: Auto-switch only fires once per source load, loops back to 0, longer timeout
   useEffect(() => {
     if (!isPlaying) return;
     if (playerReady) return;
@@ -209,13 +210,12 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
 
     autoSwitchTimeoutRef.current = setTimeout(() => {
       if (!playerReady) {
-        // Loop back to 0 instead of going to -1
         const next = (currentSourceIndex + 1) % VIDEO_SOURCES.length;
         setCurrentSourceIndex(next);
         setPlayerReady(false);
         setIsAutoSwitching(true);
       }
-    }, 10000); // 10 seconds — give each source a real chance
+    }, 10000);
 
     return () => { if (autoSwitchTimeoutRef.current) clearTimeout(autoSwitchTimeoutRef.current); };
   }, [isPlaying, currentSourceIndex, playerReady]);
@@ -236,10 +236,10 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
               <div className="flex items-center gap-2 text-xs text-gray-400">
                 <span>
                   {details?.type === 'series'
-                    ? `Season ${selectedSeason} \u00b7 Episode ${selectedEpisode}`
+                    ? `Season ${selectedSeason} · Episode ${selectedEpisode}`
                     : details?.year}
                 </span>
-                <span className="text-gray-600">\u00b7</span>
+                <span className="text-gray-600">·</span>
                 <span className="text-purple-400 font-medium">{currentSourceName}</span>
                 {!playerReady && (
                   <span className="flex items-center gap-1 text-yellow-400">
@@ -247,7 +247,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
                     Connecting...
                   </span>
                 )}
-                {playerReady && <span className="text-green-400">\u25cf Playing</span>}
+                {playerReady && <span className="text-green-400">● Playing</span>}
               </div>
             </div>
           </div>
@@ -284,7 +284,6 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
               </div>
             )}
 
-            {/* Try Next Server button — always visible while playing */}
             <button
               onClick={handleNextSource}
               className="flex items-center gap-1 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors text-white text-xs font-medium"
@@ -334,7 +333,6 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
             </div>
           )}
 
-          {/* FIX 3: null src guard — never renders iframe with undefined src */}
           {getStreamUrl() && (
             <iframe
               ref={iframeRef}
@@ -343,8 +341,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
               className="w-full h-full border-0"
               allowFullScreen
               allow="autoplay; fullscreen; picture-in-picture"
-              // FIX 4: allow-popups lets players open their stream workers
-              sandbox="allow-scripts allow-same-origin allow-forms allow-presentation allow-popups allow-popups-to-escape-sandbox"
+              sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
               title={details?.title}
               onLoad={handleIframeLoad}
             />
