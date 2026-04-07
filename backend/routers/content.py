@@ -365,3 +365,212 @@ async def get_1tvplay_homepage():
                         "stream_1080p": urls.get("resolution_1080p_url"),
                     })
         return {"movies": movies}
+
+# ============ NEW CATEGORY ENDPOINTS ============
+from services.tmdb_service import (
+    get_movies_action, get_movies_animation, get_movies_horror, get_movies_documentary, get_movies_romance,
+    get_series_action, get_series_animation, get_series_horror, get_series_documentary, get_series_romance,
+    get_movies_netflix, get_movies_hbo, get_movies_prime, get_movies_disney,
+    get_series_netflix, get_series_hbo, get_series_prime, get_series_disney,
+    get_movies_south_africa, get_movies_africa, get_movies_nollywood, get_movies_korea,
+    get_movies_anime, get_movies_hollywood, get_movies_classics, get_movies_oscars,
+    get_movies_tyler_perry, get_movies_newly_added, get_movies_franchise,
+    get_series_africa, get_series_nollywood, get_series_korea, get_series_anime,
+    get_series_hollywood, get_series_classics, get_series_tyler_perry,
+    get_series_newly_added, get_series_franchise, get_series_south_africa
+)
+
+@router.get("/movies/action")
+async def movies_action(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_movies_action(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/movies/animation")
+async def movies_animation(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_movies_animation(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/movies/horror")
+async def movies_horror(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_movies_horror(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/movies/documentary")
+async def movies_documentary(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_movies_documentary(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/movies/romance")
+async def movies_romance(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_movies_romance(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/movies/netflix")
+async def movies_netflix(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_movies_netflix(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/movies/hbo")
+async def movies_hbo(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_movies_hbo(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/movies/prime")
+async def movies_prime(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_movies_prime(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/movies/disney")
+async def movies_disney(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_movies_disney(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/movies/south-africa")
+async def movies_south_africa(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_movies_south_africa(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/movies/africa")
+async def movies_africa(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_movies_africa(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/movies/nollywood")
+async def movies_nollywood(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_movies_nollywood(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/movies/korea")
+async def movies_korea(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_movies_korea(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/movies/anime")
+async def movies_anime(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_movies_anime(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/movies/hollywood")
+async def movies_hollywood(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_movies_hollywood(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/movies/classics")
+async def movies_classics(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_movies_classics(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/movies/oscars")
+async def movies_oscars(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_movies_oscars(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/movies/tyler-perry")
+async def movies_tyler_perry(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_movies_tyler_perry(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/movies/newly-added")
+async def movies_newly_added(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_movies_newly_added(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/movies/franchise")
+async def movies_franchise(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_movies_franchise(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/series/action")
+async def series_action(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_series_action(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/series/animation")
+async def series_animation(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_series_animation(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/series/horror")
+async def series_horror(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_series_horror(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/series/documentary")
+async def series_documentary(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_series_documentary(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/series/romance")
+async def series_romance(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_series_romance(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/series/netflix")
+async def series_netflix(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_series_netflix(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/series/hbo")
+async def series_hbo(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_series_hbo(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/series/prime")
+async def series_prime(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_series_prime(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/series/disney")
+async def series_disney(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_series_disney(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/series/south-africa")
+async def series_south_africa(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_series_south_africa(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/series/africa")
+async def series_africa(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_series_africa(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/series/nollywood")
+async def series_nollywood(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_series_nollywood(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/series/korea")
+async def series_korea(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_series_korea(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/series/anime")
+async def series_anime(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_series_anime(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/series/hollywood")
+async def series_hollywood(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_series_hollywood(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/series/classics")
+async def series_classics(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_series_classics(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/series/tyler-perry")
+async def series_tyler_perry(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_series_tyler_perry(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/series/newly-added")
+async def series_newly_added(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_series_newly_added(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)
+
+@router.get("/series/franchise")
+async def series_franchise(page: int = Query(1, ge=1, le=500)):
+    items, total_pages = await get_series_franchise(page)
+    return ContentListResponse(items=items, total_pages=total_pages, page=page)

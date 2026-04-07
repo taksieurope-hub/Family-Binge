@@ -383,3 +383,262 @@ async def get_georgian_trending_movies(page: int = 1):
         results += ru["results"]
     results.sort(key=lambda x: x.get("popularity", 0), reverse=True)
     return format_movies(results[:20]), 1
+
+# ============ GENRE-BASED ============
+async def get_movies_action(page: int = 1):
+    data = await tmdb_request("/discover/movie", {"with_genres": "28", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_movies(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_movies_animation(page: int = 1):
+    data = await tmdb_request("/discover/movie", {"with_genres": "16", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_movies(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_movies_horror(page: int = 1):
+    data = await tmdb_request("/discover/movie", {"with_genres": "27", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_movies(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_movies_documentary(page: int = 1):
+    data = await tmdb_request("/discover/movie", {"with_genres": "99", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_movies(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_movies_romance(page: int = 1):
+    data = await tmdb_request("/discover/movie", {"with_genres": "10749", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_movies(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_series_action(page: int = 1):
+    data = await tmdb_request("/discover/tv", {"with_genres": "10759", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_series(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_series_animation(page: int = 1):
+    data = await tmdb_request("/discover/tv", {"with_genres": "16", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_series(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_series_horror(page: int = 1):
+    data = await tmdb_request("/discover/tv", {"with_genres": "9648", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_series(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_series_documentary(page: int = 1):
+    data = await tmdb_request("/discover/tv", {"with_genres": "99", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_series(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_series_romance(page: int = 1):
+    data = await tmdb_request("/discover/tv", {"with_genres": "10749", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_series(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+# ============ NETWORK-BASED ============
+async def get_movies_netflix(page: int = 1):
+    data = await tmdb_request("/discover/movie", {"with_watch_providers": "8", "watch_region": "US", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_movies(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_movies_hbo(page: int = 1):
+    data = await tmdb_request("/discover/movie", {"with_companies": "174", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_movies(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_movies_prime(page: int = 1):
+    data = await tmdb_request("/discover/movie", {"with_watch_providers": "119", "watch_region": "US", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_movies(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_movies_disney(page: int = 1):
+    data = await tmdb_request("/discover/movie", {"with_watch_providers": "337", "watch_region": "US", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_movies(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_series_netflix(page: int = 1):
+    data = await tmdb_request("/discover/tv", {"with_networks": "213", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_series(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_series_hbo(page: int = 1):
+    data = await tmdb_request("/discover/tv", {"with_networks": "49", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_series(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_series_prime(page: int = 1):
+    data = await tmdb_request("/discover/tv", {"with_networks": "1024", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_series(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_series_disney(page: int = 1):
+    data = await tmdb_request("/discover/tv", {"with_networks": "2739", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_series(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+# ============ REGION-BASED ============
+async def get_movies_south_africa(page: int = 1):
+    data = await tmdb_request("/discover/movie", {"with_origin_country": "ZA", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_movies(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_movies_africa(page: int = 1):
+    import asyncio
+    results_raw = await asyncio.gather(
+        tmdb_request("/discover/movie", {"with_origin_country": "NG", "sort_by": "popularity.desc", "page": page}),
+        tmdb_request("/discover/movie", {"with_origin_country": "GH", "sort_by": "popularity.desc", "page": page}),
+        tmdb_request("/discover/movie", {"with_origin_country": "KE", "sort_by": "popularity.desc", "page": page}),
+        tmdb_request("/discover/movie", {"with_origin_country": "ZA", "sort_by": "popularity.desc", "page": page}),
+    )
+    seen, merged = set(), []
+    for r in results_raw:
+        if r and "results" in r:
+            for item in r["results"]:
+                if item["id"] not in seen:
+                    seen.add(item["id"])
+                    merged.append(item)
+    return format_movies(merged), 5
+
+async def get_series_africa(page: int = 1):
+    import asyncio
+    results_raw = await asyncio.gather(
+        tmdb_request("/discover/tv", {"with_origin_country": "NG", "sort_by": "popularity.desc", "page": page}),
+        tmdb_request("/discover/tv", {"with_origin_country": "GH", "sort_by": "popularity.desc", "page": page}),
+        tmdb_request("/discover/tv", {"with_origin_country": "KE", "sort_by": "popularity.desc", "page": page}),
+        tmdb_request("/discover/tv", {"with_origin_country": "ZA", "sort_by": "popularity.desc", "page": page}),
+    )
+    seen, merged = set(), []
+    for r in results_raw:
+        if r and "results" in r:
+            for item in r["results"]:
+                if item["id"] not in seen:
+                    seen.add(item["id"])
+                    merged.append(item)
+    return format_series(merged), 5
+
+async def get_movies_nollywood(page: int = 1):
+    data = await tmdb_request("/discover/movie", {"with_origin_country": "NG", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_movies(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_series_nollywood(page: int = 1):
+    data = await tmdb_request("/discover/tv", {"with_origin_country": "NG", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_series(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_movies_korea(page: int = 1):
+    data = await tmdb_request("/discover/movie", {"with_origin_country": "KR", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_movies(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_series_korea(page: int = 1):
+    data = await tmdb_request("/discover/tv", {"with_origin_country": "KR", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_series(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_movies_anime(page: int = 1):
+    data = await tmdb_request("/discover/movie", {"with_origin_country": "JP", "with_genres": "16", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_movies(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_series_anime(page: int = 1):
+    data = await tmdb_request("/discover/tv", {"with_origin_country": "JP", "with_genres": "16", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_series(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_movies_hollywood(page: int = 1):
+    data = await tmdb_request("/discover/movie", {"with_origin_country": "US", "with_original_language": "en", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_movies(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_series_hollywood(page: int = 1):
+    data = await tmdb_request("/discover/tv", {"with_origin_country": "US", "with_original_language": "en", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_series(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_movies_classics(page: int = 1):
+    data = await tmdb_request("/discover/movie", {"primary_release_date.lte": "2000-01-01", "vote_average.gte": "7.5", "sort_by": "vote_count.desc", "page": page})
+    if data and "results" in data:
+        return format_movies(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_series_classics(page: int = 1):
+    data = await tmdb_request("/discover/tv", {"first_air_date.lte": "2000-01-01", "vote_average.gte": "7.5", "sort_by": "vote_count.desc", "page": page})
+    if data and "results" in data:
+        return format_series(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_movies_oscars(page: int = 1):
+    data = await tmdb_request("/discover/movie", {"primary_release_year": "2024", "vote_average.gte": "7.0", "sort_by": "vote_average.desc", "page": page})
+    if data and "results" in data:
+        return format_movies(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_movies_tyler_perry(page: int = 1):
+    data = await tmdb_request("/discover/movie", {"with_people": "65417", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_movies(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_series_tyler_perry(page: int = 1):
+    data = await tmdb_request("/discover/tv", {"with_people": "65417", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_series(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_movies_newly_added(page: int = 1):
+    data = await tmdb_request("/movie/now_playing", {"page": page})
+    if data and "results" in data:
+        return format_movies(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_series_newly_added(page: int = 1):
+    data = await tmdb_request("/tv/on_the_air", {"page": page})
+    if data and "results" in data:
+        return format_series(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_movies_franchise(page: int = 1):
+    data = await tmdb_request("/discover/movie", {"with_keywords": "180547|9715|282", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_movies(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_series_franchise(page: int = 1):
+    data = await tmdb_request("/discover/tv", {"with_keywords": "180547|9715|282", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_series(data["results"]), data.get("total_pages", 1)
+    return [], 1
+
+async def get_series_south_africa(page: int = 1):
+    data = await tmdb_request("/discover/tv", {"with_origin_country": "ZA", "sort_by": "popularity.desc", "page": page})
+    if data and "results" in data:
+        return format_series(data["results"]), data.get("total_pages", 1)
+    return [], 1
