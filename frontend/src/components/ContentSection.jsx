@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Play, Star, Film, Tv, Loader2, X, Clock, ChevronDown, ChevronUp } from "lucide-react";
 import { getWatchHistory, removeFromWatchHistory } from "./ContentDetailModal";
-import { moviesAPI, seriesAPI } from "../services/api";
+import * as api from "../api";
 
 const ContentCard = ({ item, onSelectContent }) => (
   <div onClick={() => onSelectContent(item)} className="group cursor-pointer">
@@ -103,6 +103,17 @@ const ContinueWatchingRow = ({ onSelectContent }) => {
   );
 };
 
+// Wraps an api.js call and forces every item to have the correct type
+const makeTypedFetch = (apiFn, forcedType) => async (page) => {
+  const res = await apiFn(page);
+  const items = (res.data.items || res.data.results || []).map(item => ({
+    ...item,
+    type: forcedType,
+    title: item.title || item.name || "Untitled",
+  }));
+  return { data: { items, total_pages: res.data.total_pages || 1 } };
+};
+
 const CategoryRow = ({ title, fetchFn, onSelectContent, icon }) => {
   const [items, setItems] = useState([]);
   const [page, setPage] = useState(1);
@@ -116,10 +127,8 @@ const CategoryRow = ({ title, fetchFn, onSelectContent, icon }) => {
     setLoading(true);
     fetchFn(1)
       .then(res => {
-        const data = res.data || res; // services/api returns {items, total_pages} directly or via .data
-        const rawItems = data.items || data.results || [];
         const allItems = [];
-        rawItems.forEach(item => {
+        (res.data.items || []).forEach(item => {
           const key = `${item.type}-${item.id}`;
           if (!seenIds.current.has(key)) {
             seenIds.current.add(key);
@@ -127,8 +136,7 @@ const CategoryRow = ({ title, fetchFn, onSelectContent, icon }) => {
           }
         });
         setItems(allItems);
-        const totalPages = data.total_pages || 1;
-        setHasMore(totalPages > 1);
+        setHasMore((res.data.total_pages || 1) > 1);
       })
       .catch(() => setHasMore(false))
       .finally(() => setLoading(false));
@@ -141,17 +149,14 @@ const CategoryRow = ({ title, fetchFn, onSelectContent, icon }) => {
     setPage(nextPage);
     fetchFn(nextPage)
       .then(res => {
-        const data = res.data || res;
-        const rawItems = data.items || data.results || [];
-        const newItems = rawItems.filter(item => {
+        const newItems = (res.data.items || []).filter(item => {
           const key = `${item.type}-${item.id}`;
           if (seenIds.current.has(key)) return false;
           seenIds.current.add(key);
           return true;
         });
         setItems(prev => [...prev, ...newItems]);
-        const totalPages = data.total_pages || 1;
-        if (nextPage >= totalPages) setHasMore(false);
+        if (nextPage >= (res.data.total_pages || 1)) setHasMore(false);
       })
       .catch(() => setHasMore(false))
       .finally(() => setLoadingMore(false));
@@ -222,50 +227,50 @@ const CategoryRow = ({ title, fetchFn, onSelectContent, icon }) => {
 };
 
 const MOVIE_CATEGORIES = [
-  { key: "popular",     title: "Top Popular",        fn: (p) => moviesAPI.getPopular(p) },
-  { key: "oscars",      title: "The Oscars 2026",    fn: (p) => moviesAPI.getOscars(p) },
-  { key: "action",      title: "Action",             fn: (p) => moviesAPI.getAction(p) },
-  { key: "animation",   title: "Animation",          fn: (p) => moviesAPI.getAnimation(p) },
-  { key: "horror",      title: "Horror",             fn: (p) => moviesAPI.getHorror(p) },
-  { key: "newly",       title: "Just Released",      fn: (p) => moviesAPI.getNewlyAdded(p) },
-  { key: "southafrica", title: "South Africa",       fn: (p) => moviesAPI.getSouthAfrica(p) },
-  { key: "africa",      title: "Africa's Homegrown", fn: (p) => moviesAPI.getAfrica(p) },
-  { key: "netflix",     title: "Netflix",            fn: (p) => moviesAPI.getNetflix(p) },
-  { key: "hbo",         title: "HBO",                fn: (p) => moviesAPI.getHBO(p) },
-  { key: "prime",       title: "Prime Video",        fn: (p) => moviesAPI.getPrime(p) },
-  { key: "disney",      title: "Disney+",            fn: (p) => moviesAPI.getDisney(p) },
-  { key: "korea",       title: "K-Cinema",           fn: (p) => moviesAPI.getKorea(p) },
-  { key: "tyler",       title: "Tyler Perry",        fn: (p) => moviesAPI.getTylerPerry(p) },
-  { key: "documentary", title: "Documentary",        fn: (p) => moviesAPI.getDocumentary(p) },
-  { key: "anime",       title: "Anime",              fn: (p) => moviesAPI.getAnime(p) },
-  { key: "romance",     title: "Romance",            fn: (p) => moviesAPI.getRomance(p) },
-  { key: "nollywood",   title: "Nollywood",          fn: (p) => moviesAPI.getNollywood(p) },
-  { key: "hollywood",   title: "Hollywood",          fn: (p) => moviesAPI.getHollywood(p) },
-  { key: "classics",    title: "Classic",            fn: (p) => moviesAPI.getClassics(p) },
-  { key: "franchise",   title: "Franchise",          fn: (p) => moviesAPI.getFranchise(p) },
+  { key: "popular",     title: "Top Popular",        fn: makeTypedFetch(api.getPopularMovies,    "movie") },
+  { key: "oscars",      title: "The Oscars 2026",    fn: makeTypedFetch(api.getMoviesOscars,     "movie") },
+  { key: "action",      title: "Action",             fn: makeTypedFetch(api.getMoviesAction,     "movie") },
+  { key: "animation",   title: "Animation",          fn: makeTypedFetch(api.getMoviesAnimation,  "movie") },
+  { key: "horror",      title: "Horror",             fn: makeTypedFetch(api.getMoviesHorror,     "movie") },
+  { key: "newly",       title: "Just Released",      fn: makeTypedFetch(api.getMoviesNewlyAdded, "movie") },
+  { key: "southafrica", title: "South Africa",       fn: makeTypedFetch(api.getMoviesSouthAfrica,"movie") },
+  { key: "africa",      title: "Africa's Homegrown", fn: makeTypedFetch(api.getMoviesAfrica,     "movie") },
+  { key: "netflix",     title: "Netflix",            fn: makeTypedFetch(api.getMoviesNetflix,    "movie") },
+  { key: "hbo",         title: "HBO",                fn: makeTypedFetch(api.getMoviesHBO,        "movie") },
+  { key: "prime",       title: "Prime Video",        fn: makeTypedFetch(api.getMoviesPrime,      "movie") },
+  { key: "disney",      title: "Disney+",            fn: makeTypedFetch(api.getMoviesDisney,     "movie") },
+  { key: "korea",       title: "K-Cinema",           fn: makeTypedFetch(api.getMoviesKorea,      "movie") },
+  { key: "tyler",       title: "Tyler Perry",        fn: makeTypedFetch(api.getMoviesTylerPerry, "movie") },
+  { key: "documentary", title: "Documentary",        fn: makeTypedFetch(api.getMoviesDocumentary,"movie") },
+  { key: "anime",       title: "Anime",              fn: makeTypedFetch(api.getMoviesAnime,      "movie") },
+  { key: "romance",     title: "Romance",            fn: makeTypedFetch(api.getMoviesRomance,    "movie") },
+  { key: "nollywood",   title: "Nollywood",          fn: makeTypedFetch(api.getMoviesNollywood,  "movie") },
+  { key: "hollywood",   title: "Hollywood",          fn: makeTypedFetch(api.getMoviesHollywood,  "movie") },
+  { key: "classics",    title: "Classic",            fn: makeTypedFetch(api.getMoviesClassics,   "movie") },
+  { key: "franchise",   title: "Franchise",          fn: makeTypedFetch(api.getMoviesFranchise,  "movie") },
 ];
 
 const SERIES_CATEGORIES = [
-  { key: "popular",     title: "Top Popular",        fn: (p) => seriesAPI.getPopular(p) },
-  { key: "action",      title: "Action",             fn: (p) => seriesAPI.getAction(p) },
-  { key: "animation",   title: "Animation",          fn: (p) => seriesAPI.getAnimation(p) },
-  { key: "horror",      title: "Horror",             fn: (p) => seriesAPI.getHorror(p) },
-  { key: "newly",       title: "Just Released",      fn: (p) => seriesAPI.getNewlyAdded(p) },
-  { key: "southafrica", title: "South Africa",       fn: (p) => seriesAPI.getSouthAfrica(p) },
-  { key: "africa",      title: "Africa's Homegrown", fn: (p) => seriesAPI.getAfrica(p) },
-  { key: "netflix",     title: "Netflix",            fn: (p) => seriesAPI.getNetflix(p) },
-  { key: "hbo",         title: "HBO",                fn: (p) => seriesAPI.getHBO(p) },
-  { key: "prime",       title: "Prime Video",        fn: (p) => seriesAPI.getPrime(p) },
-  { key: "disney",      title: "Disney+",            fn: (p) => seriesAPI.getDisney(p) },
-  { key: "korea",       title: "K-Cinema",           fn: (p) => seriesAPI.getKorea(p) },
-  { key: "tyler",       title: "Tyler Perry",        fn: (p) => seriesAPI.getTylerPerry(p) },
-  { key: "documentary", title: "Documentary",        fn: (p) => seriesAPI.getDocumentary(p) },
-  { key: "anime",       title: "Anime",              fn: (p) => seriesAPI.getAnime(p) },
-  { key: "romance",     title: "Romance",            fn: (p) => seriesAPI.getRomance(p) },
-  { key: "nollywood",   title: "Nollywood",          fn: (p) => seriesAPI.getNollywood(p) },
-  { key: "hollywood",   title: "Hollywood",          fn: (p) => seriesAPI.getHollywood(p) },
-  { key: "classics",    title: "Classic",            fn: (p) => seriesAPI.getClassics(p) },
-  { key: "franchise",   title: "Franchise",          fn: (p) => seriesAPI.getFranchise(p) },
+  { key: "popular",     title: "Top Popular",        fn: makeTypedFetch(api.getPopularSeries,    "series") },
+  { key: "action",      title: "Action",             fn: makeTypedFetch(api.getSeriesAction,     "series") },
+  { key: "animation",   title: "Animation",          fn: makeTypedFetch(api.getSeriesAnimation,  "series") },
+  { key: "horror",      title: "Horror",             fn: makeTypedFetch(api.getSeriesHorror,     "series") },
+  { key: "newly",       title: "Just Released",      fn: makeTypedFetch(api.getSeriesNewlyAdded, "series") },
+  { key: "southafrica", title: "South Africa",       fn: makeTypedFetch(api.getSeriesSouthAfrica,"series") },
+  { key: "africa",      title: "Africa's Homegrown", fn: makeTypedFetch(api.getSeriesAfrica,     "series") },
+  { key: "netflix",     title: "Netflix",            fn: makeTypedFetch(api.getSeriesNetflix,    "series") },
+  { key: "hbo",         title: "HBO",                fn: makeTypedFetch(api.getSeriesHBO,        "series") },
+  { key: "prime",       title: "Prime Video",        fn: makeTypedFetch(api.getSeriesPrime,      "series") },
+  { key: "disney",      title: "Disney+",            fn: makeTypedFetch(api.getSeriesDisney,     "series") },
+  { key: "korea",       title: "K-Cinema",           fn: makeTypedFetch(api.getSeriesKorea,      "series") },
+  { key: "tyler",       title: "Tyler Perry",        fn: makeTypedFetch(api.getSeriesTylerPerry, "series") },
+  { key: "documentary", title: "Documentary",        fn: makeTypedFetch(api.getSeriesDocumentary,"series") },
+  { key: "anime",       title: "Anime",              fn: makeTypedFetch(api.getSeriesAnime,      "series") },
+  { key: "romance",     title: "Romance",            fn: makeTypedFetch(api.getSeriesRomance,    "series") },
+  { key: "nollywood",   title: "Nollywood",          fn: makeTypedFetch(api.getSeriesNollywood,  "series") },
+  { key: "hollywood",   title: "Hollywood",          fn: makeTypedFetch(api.getSeriesHollywood,  "series") },
+  { key: "classics",    title: "Classic",            fn: makeTypedFetch(api.getSeriesClassics,   "series") },
+  { key: "franchise",   title: "Franchise",          fn: makeTypedFetch(api.getSeriesFranchise,  "series") },
 ];
 
 const ContentSection = ({ type = "movies", onSelectContent, filterMode }) => {
