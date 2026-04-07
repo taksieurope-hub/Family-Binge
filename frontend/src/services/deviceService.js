@@ -1,12 +1,23 @@
 const API = process.env.REACT_APP_API_URL || "https://family-binge-backend.onrender.com/api";
 
 export const getDeviceId = () => {
-  let id = localStorage.getItem("fb_device_id");
-  if (!id) {
-    id = "dev_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now();
-    localStorage.setItem("fb_device_id", id);
+  try {
+    let id = localStorage.getItem("fb_device_id");
+    if (!id) {
+      // Use stable fingerprint so TV doesn't re-register on every session
+      const ua = navigator.userAgent;
+      const screen = window.screen.width + "x" + window.screen.height;
+      const stable = btoa(ua + screen).replace(/[^a-z0-9]/gi, '').substr(0, 16);
+      id = "dev_" + stable + "_" + Date.now().toString(36);
+      localStorage.setItem("fb_device_id", id);
+    }
+    return id;
+  } catch (e) {
+    // localStorage blocked (e.g. some TV browsers) - use fingerprint directly
+    const ua = navigator.userAgent;
+    const screen = window.screen.width + "x" + window.screen.height;
+    return "dev_" + btoa(ua + screen).replace(/[^a-z0-9]/gi, '').substr(0, 20);
   }
-  return id;
 };
 
 export const getDeviceType = () => {
