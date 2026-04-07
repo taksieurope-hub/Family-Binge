@@ -112,45 +112,53 @@ const CategoryRow = ({ title, fetchFn, onSelectContent, icon }) => {
   const [expanded, setExpanded] = useState(false);
   const seenIds = useRef(new Set());
 
+  // On mount: fetch ONLY page 1 (was fetching 10 pages simultaneously — fixed)
   useEffect(() => {
     setLoading(true);
-    const pagesToFetch = Array.from({ length: 10 }, (_, i) => i + 1);
-    Promise.all(pagesToFetch.map(p => fetchFn(p).catch(() => null)))
-      .then(results => {
+    fetchFn(1)
+      .then(res => {
         const allItems = [];
-        results.forEach(res => {
-          if (!res) return;
-          (res.data.items || []).forEach(item => {
-            const key = `${item.type}-${item.id}`;
-            if (!seenIds.current.has(key)) {
-              seenIds.current.add(key);
-              allItems.push(item);
-            }
-          });
+        (res.data.items || []).forEach(item => {
+          const key = `${item.type}-${item.id}`;
+          if (!seenIds.current.has(key)) {
+            seenIds.current.add(key);
+            allItems.push(item);
+          }
         });
         setItems(allItems);
-        setHasMore(false);
+        const totalPages = res.data.total_pages || 1;
+        setHasMore(totalPages > 1);
       })
+      .catch(() => setHasMore(false))
       .finally(() => setLoading(false));
   }, []);
 
-  const loadMore = () => {
+  // Load more pages only when user clicks "Show All" or "Load More"
+  const loadMore = useCallback(() => {
     if (loadingMore || !hasMore) return;
     setLoadingMore(true);
     const nextPage = page + 1;
     setPage(nextPage);
-    fetchFn(nextPage).then(res => {
-      const newItems = (res.data.items || []).filter(item => {
-        const key = `${item.type}-${item.id}`;
-        if (seenIds.current.has(key)) return false;
-        seenIds.current.add(key);
-        return true;
-      });
-      setItems(prev => [...prev, ...newItems]);
-      const totalPages = res.data.total_pages || 1;
-      if (nextPage >= totalPages) setHasMore(false);
-    }).catch(() => setHasMore(false))
+    fetchFn(nextPage)
+      .then(res => {
+        const newItems = (res.data.items || []).filter(item => {
+          const key = `${item.type}-${item.id}`;
+          if (seenIds.current.has(key)) return false;
+          seenIds.current.add(key);
+          return true;
+        });
+        setItems(prev => [...prev, ...newItems]);
+        const totalPages = res.data.total_pages || 1;
+        if (nextPage >= totalPages) setHasMore(false);
+      })
+      .catch(() => setHasMore(false))
       .finally(() => setLoadingMore(false));
+  }, [loadingMore, hasMore, page, fetchFn]);
+
+  const handleShowAll = () => {
+    setExpanded(true);
+    // Fetch a few more pages in the background when user expands
+    if (hasMore) loadMore();
   };
 
   const displayed = expanded ? items : items.slice(0, 12);
@@ -182,7 +190,7 @@ const CategoryRow = ({ title, fetchFn, onSelectContent, icon }) => {
           <div className="flex items-center justify-center gap-3 mt-6">
             {!expanded && items.length > 12 && (
               <button
-                onClick={() => setExpanded(true)}
+                onClick={handleShowAll}
                 className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white text-sm font-medium rounded-xl transition-colors flex items-center gap-2"
               >
                 <ChevronDown className="w-4 h-4" /> Show All ({items.length})
