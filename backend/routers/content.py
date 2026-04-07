@@ -110,13 +110,6 @@ async def movies_by_genre(genre_id: int, page: int = Query(1, ge=1, le=500)):
     movies, total_pages = await get_movies_by_genre(genre_id, page)
     return ContentListResponse(items=movies, total_pages=total_pages, page=page)
 
-@router.get("/movies/{movie_id}")
-async def movie_details(movie_id: int):
-    """Get detailed movie information including trailer"""
-    details = await get_movie_details(movie_id)
-    if not details:
-        raise HTTPException(status_code=404, detail="Movie not found")
-    return details
 
 @router.get("/movies/search/{query}")
 async def search_movies_endpoint(query: str, page: int = Query(1, ge=1, le=500)):
@@ -156,13 +149,6 @@ async def series_by_genre(genre_id: int, page: int = Query(1, ge=1, le=500)):
     series, total_pages = await get_series_by_genre(genre_id, page)
     return ContentListResponse(items=series, total_pages=total_pages, page=page)
 
-@router.get("/series/{series_id}")
-async def series_details(series_id: int):
-    """Get detailed series information including trailer"""
-    details = await get_series_details(series_id)
-    if not details:
-        raise HTTPException(status_code=404, detail="Series not found")
-    return details
 
 @router.get("/series/search/{query}")
 async def search_series_endpoint(query: str, page: int = Query(1, ge=1, le=500)):
