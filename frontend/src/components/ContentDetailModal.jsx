@@ -76,7 +76,6 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
   const [watchCountdown, setWatchCountdown] = useState(null);
   const watchCountdownRef = useRef(null);
   const [shareCopied, setShareCopied] = useState(false);
-  const [subtitlesEnabled, setSubtitlesEnabled] = useState(true);
   const iframeRef = useRef(null);
   const playerContainerRef = useRef(null);
   const autoSwitchTimeoutRef = useRef(null);
@@ -93,8 +92,6 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
       else if (el.msRequestFullscreen) el.msRequestFullscreen();
     } catch (e) { console.log('Fullscreen not available'); }
   }, []);
-
-
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -138,33 +135,31 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
     };
   }, [content]);
 
-
-
   const handleWatchNow = () => {
-  if (accessStatus === 'expired') {
-    onClose();
-    if (onExpiredClick) onExpiredClick();
-    return;
-  }
-  setIsPlaying(true);
-  setCurrentSourceIndex(0);
-  setPlayerReady(false);
-  setIsAutoSwitching(true);
-  if (details) {
-    saveToWatchHistory(details, selectedSeason, selectedEpisode, 0);
-    window.dispatchEvent(new Event('watchHistoryUpdated'));
-  }
-  setWatchCountdown(5);
-  let count = 5;
-  watchCountdownRef.current = setInterval(() => {
-    count -= 1;
-    setWatchCountdown(count);
-    if (count <= 0) {
-      clearInterval(watchCountdownRef.current);
-      setWatchCountdown(null);
+    if (accessStatus === 'expired') {
+      onClose();
+      if (onExpiredClick) onExpiredClick();
+      return;
     }
-  }, 1000);
-};
+    setIsPlaying(true);
+    setCurrentSourceIndex(0);
+    setPlayerReady(false);
+    setIsAutoSwitching(true);
+    if (details) {
+      saveToWatchHistory(details, selectedSeason, selectedEpisode, 0);
+      window.dispatchEvent(new Event('watchHistoryUpdated'));
+    }
+    setWatchCountdown(5);
+    let count = 5;
+    watchCountdownRef.current = setInterval(() => {
+      count -= 1;
+      setWatchCountdown(count);
+      if (count <= 0) {
+        clearInterval(watchCountdownRef.current);
+        setWatchCountdown(null);
+      }
+    }, 1000);
+  };
 
   const handleShare = async () => {
     const text = `Check out ${details?.title} on Family Binge! Watch it here: https://familybinge.co.za`;
@@ -183,40 +178,49 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
     if (details?.youtube_id) onPlayVideo(details.youtube_id);
   };
 
-
   const getStreamUrl = () => {
     if (!details) return null;
     const source = VIDEO_SOURCES[currentSourceIndex];
+    if (!source) return null;
     return source.getUrl(details.type, details.id, selectedSeason, selectedEpisode);
   };
 
+  // FIX 1: Mark player as ready when iframe loads — stops the cycling
   const handleIframeLoad = () => {
-    // Don't mark as ready - let the timeout keep switching until user sees content
+    setPlayerReady(true);
+    setIsAutoSwitching(false);
+    if (autoSwitchTimeoutRef.current) clearTimeout(autoSwitchTimeoutRef.current);
     setTimeout(() => enterFullscreen(), 300);
-};
+  };
 
-  // Auto-switch to next source after 8 seconds if not ready
+  // Manual "Try Next Server" handler
+  const handleNextSource = () => {
+    const next = (currentSourceIndex + 1) % VIDEO_SOURCES.length;
+    setCurrentSourceIndex(next);
+    setPlayerReady(false);
+    setIsAutoSwitching(true);
+  };
+
+  // FIX 2: Auto-switch only fires once per source load, loops back to 0, longer timeout
   useEffect(() => {
     if (!isPlaying) return;
     if (playerReady) return;
     if (autoSwitchTimeoutRef.current) clearTimeout(autoSwitchTimeoutRef.current);
+
     autoSwitchTimeoutRef.current = setTimeout(() => {
       if (!playerReady) {
-        const next = currentSourceIndex + 1;
-        if (next < VIDEO_SOURCES.length) {
-          setCurrentSourceIndex(next);
-          setPlayerReady(false);
-          setIsAutoSwitching(true);
-        } else {
-          setIsAutoSwitching(false);
-          setPlayerReady(false);
-          setCurrentSourceIndex(-1);
-        }
+        // Loop back to 0 instead of going to -1
+        const next = (currentSourceIndex + 1) % VIDEO_SOURCES.length;
+        setCurrentSourceIndex(next);
+        setPlayerReady(false);
+        setIsAutoSwitching(true);
       }
-    }, 3000);
+    }, 10000); // 10 seconds — give each source a real chance
+
     return () => { if (autoSwitchTimeoutRef.current) clearTimeout(autoSwitchTimeoutRef.current); };
   }, [isPlaying, currentSourceIndex, playerReady]);
 
+  const currentSourceName = VIDEO_SOURCES[currentSourceIndex]?.name || '';
 
   if (isPlaying) {
     return (
@@ -230,16 +234,20 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
             <div className="min-w-0">
               <h2 className="text-white font-semibold text-sm truncate">{details?.title}</h2>
               <div className="flex items-center gap-2 text-xs text-gray-400">
-                <span>{details?.type === 'series' ? `Season ${selectedSeason} Â· Episode ${selectedEpisode}` : details?.year}</span>
-                <span className="text-gray-600">Â·</span>
-                <span className="text-purple-400 font-medium">Auto</span>
+                <span>
+                  {details?.type === 'series'
+                    ? `Season ${selectedSeason} \u00b7 Episode ${selectedEpisode}`
+                    : details?.year}
+                </span>
+                <span className="text-gray-600">\u00b7</span>
+                <span className="text-purple-400 font-medium">{currentSourceName}</span>
                 {!playerReady && (
                   <span className="flex items-center gap-1 text-yellow-400">
                     <Loader2 className="w-3 h-3 animate-spin" />
-                    Finding best server...
+                    Connecting...
                   </span>
                 )}
-                {playerReady && <span className="text-green-400">â— Playing</span>}
+                {playerReady && <span className="text-green-400">\u25cf Playing</span>}
               </div>
             </div>
           </div>
@@ -253,10 +261,12 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
                   setCurrentSourceIndex(0);
                   setPlayerReady(false);
                   setIsAutoSwitching(true);
-                              saveToWatchHistory(details, ns, selectedEpisode, 0);
+                  saveToWatchHistory(details, ns, selectedEpisode, 0);
                   window.dispatchEvent(new Event('watchHistoryUpdated'));
                 }} className="bg-white/10 text-white px-2.5 py-1.5 rounded-lg border border-white/15 text-xs font-medium cursor-pointer hover:bg-white/20">
-                  {Array.from({ length: details?.seasons || 1 }, (_, i) => <option key={i+1} value={i+1} className="bg-gray-900">Season {i+1}</option>)}
+                  {Array.from({ length: details?.seasons || 1 }, (_, i) => (
+                    <option key={i+1} value={i+1} className="bg-gray-900">Season {i+1}</option>
+                  ))}
                 </select>
                 <select value={selectedEpisode} onChange={(e) => {
                   const ne = Number(e.target.value);
@@ -264,13 +274,25 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
                   setCurrentSourceIndex(0);
                   setPlayerReady(false);
                   setIsAutoSwitching(true);
-                              saveToWatchHistory(details, selectedSeason, ne, 0);
+                  saveToWatchHistory(details, selectedSeason, ne, 0);
                   window.dispatchEvent(new Event('watchHistoryUpdated'));
                 }} className="bg-white/10 text-white px-2.5 py-1.5 rounded-lg border border-white/15 text-xs font-medium cursor-pointer hover:bg-white/20">
-                  {Array.from({ length: 50 }, (_, i) => <option key={i+1} value={i+1} className="bg-gray-900">Ep {i+1}</option>)}
+                  {Array.from({ length: 50 }, (_, i) => (
+                    <option key={i+1} value={i+1} className="bg-gray-900">Ep {i+1}</option>
+                  ))}
                 </select>
               </div>
             )}
+
+            {/* Try Next Server button — always visible while playing */}
+            <button
+              onClick={handleNextSource}
+              className="flex items-center gap-1 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors text-white text-xs font-medium"
+              title="Try next server"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Next Server</span>
+            </button>
 
             {details?.type === 'series' && (
               <button
@@ -296,37 +318,37 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
 
         {/* Player Area */}
         <div className="flex-1 bg-black relative">
-          {!playerReady && currentSourceIndex !== -1 && (
+          {!playerReady && currentSourceIndex >= 0 && (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-black z-10">
               <Loader2 className="w-14 h-14 text-purple-500 animate-spin" />
-              <p className="text-white mt-5 font-medium">Connecting to best server...</p>
-            </div>
-          )}
-          {currentSourceIndex === -1 && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black z-10 text-center px-6">
-              <div className="w-20 h-20 bg-gray-800 rounded-full flex items-center justify-center mb-6">
-                <Film className="w-10 h-10 text-gray-500" />
-              </div>
-              <h2 className="text-white text-2xl font-bold mb-3">Content Not Available</h2>
-              <p className="text-gray-400 text-sm max-w-md">This title is not yet available on our database. We are working on adding it in the near future.</p>
-              <button onClick={() => { setIsPlaying(false); }} className="mt-8 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-medium transition-colors">
-                Go Back
+              <p className="text-white mt-5 font-medium">Connecting to {currentSourceName}...</p>
+              <p className="text-gray-500 text-sm mt-2">
+                Server {currentSourceIndex + 1} of {VIDEO_SOURCES.length}
+              </p>
+              <button
+                onClick={handleNextSource}
+                className="mt-6 flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white text-sm transition-colors"
+              >
+                <RefreshCw className="w-4 h-4" /> Try Next Server
               </button>
             </div>
           )}
 
-          <iframe
-            ref={iframeRef}
-            key={`${details?.id}-${selectedSeason}-${selectedEpisode}-${currentSourceIndex}`}
-            src={getStreamUrl()}
-            className="w-full h-full border-0"
-            allowFullScreen
-            allow="autoplay; fullscreen; picture-in-picture"
-            sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
-            title={details?.title}
-            onLoad={handleIframeLoad}
-          />
-
+          {/* FIX 3: null src guard — never renders iframe with undefined src */}
+          {getStreamUrl() && (
+            <iframe
+              ref={iframeRef}
+              key={`${details?.id}-${selectedSeason}-${selectedEpisode}-${currentSourceIndex}`}
+              src={getStreamUrl()}
+              className="w-full h-full border-0"
+              allowFullScreen
+              allow="autoplay; fullscreen; picture-in-picture"
+              // FIX 4: allow-popups lets players open their stream workers
+              sandbox="allow-scripts allow-same-origin allow-forms allow-presentation allow-popups allow-popups-to-escape-sandbox"
+              title={details?.title}
+              onLoad={handleIframeLoad}
+            />
+          )}
         </div>
       </div>
     );
@@ -392,9 +414,9 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
 
                   <div className="flex flex-wrap gap-4">
                     <Button onClick={handleWatchNow} className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-8 py-6 text-lg font-semibold rounded-lg">
-  <Play className="w-6 h-6 fill-white" />
-  Watch Now
-</Button>
+                      <Play className="w-6 h-6 fill-white" />
+                      Watch Now
+                    </Button>
                     <Button onClick={handlePlayTrailer} disabled={!details.youtube_id} variant="outline" className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white border-white/30 px-8 py-6 text-lg rounded-lg disabled:opacity-50">
                       <Play className="w-6 h-6" />
                       Trailer
@@ -470,6 +492,3 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
 };
 
 export default ContentDetailModal;
-
-
-
