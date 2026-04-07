@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
 
 const ANNOUNCEMENT_KEY = "announcement_v1_dismissed";
-const MESSAGE = "We apologize if you experienced any downtime today due to some upgrades on our page. We hope that you are enjoying the experience and that you stay tuned and support us as we grow into a more affordable empire for the world to experience.";
+const MESSAGE = "";
 
 const AnnouncementBanner = () => {
   const [visible, setVisible] = useState(false);
