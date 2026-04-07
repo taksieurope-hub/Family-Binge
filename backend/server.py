@@ -37,7 +37,7 @@ from routers.content import router as content_router
 from routers.imovs import router as imovs_router
 from routers.payment import router as payment_router
 app.include_router(payment_router, prefix="/api")
-app.include_router(content_router, prefix="/api/content")
+app.include_router(content_router, prefix="/api")
 app.include_router(imovs_router, prefix="/api/content")
 
 from fastapi import Request
@@ -100,3 +100,6 @@ async def proxy_stream(url: str):
                           headers={"Access-Control-Allow-Origin": "*"})
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+if __name__ == '__main__':
+    import uvicorn
+    uvicorn.run('server:app', host='0.0.0.0', port=5000, reload=True)
