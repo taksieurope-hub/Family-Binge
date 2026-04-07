@@ -29,13 +29,17 @@ const LiveTVPage = () => {
         const snap = await getDoc(doc(db, 'users', user.uid));
         if (!snap.exists()) { setAccessBlocked(true); return; }
         const data = snap.data();
-        const status = data.subscriptionStatus;
-        const trialEnd = data.trialEndsAt?.toDate ? data.trialEndsAt.toDate() : new Date(data.trialEndsAt);
-        const subEnd = data.subscriptionEndsAt?.toDate ? data.subscriptionEndsAt.toDate() : new Date(data.subscriptionEndsAt);
         const now = new Date();
-        const trialActive = data.trialEndsAt && trialEnd > now;
-        const subActive = status === 'active' && data.subscriptionEndsAt && subEnd > now;
-        const isFamilyRole = data.role === 'family';
+        const isFamilyRole = data.role === 'admin' || data.role === 'family';
+        const baseTrialEnd = data.trialEnds?.toDate ? data.trialEnds.toDate() : new Date(data.trialEnds);
+        const promoDays = data.promoDays || 0;
+        const promoQualifies = data.promoUnlocked || (data.promoReferrals || 0) >= 2;
+        const trialEnd = promoQualifies && promoDays > 0
+          ? new Date(baseTrialEnd.getTime() + promoDays * 24 * 60 * 60 * 1000)
+          : baseTrialEnd;
+        const trialActive = data.trialEnds && trialEnd > now;
+        const subExpires = data.subscriptionExpires?.toDate ? data.subscriptionExpires.toDate() : data.subscriptionExpires ? new Date(data.subscriptionExpires) : null;
+        const subActive = data.plan && data.plan !== 'free_trial' && subExpires && subExpires > now;
         if (!trialActive && !subActive && !isFamilyRole) setAccessBlocked(true);
       } catch(e) { console.error(e); }
     };
