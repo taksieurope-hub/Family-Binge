@@ -46,17 +46,21 @@ export const removeFromWatchHistory = (id, type) => {
 
 const VIDEO_SOURCES = [
   { name: 'VidSrc CC',     getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}` : `https://vidsrc.cc/v2/embed/movie/${id}` },
+  { name: 'VidLink',       getUrl: (type, id, s, e) => type === 'series' ? `https://vidlink.pro/tv/${id}/${s}/${e}` : `https://vidlink.pro/movie/${id}` },
   { name: 'VidSrc Pro',    getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrc.pro/embed/tv/${id}/${s}/${e}` : `https://vidsrc.pro/embed/movie/${id}` },
-  { name: 'Embed.su',      getUrl: (type, id, s, e) => type === 'series' ? `https://embed.su/embed/tv/${id}/${s}/${e}` : `https://embed.su/embed/movie/${id}` },
-  { name: 'VidSrc XYZ',    getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrc.xyz/embed/tv/${id}/${s}/${e}` : `https://vidsrc.xyz/embed/movie/${id}` },
-  { name: 'Smashy',        getUrl: (type, id, s, e) => type === 'series' ? `https://player.smashy.stream/tv/${id}?s=${s}&e=${e}` : `https://player.smashy.stream/movie/${id}` },
-  { name: 'MultiEmbed',    getUrl: (type, id, s, e) => type === 'series' ? `https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1&s=${s}&e=${e}` : `https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1` },
-  { name: 'NontonGo',      getUrl: (type, id, s, e) => type === 'series' ? `https://www.NontonGo.net/embed/tv/${id}/${s}/${e}` : `https://www.NontonGo.net/embed/movie/${id}` },
-  { name: 'VidSrc NL',     getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrc.nl/embed/tv/${id}/${s}/${e}` : `https://vidsrc.nl/embed/movie/${id}` },
-  { name: '2Embed',        getUrl: (type, id, s, e) => type === 'series' ? `https://www.2embed.cc/embedtv/${id}&s=${s}&e=${e}` : `https://www.2embed.cc/embed/${id}` },
   { name: 'AutoEmbed',     getUrl: (type, id, s, e) => type === 'series' ? `https://player.autoembed.cc/embed/tv/${id}/${s}/${e}` : `https://player.autoembed.cc/embed/movie/${id}` },
+  { name: 'MultiEmbed',    getUrl: (type, id, s, e) => type === 'series' ? `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s}&e=${e}` : `https://multiembed.mov/?video_id=${id}&tmdb=1` },
+  { name: 'Embed.su',      getUrl: (type, id, s, e) => type === 'series' ? `https://embed.su/embed/tv/${id}/${s}/${e}` : `https://embed.su/embed/movie/${id}` },
+  { name: 'VidSrc XYZ',   getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrc.xyz/embed/tv/${id}/${s}/${e}` : `https://vidsrc.xyz/embed/movie/${id}` },
+  { name: 'VidSrc NL',    getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrc.nl/embed/tv/${id}/${s}/${e}` : `https://vidsrc.nl/embed/movie/${id}` },
+  { name: 'TMDBApi',       getUrl: (type, id, s, e) => type === 'series' ? `https://www.tmdbapi.xyz/api/tmdb/series/?video_id=${id}&s=${s}&e=${e}&c=a885da` : `https://www.tmdbapi.xyz/api/tmdb/films/?video_id=${id}&c=a885da` },
+  { name: 'Show2Embed',    getUrl: (type, id, s, e) => type === 'series' ? `https://show2embed.web.app/watch/${id}/${s}/${e}` : `https://show2embed.web.app/watch/${id}` },
+  { name: 'Smashy',        getUrl: (type, id, s, e) => type === 'series' ? `https://player.smashy.stream/tv/${id}?s=${s}&e=${e}` : `https://player.smashy.stream/movie/${id}` },
   { name: 'MoviesAPI',     getUrl: (type, id, s, e) => type === 'series' ? `https://moviesapi.club/tv/${id}-${s}-${e}` : `https://moviesapi.club/movie/${id}` },
-  { name: 'SuperEmbed',    getUrl: (type, id, s, e) => type === 'series' ? `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s}&e=${e}` : `https://multiembed.mov/?video_id=${id}&tmdb=1` },
+  { name: '2Embed',        getUrl: (type, id, s, e) => type === 'series' ? `https://www.2embed.cc/embedtv/${id}&s=${s}&e=${e}` : `https://www.2embed.cc/embed/${id}` },
+  { name: 'NontonGo',      getUrl: (type, id, s, e) => type === 'series' ? `https://www.NontonGo.net/embed/tv/${id}/${s}/${e}` : `https://www.NontonGo.net/embed/movie/${id}` },
+  { name: 'GoDrive',       getUrl: (type, id, s, e) => type === 'series' ? `https://godriveplayer.com/player.php?tmdb=${id}&s=${s}&e=${e}` : `https://godriveplayer.com/player.php?tmdb=${id}` },
+  { name: 'CurtStream',    getUrl: (type, id, s, e) => type === 'series' ? `https://curtstream.com/series/tmdb/${id}/${s}/${e}/` : `https://curtstream.com/movies/tmdb/${id}` },
 ];
 
 
@@ -209,7 +213,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
           setCurrentSourceIndex(-1);
         }
       }
-    }, 15000);
+    }, 3000);
     return () => { if (autoSwitchTimeoutRef.current) clearTimeout(autoSwitchTimeoutRef.current); };
   }, [isPlaying, currentSourceIndex, playerReady]);
 
