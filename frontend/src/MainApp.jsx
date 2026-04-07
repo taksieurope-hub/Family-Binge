@@ -138,7 +138,7 @@ const TrialBanner = ({ trialEnds, onUpgrade, onDismiss }) => {
 const GuestBanner = ({ onSignup, onLogin, onDismiss }) => {
   return (
     <div className="w-full px-4 py-3 flex items-center justify-between gap-3 bg-gradient-to-r from-purple-600 to-pink-600">
-      <div className="flex items-center gap-3 min-w-0">
+      <div className="flex items-center gap-3 min-w-0">a
         <Crown className="w-5 h-5 text-white flex-shrink-0" />
         <p className="text-white text-sm font-medium truncate">
           Sign up for a <span className="font-bold">3-day free trial</span> — Unlimited movies, series & Live TV!
