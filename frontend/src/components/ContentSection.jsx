@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Play, Star, Film, Tv, Loader2, X, Clock, ChevronDown, ChevronUp } from "lucide-react";
 import { getWatchHistory, removeFromWatchHistory } from "./ContentDetailModal";
-import * as api from "../api";
+import { moviesAPI, seriesAPI } from "../services/api";
 
 const ContentCard = ({ item, onSelectContent }) => (
   <div onClick={() => onSelectContent(item)} className="group cursor-pointer">
@@ -112,13 +112,14 @@ const CategoryRow = ({ title, fetchFn, onSelectContent, icon }) => {
   const [expanded, setExpanded] = useState(false);
   const seenIds = useRef(new Set());
 
-  // On mount: fetch ONLY page 1 (was fetching 10 pages simultaneously — fixed)
   useEffect(() => {
     setLoading(true);
     fetchFn(1)
       .then(res => {
+        const data = res.data || res; // services/api returns {items, total_pages} directly or via .data
+        const rawItems = data.items || data.results || [];
         const allItems = [];
-        (res.data.items || []).forEach(item => {
+        rawItems.forEach(item => {
           const key = `${item.type}-${item.id}`;
           if (!seenIds.current.has(key)) {
             seenIds.current.add(key);
@@ -126,14 +127,13 @@ const CategoryRow = ({ title, fetchFn, onSelectContent, icon }) => {
           }
         });
         setItems(allItems);
-        const totalPages = res.data.total_pages || 1;
+        const totalPages = data.total_pages || 1;
         setHasMore(totalPages > 1);
       })
       .catch(() => setHasMore(false))
       .finally(() => setLoading(false));
   }, []);
 
-  // Load more pages only when user clicks "Show All" or "Load More"
   const loadMore = useCallback(() => {
     if (loadingMore || !hasMore) return;
     setLoadingMore(true);
@@ -141,14 +141,16 @@ const CategoryRow = ({ title, fetchFn, onSelectContent, icon }) => {
     setPage(nextPage);
     fetchFn(nextPage)
       .then(res => {
-        const newItems = (res.data.items || []).filter(item => {
+        const data = res.data || res;
+        const rawItems = data.items || data.results || [];
+        const newItems = rawItems.filter(item => {
           const key = `${item.type}-${item.id}`;
           if (seenIds.current.has(key)) return false;
           seenIds.current.add(key);
           return true;
         });
         setItems(prev => [...prev, ...newItems]);
-        const totalPages = res.data.total_pages || 1;
+        const totalPages = data.total_pages || 1;
         if (nextPage >= totalPages) setHasMore(false);
       })
       .catch(() => setHasMore(false))
@@ -157,7 +159,6 @@ const CategoryRow = ({ title, fetchFn, onSelectContent, icon }) => {
 
   const handleShowAll = () => {
     setExpanded(true);
-    // Fetch a few more pages in the background when user expands
     if (hasMore) loadMore();
   };
 
@@ -221,50 +222,50 @@ const CategoryRow = ({ title, fetchFn, onSelectContent, icon }) => {
 };
 
 const MOVIE_CATEGORIES = [
-  { key: "popular",      title: "Top Popular",          fn: (p) => api.getPopularMovies(p) },
-  { key: "oscars",       title: "The Oscars 2026",       fn: (p) => api.getMoviesOscars(p) },
-  { key: "action",       title: "Action",                fn: (p) => api.getMoviesAction(p) },
-  { key: "animation",    title: "Animation",             fn: (p) => api.getMoviesAnimation(p) },
-  { key: "horror",       title: "Horror",                fn: (p) => api.getMoviesHorror(p) },
-  { key: "newly",        title: "Just Released",         fn: (p) => api.getMoviesNewlyAdded(p) },
-  { key: "southafrica",  title: "South Africa",          fn: (p) => api.getMoviesSouthAfrica(p) },
-  { key: "africa",       title: "Africa's Homegrown",    fn: (p) => api.getMoviesAfrica(p) },
-  { key: "netflix",      title: "Netflix",               fn: (p) => api.getMoviesNetflix(p) },
-  { key: "hbo",          title: "HBO",                   fn: (p) => api.getMoviesHBO(p) },
-  { key: "prime",        title: "Prime Video",           fn: (p) => api.getMoviesPrime(p) },
-  { key: "disney",       title: "Disney+",               fn: (p) => api.getMoviesDisney(p) },
-  { key: "korea",        title: "K-Cinema",              fn: (p) => api.getMoviesKorea(p) },
-  { key: "tyler",        title: "Tyler Perry",           fn: (p) => api.getMoviesTylerPerry(p) },
-  { key: "documentary",  title: "Documentary",           fn: (p) => api.getMoviesDocumentary(p) },
-  { key: "anime",        title: "Anime",                 fn: (p) => api.getMoviesAnime(p) },
-  { key: "romance",      title: "Romance",               fn: (p) => api.getMoviesRomance(p) },
-  { key: "nollywood",    title: "Nollywood",             fn: (p) => api.getMoviesNollywood(p) },
-  { key: "hollywood",    title: "Hollywood",             fn: (p) => api.getMoviesHollywood(p) },
-  { key: "classics",     title: "Classic",               fn: (p) => api.getMoviesClassics(p) },
-  { key: "franchise",    title: "Franchise",             fn: (p) => api.getMoviesFranchise(p) },
+  { key: "popular",     title: "Top Popular",        fn: (p) => moviesAPI.getPopular(p) },
+  { key: "oscars",      title: "The Oscars 2026",    fn: (p) => moviesAPI.getOscars(p) },
+  { key: "action",      title: "Action",             fn: (p) => moviesAPI.getAction(p) },
+  { key: "animation",   title: "Animation",          fn: (p) => moviesAPI.getAnimation(p) },
+  { key: "horror",      title: "Horror",             fn: (p) => moviesAPI.getHorror(p) },
+  { key: "newly",       title: "Just Released",      fn: (p) => moviesAPI.getNewlyAdded(p) },
+  { key: "southafrica", title: "South Africa",       fn: (p) => moviesAPI.getSouthAfrica(p) },
+  { key: "africa",      title: "Africa's Homegrown", fn: (p) => moviesAPI.getAfrica(p) },
+  { key: "netflix",     title: "Netflix",            fn: (p) => moviesAPI.getNetflix(p) },
+  { key: "hbo",         title: "HBO",                fn: (p) => moviesAPI.getHBO(p) },
+  { key: "prime",       title: "Prime Video",        fn: (p) => moviesAPI.getPrime(p) },
+  { key: "disney",      title: "Disney+",            fn: (p) => moviesAPI.getDisney(p) },
+  { key: "korea",       title: "K-Cinema",           fn: (p) => moviesAPI.getKorea(p) },
+  { key: "tyler",       title: "Tyler Perry",        fn: (p) => moviesAPI.getTylerPerry(p) },
+  { key: "documentary", title: "Documentary",        fn: (p) => moviesAPI.getDocumentary(p) },
+  { key: "anime",       title: "Anime",              fn: (p) => moviesAPI.getAnime(p) },
+  { key: "romance",     title: "Romance",            fn: (p) => moviesAPI.getRomance(p) },
+  { key: "nollywood",   title: "Nollywood",          fn: (p) => moviesAPI.getNollywood(p) },
+  { key: "hollywood",   title: "Hollywood",          fn: (p) => moviesAPI.getHollywood(p) },
+  { key: "classics",    title: "Classic",            fn: (p) => moviesAPI.getClassics(p) },
+  { key: "franchise",   title: "Franchise",          fn: (p) => moviesAPI.getFranchise(p) },
 ];
 
 const SERIES_CATEGORIES = [
-  { key: "popular",      title: "Top Popular",          fn: (p) => api.getPopularSeries(p) },
-  { key: "action",       title: "Action",               fn: (p) => api.getSeriesAction(p) },
-  { key: "animation",    title: "Animation",            fn: (p) => api.getSeriesAnimation(p) },
-  { key: "horror",       title: "Horror",               fn: (p) => api.getSeriesHorror(p) },
-  { key: "newly",        title: "Just Released",        fn: (p) => api.getSeriesNewlyAdded(p) },
-  { key: "southafrica",  title: "South Africa",         fn: (p) => api.getSeriesSouthAfrica(p) },
-  { key: "africa",       title: "Africa's Homegrown",   fn: (p) => api.getSeriesAfrica(p) },
-  { key: "netflix",      title: "Netflix",              fn: (p) => api.getSeriesNetflix(p) },
-  { key: "hbo",          title: "HBO",                  fn: (p) => api.getSeriesHBO(p) },
-  { key: "prime",        title: "Prime Video",          fn: (p) => api.getSeriesPrime(p) },
-  { key: "disney",       title: "Disney+",              fn: (p) => api.getSeriesDisney(p) },
-  { key: "korea",        title: "K-Cinema",             fn: (p) => api.getSeriesKorea(p) },
-  { key: "tyler",        title: "Tyler Perry",          fn: (p) => api.getSeriesTylerPerry(p) },
-  { key: "documentary",  title: "Documentary",          fn: (p) => api.getSeriesDocumentary(p) },
-  { key: "anime",        title: "Anime",                fn: (p) => api.getSeriesAnime(p) },
-  { key: "romance",      title: "Romance",              fn: (p) => api.getSeriesRomance(p) },
-  { key: "nollywood",    title: "Nollywood",            fn: (p) => api.getSeriesNollywood(p) },
-  { key: "hollywood",    title: "Hollywood",            fn: (p) => api.getSeriesHollywood(p) },
-  { key: "classics",     title: "Classic",              fn: (p) => api.getSeriesClassics(p) },
-  { key: "franchise",    title: "Franchise",            fn: (p) => api.getSeriesFranchise(p) },
+  { key: "popular",     title: "Top Popular",        fn: (p) => seriesAPI.getPopular(p) },
+  { key: "action",      title: "Action",             fn: (p) => seriesAPI.getAction(p) },
+  { key: "animation",   title: "Animation",          fn: (p) => seriesAPI.getAnimation(p) },
+  { key: "horror",      title: "Horror",             fn: (p) => seriesAPI.getHorror(p) },
+  { key: "newly",       title: "Just Released",      fn: (p) => seriesAPI.getNewlyAdded(p) },
+  { key: "southafrica", title: "South Africa",       fn: (p) => seriesAPI.getSouthAfrica(p) },
+  { key: "africa",      title: "Africa's Homegrown", fn: (p) => seriesAPI.getAfrica(p) },
+  { key: "netflix",     title: "Netflix",            fn: (p) => seriesAPI.getNetflix(p) },
+  { key: "hbo",         title: "HBO",                fn: (p) => seriesAPI.getHBO(p) },
+  { key: "prime",       title: "Prime Video",        fn: (p) => seriesAPI.getPrime(p) },
+  { key: "disney",      title: "Disney+",            fn: (p) => seriesAPI.getDisney(p) },
+  { key: "korea",       title: "K-Cinema",           fn: (p) => seriesAPI.getKorea(p) },
+  { key: "tyler",       title: "Tyler Perry",        fn: (p) => seriesAPI.getTylerPerry(p) },
+  { key: "documentary", title: "Documentary",        fn: (p) => seriesAPI.getDocumentary(p) },
+  { key: "anime",       title: "Anime",              fn: (p) => seriesAPI.getAnime(p) },
+  { key: "romance",     title: "Romance",            fn: (p) => seriesAPI.getRomance(p) },
+  { key: "nollywood",   title: "Nollywood",          fn: (p) => seriesAPI.getNollywood(p) },
+  { key: "hollywood",   title: "Hollywood",          fn: (p) => seriesAPI.getHollywood(p) },
+  { key: "classics",    title: "Classic",            fn: (p) => seriesAPI.getClassics(p) },
+  { key: "franchise",   title: "Franchise",          fn: (p) => seriesAPI.getFranchise(p) },
 ];
 
 const ContentSection = ({ type = "movies", onSelectContent, filterMode }) => {
