@@ -72,6 +72,12 @@ import httpx
 from fastapi import HTTPException
 from fastapi.responses import StreamingResponse, Response
 
+@app.get("/api/{catchall:path}", include_in_schema=False)
+async def catch_bad_m3u8(catchall: str):
+    if catchall.endswith(".m3u8"):
+        return Response(content="#EXTM3U\n", media_type="application/vnd.apple.mpegurl", headers={"Access-Control-Allow-Origin": "*"})
+    raise HTTPException(status_code=404, detail="Not found")
+
 @app.get("/api/proxy")
 async def proxy_stream(url: str):
     try:
