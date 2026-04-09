@@ -52,7 +52,9 @@ const SignupPage = () => {
       await _setDoc(_doc(db, 'promo', 'counter'), { count: promoCount + 1 }, { merge: true });
 
       const now = new Date();
-      const trialEnds = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000); // standard 3 days
+      const isPromoCode = promoCode.trim().toUpperCase() === 'PEAKY15';
+      const trialDays = isPromoCode ? 15 : 3;
+      const trialEnds = new Date(now.getTime() + trialDays * 24 * 60 * 60 * 1000);
 
       await setDoc(doc(db, 'users', user.uid), {
         name,
