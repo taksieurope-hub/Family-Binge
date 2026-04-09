@@ -121,7 +121,7 @@ const LiveTVPage = () => {
       hls.attachMedia(videoRef.current);
       hls.on(window.Hls.Events.MANIFEST_PARSED, () => {
         setLoading(false);
-        videoRef.current?.play().catch(() => {});
+        const v = videoRef.current; if (v) { v.muted = true; v.play().then(() => { v.muted = false; }).catch(() => {}); }
       });
       hls.on(window.Hls.Events.ERROR, (_, data) => {
         if (data.fatal) {
@@ -269,7 +269,7 @@ const LiveTVPage = () => {
             </div>
           )}
           {activeChannel && (
-            <video ref={videoRef} style={{ width: '100%', height: '100%', objectFit: 'contain' }} controls playsInline autoPlay />
+            <video ref={videoRef} style={{ width: '100%', height: '100%', objectFit: 'contain' }} controls playsInline autoPlay muted />
           )}
           {loading && (
             <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.85)', gap: 12 }}>
