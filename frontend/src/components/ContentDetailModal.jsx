@@ -270,8 +270,6 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
             )}
 
             <button
-              onClick={handleNextSource}
-              className="flex items-center gap-1 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors text-white text-xs font-medium"
               
 
             {details?.type === 'series' && (
@@ -306,7 +304,6 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
                 Server {currentSourceIndex + 1} of {VIDEO_SOURCES.length}
               </p>
               <button
-                onClick={handleNextSource}
                 className="mt-6 flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white text-sm transition-colors"
               >
                 <RefreshCw className="w-4 h-4" /> Try Next Server
