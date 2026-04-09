@@ -12,26 +12,28 @@ const VideoPlayer = ({ videoId, onClose, season, episode, isTV }) => {
   const [status, setStatus] = useState('loading');
   const iframeRef = useRef(null);
   const errorTimer = useRef(null);
+
+  useEffect(() => {
+    if (!videoId) return;
+    setStatus('loading');
+    errorTimer.current = setTimeout(() => {
+      setServerIndex(i => {
+        if (i < SERVERS.length - 1) return i + 1;
+        setStatus('ready');
+        return i;
+      });
+    }, 12000);
+    return () => clearTimeout(errorTimer.current);
+  }, [serverIndex, videoId]);
+
   if (!videoId) return null;
-  const isYouTube = videoId && !/^\d+$/.test(videoId);
+
+  const isYouTube = !/^\d+$/.test(videoId);
   const src = isYouTube
     ? `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`
     : isTV
       ? SERVERS[serverIndex].tv(videoId, season || 1, episode || 1)
       : SERVERS[serverIndex].movie(videoId);
-
-  useEffect(() => {
-    setStatus('loading');
-    // If iframe hasnt signalled anything after 12s, auto-advance to next server
-    errorTimer.current = setTimeout(() => {
-      if (status === 'loading' && serverIndex < SERVERS.length - 1) {
-        setServerIndex(i => i + 1);
-      } else {
-        setStatus('ready');
-      }
-    }, 12000);
-    return () => clearTimeout(errorTimer.current);
-  }, [serverIndex]);
 
   const handleLoad = () => {
     clearTimeout(errorTimer.current);
@@ -47,7 +49,7 @@ const VideoPlayer = ({ videoId, onClose, season, episode, isTV }) => {
         {!isYouTube && (
           <div className="flex gap-2 flex-wrap justify-center items-center">
             {SERVERS.map((s, i) => (
-              <button key={i} onClick={() => { setServerIndex(i); }}
+              <button key={i} onClick={() => setServerIndex(i)}
                 className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${i === serverIndex ? 'bg-white text-black' : 'bg-white/10 text-white hover:bg-white/20'}`}>
                 {s.name}
               </button>
@@ -70,7 +72,7 @@ const VideoPlayer = ({ videoId, onClose, season, episode, isTV }) => {
           )}
         </div>
       </div>
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-gray-400 text-sm">If video doesn't load, try another server</div>
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-gray-400 text-sm">If video does not load, try another server</div>
     </div>
   );
 };
