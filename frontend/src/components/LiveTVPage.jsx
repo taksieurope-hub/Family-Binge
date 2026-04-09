@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Tv, Menu, X, Search, Trash2 } from 'lucide-react';
+import { ArrowLeft, Tv, Menu, X, Search } from 'lucide-react';
 import { channels } from './LiveTVSection';
 import { useAuth } from '../services/AuthContext';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
@@ -9,10 +9,20 @@ import { db } from '../services/firebase';
 const PROXY = 'https://family-binge-backend.onrender.com/api/proxy?url=';
 const proxyUrl = (url) => url ? PROXY + encodeURIComponent(url) : url;
 
+// Load HLS.js once at module level so it's ready before any click
+const hlsReady = new Promise((resolve) => {
+  if (window.Hls) { resolve(); return; }
+  const script = document.createElement('script');
+  script.src = 'https://cdn.jsdelivr.net/npm/hls.js@1.5.7/dist/hls.min.js';
+  script.onload = resolve;
+  document.head.appendChild(script);
+});
+
 const LiveTVPage = () => {
   const navigate = useNavigate();
   const videoRef = useRef(null);
   const hlsRef = useRef(null);
+  const pendingChannel = useRef(null);
   const [activeChannel, setActiveChannel] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -81,19 +91,27 @@ const LiveTVPage = () => {
     if (user) setDoc(doc(db, 'hidden_channels', user.uid), { ids: [] });
   };
 
-  const loadStream = (channel, idx = 0) => {
+  const loadStream = async (channel, idx = 0) => {
     setLoading(true);
     setError(false);
     const rawUrl = channel.streams[idx];
     if (!rawUrl) { setError(true); setLoading(false); return; }
     const url = proxyUrl(rawUrl);
+
+    // Wait for HLS.js to be ready before doing anything
+    await hlsReady;
+
     if (hlsRef.current) { hlsRef.current.destroy(); hlsRef.current = null; }
+
     if (window.Hls && window.Hls.isSupported()) {
       const hls = new window.Hls({ enableWorker: true, lowLatencyMode: true });
       hlsRef.current = hls;
       hls.loadSource(url);
       hls.attachMedia(videoRef.current);
-      hls.on(window.Hls.Events.MANIFEST_PARSED, () => { setLoading(false); videoRef.current?.play().catch(() => {}); });
+      hls.on(window.Hls.Events.MANIFEST_PARSED, () => {
+        setLoading(false);
+        videoRef.current?.play().catch(() => {});
+      });
       hls.on(window.Hls.Events.ERROR, (_, data) => {
         if (data.fatal) {
           const next = idx + 1;
@@ -119,11 +137,6 @@ const LiveTVPage = () => {
   };
 
   useEffect(() => {
-    if (!window.Hls) {
-      const script = document.createElement('script');
-      script.src = 'https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js';
-      document.head.appendChild(script);
-    }
     const mobile = window.innerWidth < 768;
     setIsMobile(mobile);
     setSidebarOpen(!mobile);
@@ -149,7 +162,6 @@ const LiveTVPage = () => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#0a0a0a', color: '#fff', fontFamily: 'sans-serif', overflow: 'hidden' }}>
 
-      {/* Top bar */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px', borderBottom: '1px solid #222', background: '#111', flexShrink: 0, zIndex: 10 }}>
         <button onClick={() => navigate('/app')} style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'none', border: 'none', color: '#aaa', cursor: 'pointer', fontSize: 13, padding: '4px 8px' }}>
           <ArrowLeft size={15} /> Back
@@ -174,16 +186,13 @@ const LiveTVPage = () => {
 
         {sidebarOpen && (
           <div style={{ position: isMobile ? 'absolute' : 'relative', top: 0, left: 0, height: '100%', width: 280, background: '#111', borderRight: '1px solid #222', display: 'flex', flexDirection: 'column', flexShrink: 0, zIndex: 30 }}>
-
-            {/* Sidebar header */}
             <div style={{ padding: '10px 14px', borderBottom: '1px solid #1e1e1e', flexShrink: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
                 <span style={{ color: '#888', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700 }}>
                   {filtered.length} Channels
                 </span>
                 <div style={{ display: 'flex', gap: 6 }}>
-                  <button
-                    onClick={() => setDeleteMode(d => !d)}
+                  <button onClick={() => setDeleteMode(d => !d)}
                     style={{ background: deleteMode ? '#dc2626' : '#1f2937', border: '1px solid ' + (deleteMode ? '#dc2626' : '#374151'), borderRadius: 6, color: '#fff', cursor: 'pointer', fontSize: 11, padding: '4px 8px' }}>
                     {deleteMode ? 'Done' : 'Manage'}
                   </button>
@@ -194,39 +203,28 @@ const LiveTVPage = () => {
                   )}
                 </div>
               </div>
-              {/* Search */}
               <div style={{ position: 'relative' }}>
                 <Search size={12} style={{ position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)', color: '#555' }} />
-                <input
-                  type="text"
-                  placeholder="Search channels..."
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  style={{ width: '100%', background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 6, color: '#fff', fontSize: 12, padding: '6px 8px 6px 26px', outline: 'none', boxSizing: 'border-box' }}
-                />
+                <input type="text" placeholder="Search channels..." value={search} onChange={e => setSearch(e.target.value)}
+                  style={{ width: '100%', background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 6, color: '#fff', fontSize: 12, padding: '6px 8px 6px 26px', outline: 'none', boxSizing: 'border-box' }} />
               </div>
             </div>
 
-            {/* Category tabs */}
             <div style={{ display: 'flex', gap: 6, padding: '8px 10px', overflowX: 'auto', flexShrink: 0, borderBottom: '1px solid #1e1e1e' }}>
               {categories.map(cat => (
-                <button
-                  key={cat}
-                  onClick={() => setActiveCategory(cat)}
+                <button key={cat} onClick={() => setActiveCategory(cat)}
                   style={{ background: activeCategory === cat ? '#7c3aed' : '#1a1a1a', border: '1px solid ' + (activeCategory === cat ? '#7c3aed' : '#2a2a2a'), borderRadius: 20, color: activeCategory === cat ? '#fff' : '#888', cursor: 'pointer', fontSize: 11, padding: '4px 10px', whiteSpace: 'nowrap', flexShrink: 0 }}>
                   {cat}
                 </button>
               ))}
             </div>
 
-            {/* Channel list */}
             <div style={{ flex: 1, overflowY: 'auto' }}>
               {filtered.map(ch => {
                 const isActive = activeChannel?.id === ch.id;
                 return (
                   <div key={ch.id} style={{ position: 'relative' }}>
-                    <button
-                      onClick={() => selectChannel(ch)}
+                    <button onClick={() => selectChannel(ch)}
                       style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: isActive ? '#1a2744' : 'transparent', border: 'none', borderBottom: '1px solid #161616', borderLeft: isActive ? '3px solid #3b82f6' : '3px solid transparent', color: isActive ? '#fff' : '#bbb', cursor: 'pointer', textAlign: 'left' }}>
                       <Tv size={12} color={isActive ? '#3b82f6' : '#444'} style={{ flexShrink: 0 }} />
                       <div style={{ flex: 1, minWidth: 0 }}>
@@ -236,8 +234,7 @@ const LiveTVPage = () => {
                       {isActive && <span style={{ fontSize: 9, color: '#ef4444', flexShrink: 0 }}>LIVE</span>}
                     </button>
                     {deleteMode && (
-                      <button
-                        onClick={(e) => handleDelete(e, ch.id)}
+                      <button onClick={(e) => handleDelete(e, ch.id)}
                         style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: '#dc2626', border: 'none', borderRadius: 4, color: '#fff', cursor: 'pointer', fontSize: 11, padding: '3px 7px', zIndex: 10 }}>
                         Hide
                       </button>
@@ -252,7 +249,6 @@ const LiveTVPage = () => {
           </div>
         )}
 
-        {/* Video area */}
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#000', position: 'relative', minWidth: 0 }}>
           {!activeChannel && (
             <div style={{ textAlign: 'center', padding: 20 }}>
