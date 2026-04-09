@@ -45,10 +45,9 @@ export const removeFromWatchHistory = (id, type) => {
 };
 
 const VIDEO_SOURCES = [
-  { name: 'Server 1', getUrl: (type, id, s, e) => type === 'series' ? `https://moviesapi.club/tv/${id}-${s}-${e}` : `https://moviesapi.club/movie/${id}` },
-  { name: 'Server 2', getUrl: (type, id, s, e) => type === 'series' ? `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s}&e=${e}` : `https://multiembed.mov/?video_id=${id}&tmdb=1` },
-  { name: 'Server 3', getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrcme.su/embed/tv/${id}/${s}/${e}` : `https://vidsrcme.su/embed/movie/${id}` },
-  { name: 'Server 4', getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrc-embed.su/embed/tv/${id}/${s}/${e}` : `https://vidsrc-embed.su/embed/movie/${id}` },
+  { name: 'Server 1', getUrl: (type, id, s, e) => type === 'series' ? `https://autoembed.co/tv/tmdb/${id}-${s}-${e}` : `https://autoembed.co/movie/tmdb/${id}` },
+  { name: 'Server 2', getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrcme.su/embed/tv/${id}/${s}/${e}` : `https://vidsrcme.su/embed/movie/${id}` },
+  { name: 'Server 3', getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrc-embed.su/embed/tv/${id}/${s}/${e}` : `https://vidsrc-embed.su/embed/movie/${id}` },
 ];
 
 
