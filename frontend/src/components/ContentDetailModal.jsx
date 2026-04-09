@@ -269,10 +269,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
               </div>
             )}
 
-            <button
-              
-
-            {details?.type === 'series' && (
+                        {details?.type === 'series' && (
               <button
                 onClick={() => {
                   const nextEp = selectedEpisode + 1;
