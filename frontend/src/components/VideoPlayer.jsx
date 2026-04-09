@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
 const SERVERS = [
-  { name: 'VidSrc',   movie: (id) => `https://vidsrc.cc/v2/embed/movie/${id}`,   tv: (id, s, e) => `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}` },
+  { name: 'VidSrc',   movie: (id) => `https://vidsrc.net/embed/movie/?tmdb=${id}`,   tv: (id, s, e) => `https://vidsrc.net/embed/tv/?tmdb=${id}&season=${s}&episode=${e}` },
   { name: 'Server 2', movie: (id) => `https://vidsrc.xyz/embed/movie/${id}`,     tv: (id, s, e) => `https://vidsrc.xyz/embed/tv/${id}/${s}/${e}` },
   { name: 'Server 3', movie: (id) => `https://vidsrc.to/embed/movie/${id}`,      tv: (id, s, e) => `https://vidsrc.to/embed/tv/${id}/${s}/${e}` },
   { name: 'Server 4', movie: (id) => `https://vidsrc.me/embed/movie?tmdb=${id}`, tv: (id, s, e) => `https://vidsrc.me/embed/tv?tmdb=${id}&season=${s}&episode=${e}` },
