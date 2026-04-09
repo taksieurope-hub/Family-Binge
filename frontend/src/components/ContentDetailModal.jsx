@@ -45,11 +45,7 @@ export const removeFromWatchHistory = (id, type) => {
 };
 
 const VIDEO_SOURCES = [
-  { name: 'VidSrc 1',  getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrcme.ru/embed/tv/${id}/${s}/${e}` : `https://vidsrcme.ru/embed/movie/${id}` },
-  { name: 'VidSrc 2',  getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrcme.su/embed/tv/${id}/${s}/${e}` : `https://vidsrcme.su/embed/movie/${id}` },
-  { name: 'VidSrc 3',  getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrc-me.ru/embed/tv/${id}/${s}/${e}` : `https://vidsrc-me.ru/embed/movie/${id}` },
-  { name: 'VidSrc 4',  getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrc-me.su/embed/tv/${id}/${s}/${e}` : `https://vidsrc-me.su/embed/movie/${id}` },
-  { name: 'VidSrc 5',  getUrl: (type, id, s, e) => type === 'series' ? `https://vsrc.su/embed/tv/${id}/${s}/${e}` : `https://vsrc.su/embed/movie/${id}` },
+  { name: 'VidSrc',    getUrl: (type, id, s, e) => type === 'series' ? `https://vsembed.su/embed/tv/${id}/${s}/${e}` : `https://vsembed.su/embed/movie/${id}` },
 ];
 
 
