@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
 const SERVERS = [
-  { name: 'VidSrc',   movie: (id) => `https://vidsrc.net/embed/movie/?tmdb=${id}`,   tv: (id, s, e) => `https://vidsrc.net/embed/tv/?tmdb=${id}&season=${s}&episode=${e}` },
-  { name: 'Server 2', movie: (id) => `https://vidsrc.xyz/embed/movie/${id}`,     tv: (id, s, e) => `https://vidsrc.xyz/embed/tv/${id}/${s}/${e}` },
-  { name: 'Server 3', movie: (id) => `https://vidsrc.to/embed/movie/${id}`,      tv: (id, s, e) => `https://vidsrc.to/embed/tv/${id}/${s}/${e}` },
-  { name: 'Server 4', movie: (id) => `https://vidsrc.me/embed/movie?tmdb=${id}`, tv: (id, s, e) => `https://vidsrc.me/embed/tv?tmdb=${id}&season=${s}&episode=${e}` },
-  { name: 'Server 5', movie: (id) => `https://autoembed.cc/movie/tmdb/${id}`,    tv: (id, s, e) => `https://autoembed.cc/tv/tmdb/${id}-${s}-${e}` },
+  { name: 'Server 1', movie: (id) => `https://embed.su/embed/movie/${id}`,        tv: (id, s, e) => `https://embed.su/embed/tv/${id}/${s}/${e}` },
+  { name: 'Server 2', movie: (id) => `https://multiembed.mov/?video_id=${id}&tmdb=1`, tv: (id, s, e) => `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s}&e=${e}` },
+  { name: 'Server 3', movie: (id) => `https://www.2embed.cc/embed/${id}`,         tv: (id, s, e) => `https://www.2embed.cc/embedtv/${id}&s=${s}&e=${e}` },
+  { name: 'Server 4', movie: (id) => `https://autoembed.cc/movie/tmdb/${id}`,     tv: (id, s, e) => `https://autoembed.cc/tv/tmdb/${id}-${s}-${e}` },
+  { name: 'Server 5', movie: (id) => `https://player.videasy.net/movie/${id}`,    tv: (id, s, e) => `https://player.videasy.net/tv/${id}/${s}/${e}` },
 ];
 const VideoPlayer = ({ videoId, onClose, season, episode, isTV }) => {
   const [serverIndex, setServerIndex] = useState(0);
