@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Tv, Menu, X, Search } from 'lucide-react';
-import { channels } from './LiveTVSection';
+import { channels, fetchIPTVChannels } from './LiveTVSection';
 import { useAuth } from '../services/AuthContext';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
@@ -45,9 +45,19 @@ const LiveTVPage = () => {
   const { user } = useAuth();
   const [accessBlocked, setAccessBlocked] = useState(false);
   const [deletedIds, setDeletedIds] = useState([]);
+  const [allChannels, setAllChannels] = useState(channels);
 
   useEffect(() => {
     if (!user) { navigate('/login'); return; }
+    // Load dynamic IPTV playlists
+    fetchIPTVChannels().then(dynamic => {
+      setAllChannels(prev => {
+        const existingNames = new Set(prev.map(ch => ch.name.toLowerCase()));
+        const newOnes = dynamic.filter(ch => !existingNames.has(ch.name.toLowerCase()));
+        let nextId = Math.max(...prev.map(ch => ch.id || 0)) + 1;
+        return [...prev, ...newOnes.map(ch => ({ ...ch, id: nextId++ }))];
+      });
+    }).catch(() => {});
     const checkAccess = async () => {
       try {
         const snap = await getDoc(doc(db, 'users', user.uid));
@@ -81,7 +91,7 @@ const LiveTVPage = () => {
     load();
   }, [user]);
 
-  const visibleChannels = channels.filter(c => !deletedIds.includes(c.id));
+  const visibleChannels = allChannels.filter(c => !deletedIds.includes(c.id));
   const categories = ['All', ...Array.from(new Set(visibleChannels.map(c => c.category))).sort()];
   const filtered = visibleChannels.filter(c => {
     const matchCat = activeCategory === 'All' || c.category === activeCategory;

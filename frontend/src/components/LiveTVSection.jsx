@@ -5,6 +5,51 @@ import { Tv, Radio, Globe, Search } from 'lucide-react';
 const PROXY = 'https://family-binge-backend.onrender.com/api/proxy?url=';
 const proxyUrl = (url) => url ? PROXY + encodeURIComponent(url) : url;
 
+const IPTV_PLAYLISTS = [
+  { url: 'https://iptv-org.github.io/iptv/countries/us.m3u', category: 'USA' },
+  { url: 'https://iptv-org.github.io/iptv/countries/uk.m3u', category: 'UK' },
+  { url: 'https://iptv-org.github.io/iptv/countries/ca.m3u', category: 'Canada' },
+  { url: 'https://iptv-org.github.io/iptv/countries/au.m3u', category: 'Australia' },
+  { url: 'https://iptv-org.github.io/iptv/countries/nz.m3u', category: 'New Zealand' },
+];
+
+function parseM3U(text, category) {
+  const lines = text.split('\n');
+  const channels = [];
+  let current = null;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (line.startsWith('#EXTINF')) {
+      const nameMatch = line.match(/,(.+)$/);
+      const logoMatch = line.match(/tvg-logo="([^"]+)"/);
+      current = {
+        name: nameMatch ? nameMatch[1].trim() : 'Unknown',
+        logo: logoMatch ? logoMatch[1] : null,
+        category,
+      };
+    } else if (line && !line.startsWith('#') && current) {
+      channels.push({ ...current, streams: [line] });
+      current = null;
+    }
+  }
+  return channels;
+}
+
+export async function fetchIPTVChannels() {
+  const results = [];
+  for (const playlist of IPTV_PLAYLISTS) {
+    try {
+      const res = await fetch(PROXY + encodeURIComponent(playlist.url));
+      const text = await res.text();
+      const parsed = parseM3U(text, playlist.category);
+      results.push(...parsed);
+    } catch (e) {
+      console.warn('Failed to load playlist:', playlist.url);
+    }
+  }
+  return results;
+}
+
 export const channels = [
   { id: 1,  name: 'Al Jazeera English',   category: 'News',          logo: null,                                                                                streams: ['https://live-hls-aje-ak.getaj.net/AJE/01.m3u8'] },
   { id: 2,  name: 'TRT World',            category: 'News',          logo: null,                                                                                streams: ['https://tv-trtworld.medya.trt.com.tr/master_1080.m3u8'] },
