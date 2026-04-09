@@ -45,9 +45,11 @@ export const removeFromWatchHistory = (id, type) => {
 };
 
 const VIDEO_SOURCES = [
-  { name: 'Server 1', getUrl: (type, id, s, e) => type === 'series' ? `https://autoembed.co/tv/tmdb/${id}-${s}-${e}` : `https://autoembed.co/movie/tmdb/${id}` },
-  { name: 'Server 2', getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrcme.su/embed/tv/${id}/${s}/${e}` : `https://vidsrcme.su/embed/movie/${id}` },
-  { name: 'Server 3', getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrc-embed.su/embed/tv/${id}/${s}/${e}` : `https://vidsrc-embed.su/embed/movie/${id}` },
+  { name: 'Server 1', getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}` : `https://vidsrc.cc/v2/embed/movie/${id}` },
+  { name: 'Server 2', getUrl: (type, id, s, e) => type === 'series' ? `https://player.videasy.net/tv/${id}/${s}/${e}` : `https://player.videasy.net/movie/${id}` },
+  { name: 'Server 3', getUrl: (type, id, s, e) => type === 'series' ? `https://flicky.host/embed/tv/${id}/${s}/${e}` : `https://flicky.host/embed/movie/${id}` },
+  { name: 'Server 4', getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrcme.su/embed/tv/${id}/${s}/${e}` : `https://vidsrcme.su/embed/movie/${id}` },
+  { name: 'Server 5', getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrc-embed.su/embed/tv/${id}/${s}/${e}` : `https://vidsrc-embed.su/embed/movie/${id}` },
 ];
 
 
