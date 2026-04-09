@@ -25,6 +25,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/api/health")
+async def health_check():
+    return {"status": "ok"}
+
 @app.get("/")
 async def root():
     return {"message": "Family Binge API running"}
