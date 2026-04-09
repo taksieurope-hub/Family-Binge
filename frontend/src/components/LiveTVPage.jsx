@@ -1,10 +1,13 @@
-﻿import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Tv, Menu, X, Search, Trash2 } from 'lucide-react';
 import { channels } from './LiveTVSection';
 import { useAuth } from '../services/AuthContext';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
+
+const PROXY = 'https://family-binge-backend.onrender.com/api/proxy?url=';
+const proxyUrl = (url) => url ? PROXY + encodeURIComponent(url) : url;
 
 const LiveTVPage = () => {
   const navigate = useNavigate();
@@ -57,8 +60,6 @@ const LiveTVPage = () => {
     load();
   }, [user]);
 
-
-
   const visibleChannels = channels.filter(c => !deletedIds.includes(c.id));
   const categories = ['All', ...Array.from(new Set(visibleChannels.map(c => c.category))).sort()];
   const filtered = visibleChannels.filter(c => {
@@ -83,8 +84,9 @@ const LiveTVPage = () => {
   const loadStream = (channel, idx = 0) => {
     setLoading(true);
     setError(false);
-    const url = channel.streams[idx];
-    if (!url) { setError(true); setLoading(false); return; }
+    const rawUrl = channel.streams[idx];
+    if (!rawUrl) { setError(true); setLoading(false); return; }
+    const url = proxyUrl(rawUrl);
     if (hlsRef.current) { hlsRef.current.destroy(); hlsRef.current = null; }
     if (window.Hls && window.Hls.isSupported()) {
       const hls = new window.Hls({ enableWorker: true, lowLatencyMode: true });
@@ -136,7 +138,7 @@ const LiveTVPage = () => {
 
   if (accessBlocked) return (
     <div className="fixed inset-0 bg-black flex flex-col items-center justify-center p-6 text-center">
-      <div className="text-6xl mb-4">??</div>
+      <div className="text-6xl mb-4">🔒</div>
       <h2 className="text-white text-2xl font-bold mb-2">Subscription Required</h2>
       <p className="text-gray-400 mb-6">Your free trial has ended. Subscribe to keep watching Live TV.</p>
       <button onClick={() => navigate('/app#pricing')} className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl transition-colors">View Plans</button>
@@ -229,7 +231,7 @@ const LiveTVPage = () => {
                       <Tv size={12} color={isActive ? '#3b82f6' : '#444'} style={{ flexShrink: 0 }} />
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: 13, fontWeight: isActive ? 600 : 400, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{ch.name}</div>
-                        <div style={{ fontSize: 10, color: '#555', marginTop: 1 }}>CH {ch.id} Â· {ch.category}</div>
+                        <div style={{ fontSize: 10, color: '#555', marginTop: 1 }}>CH {ch.id} · {ch.category}</div>
                       </div>
                       {isActive && <span style={{ fontSize: 9, color: '#ef4444', flexShrink: 0 }}>LIVE</span>}
                     </button>
@@ -284,6 +286,3 @@ const LiveTVPage = () => {
 };
 
 export default LiveTVPage;
-
-
-
