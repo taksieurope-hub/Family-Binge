@@ -11,6 +11,16 @@ const IPTV_PLAYLISTS = [
   { url: 'https://iptv-org.github.io/iptv/countries/ca.m3u', category: 'Canada' },
   { url: 'https://iptv-org.github.io/iptv/countries/au.m3u', category: 'Australia' },
   { url: 'https://iptv-org.github.io/iptv/countries/nz.m3u', category: 'New Zealand' },
+  { url: 'https://iptv-org.github.io/iptv/regions/eur.m3u', category: 'Europe' },
+  { url: 'https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u8', category: 'General' },
+  { url: 'https://www.apsattv.com/rok.m3u', category: 'Roku' },
+  { url: 'https://www.apsattv.com/xumo.m3u', category: 'Movies' },
+  { url: 'https://www.apsattv.com/lg.m3u', category: 'General' },
+  { url: 'https://www.apsattv.com/vizio.m3u', category: 'General' },
+  { url: 'https://www.apsattv.com/firetv.m3u', category: 'General' },
+  { url: 'https://www.apsattv.com/distro.m3u', category: 'General' },
+  { url: 'https://www.apsattv.com/cineverse.m3u', category: 'Movies' },
+  { url: 'https://tvpass.org/playlist/m3u', category: 'USA' },
 ];
 
 function parseM3U(text, category) {
