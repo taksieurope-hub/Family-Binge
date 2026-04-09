@@ -383,7 +383,26 @@ const LiveTVSection = ({ onSelectContent }) => {
     (activeCategory === 'All' || c.category === activeCategory) &&
     c.name.toLowerCase().includes(search.toLowerCase())
   );
-  const categories = ['All', ...Array.from(new Set(langChannels.map(c => c.category))).sort()];
+  const categories = ['All', ...Array.from(new Set(langChannels.map(c => c.category))).sort()
+  { id: 2308, name: 'CBC Toronto',            category: 'Canada', logo: 'https://i.imgur.com/H5yEbxf.png', streams: ['https://bozztv.com/teleyupp1/teleup-ydcl2V1MVC/playlist.m3u8'] },
+  { id: 2309, name: 'Citytv',                 category: 'Canada', logo: 'https://i.imgur.com/BlFNlHz.png', streams: ['https://bozztv.com/teleyupp1/teleup-iSykLSKMFr/tracks-v1a1/mono.m3u8'] },
+  { id: 2310, name: 'CTV Toronto',            category: 'Canada', logo: 'https://i.imgur.com/qOutOWN.png', streams: ['https://bozztv.com/teleyupp1/teleup-zxsJFt6VvY/playlist.m3u8'] },
+  { id: 2311, name: 'Global Toronto',         category: 'Canada', logo: 'https://i.imgur.com/2CxLO4H.png', streams: ['https://d128o1k7zh3htz.cloudfront.net/out/v1/74a58360a3734f97b74ba439bc678044/index.m3u8'] },
+  { id: 2312, name: 'Global Calgary',         category: 'Canada', logo: 'https://i.imgur.com/2CxLO4H.png', streams: ['https://dfmjr9irb1dl5.cloudfront.net/out/v1/454010ff309e4963a087f5802856e346/index.m3u8'] },
+  { id: 2313, name: 'Global Edmonton',        category: 'Canada', logo: 'https://i.imgur.com/2CxLO4H.png', streams: ['https://da7sdtkzly6qj.cloudfront.net/out/v1/b317f6c10f2e493993bd2b5314df1c7c/index_1.m3u8'] },
+  { id: 2314, name: 'TVO',                    category: 'Canada', logo: 'https://i.imgur.com/PkBPPcL.png', streams: ['https://bozztv.com/teleyupp1/teleup-OMZsmYVUMp/playlist.m3u8'] },
+  { id: 2315, name: 'CBC News',               category: 'Canada', logo: 'https://i.imgur.com/1EqQGKS.png', streams: ['https://cbcnewshd-f.akamaihd.net/i/cbcnews_1@8981/index_2500_av-p.m3u8'] },
+  { id: 2316, name: 'CTV News',               category: 'Canada', logo: 'https://i.imgur.com/T3oBeiX.png', streams: ['https://pe-fa-lp02a.9c9media.com/live/News1Digi/p/hls/00000201/38ef78f479b07aa0/index/0c6a10a2/live/stream/h264/v1/3500000/manifest.m3u8'] },
+  { id: 2317, name: 'Global News',            category: 'Canada', logo: 'https://i.imgur.com/IpfmG93.png', streams: ['https://i.mjh.nz/PlutoTV/62cbef9ebb857100072fc187-alt.m3u8'] },
+  { id: 2318, name: 'CPAC EN',                category: 'Canada', logo: 'https://i.imgur.com/AbdFD0S.png', streams: ['https://d7z3qjdsxbwoq.cloudfront.net/groupa/live/f9809cea-1e07-47cd-a94d-2ddd3e1351db/live.isml/.m3u8'] },
+  { id: 2319, name: 'ICI RDI',                category: 'Canada', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/ICI_RDI_logo.svg/640px-ICI_RDI_logo.svg.png', streams: ['https://rcavlive.akamaized.net/hls/live/704025/xcanrdi/master.m3u8'] },
+  { id: 2320, name: 'ICI Tele HD',            category: 'Canada', logo: 'https://i.imgur.com/HsSi3NV.png', streams: ['https://rcavlive.akamaized.net/hls/live/696615/xcancbft/master.m3u8'] },
+  { id: 2321, name: 'TVA',                    category: 'Canada', logo: 'https://i.imgur.com/1GR8Szn.png', streams: ['https://tvalive.akamaized.net/hls/live/2012413/tva01/master.m3u8'] },
+  { id: 2322, name: 'Tele Quebec',            category: 'Canada', logo: 'https://i.imgur.com/8grBWK9.png', streams: ['https://bcovlive-a.akamaihd.net/575d86160eb143458d51f7ab187a4e68/us-east-1/6101674910001/playlist.m3u8'] },
+  { id: 2323, name: 'Savoir Media',           category: 'Canada', logo: 'https://i.imgur.com/pa4wOVY.png', streams: ['https://hls.savoir.media/live/stream.m3u8'] },
+  { id: 2324, name: 'ICI Montreal',           category: 'Canada', logo: 'https://i.imgur.com/Z1b2TJD.png', streams: ['https://amdici.akamaized.net/hls/live/873426/ICI-Live-Stream/master.m3u8'] },
+  { id: 2325, name: 'Toronto 360 TV',         category: 'Canada', logo: 'https://i.imgur.com/PkWndsv.png', streams: ['http://cdn3.toronto360.tv:8081/toronto360/hd/playlist.m3u8'] },
+];
 
   useEffect(() => {
     if (!activeChannel) return;
