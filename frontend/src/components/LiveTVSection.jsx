@@ -383,22 +383,7 @@ const LiveTVSection = ({ onSelectContent }) => {
     (activeCategory === 'All' || c.category === activeCategory) &&
     c.name.toLowerCase().includes(search.toLowerCase())
   );
-  const categories = ['All', ...Array.from(new Set(langChannels.map(c => c.category))).sort()
-  { id: 2308, name: 'beIN Sports 1 HD',       category: 'Sports', logo: 'https://i.imgur.com/BXnUONl.png', streams: ['http://iptv.deluxeplay.live:80/live/kgmwuozc/k91M8rvhY6/9740.m3u8'] },
-  { id: 2309, name: 'beIN Sports 2 HD',       category: 'Sports', logo: 'https://i.imgur.com/BXnUONl.png', streams: ['http://iptv.deluxeplay.live:80/live/kgmwuozc/k91M8rvhY6/9741.m3u8'] },
-  { id: 2310, name: 'beIN Sports 3 HD',       category: 'Sports', logo: 'https://i.imgur.com/BXnUONl.png', streams: ['http://iptv.deluxeplay.live:80/live/kgmwuozc/k91M8rvhY6/9742.m3u8'] },
-  { id: 2311, name: 'beIN Sports 4 HD',       category: 'Sports', logo: 'https://i.imgur.com/BXnUONl.png', streams: ['http://iptv.deluxeplay.live:80/live/kgmwuozc/k91M8rvhY6/9743.m3u8'] },
-  { id: 2312, name: 'beIN Sports 5 HD',       category: 'Sports', logo: 'https://i.imgur.com/BXnUONl.png', streams: ['http://iptv.deluxeplay.live:80/live/kgmwuozc/k91M8rvhY6/9744.m3u8'] },
-  { id: 2313, name: 'beIN Sports Global HD',  category: 'Sports', logo: 'https://i.imgur.com/BXnUONl.png', streams: ['http://absher-tv.com:8080/live/Ghulam/1111/67541.m3u8'] },
-  { id: 2314, name: 'beIN Sports News HD',    category: 'Sports', logo: 'https://i.imgur.com/BXnUONl.png', streams: ['http://absher-tv.com:8080/live/Ghulam/1111/67540.m3u8'] },
-  { id: 2315, name: 'beIN Sports HD',         category: 'Sports', logo: 'https://i.imgur.com/BXnUONl.png', streams: ['http://absher-tv.com:8080/live/Ghulam/1111/67466.m3u8'] },
-  { id: 2316, name: 'beIN La Liga FHD',       category: 'Sports', logo: 'https://i.imgur.com/BXnUONl.png', streams: ['http://ingrid.ltd:25461/live/frank1/frank/40024.m3u8'] },
-  { id: 2317, name: 'beIN Sport FHD',         category: 'Sports', logo: 'https://i.imgur.com/BXnUONl.png', streams: ['http://ingrid.ltd:25461/live/frank1/frank/40023.m3u8'] },
-  { id: 2318, name: 'beIN Sport HD VIP',      category: 'Sports', logo: 'https://i.imgur.com/BXnUONl.png', streams: ['http://ingrid.ltd:25461/live/frank1/frank/40022.m3u8'] },
-  { id: 2319, name: 'beIN Sport 1 US HD',     category: 'Sports', logo: 'https://i.imgur.com/BXnUONl.png', streams: ['http://iptv-line.com:7899/live/thomasdj19821/vODCWh1y/49291.m3u8'] },
-  { id: 2320, name: 'beIN Sport 2 US HD',     category: 'Sports', logo: 'https://i.imgur.com/BXnUONl.png', streams: ['http://iptv-line.com:7899/live/thomasdj19821/vODCWh1y/49292.m3u8'] },
-  { id: 2321, name: 'beIN Sport 4 US HD',     category: 'Sports', logo: 'https://i.imgur.com/BXnUONl.png', streams: ['http://iptv-line.com:7899/live/thomasdj19821/vODCWh1y/49293.m3u8'] },
-];
+  const categories = ['All', ...Array.from(new Set(langChannels.map(c => c.category))).sort()];
 
   useEffect(() => {
     if (!activeChannel) return;
@@ -498,3 +483,19 @@ const LiveTVSection = ({ onSelectContent }) => {
 };
 
 export default LiveTVSection;
+  { id: 2308, name: 'beIN Sports 1 HD',       category: 'Sports', logo: 'https://i.imgur.com/BXnUONl.png', streams: ['http://iptv.deluxeplay.live:80/live/kgmwuozc/k91M8rvhY6/9740.m3u8'] },
+  { id: 2309, name: 'beIN Sports 2 HD',       category: 'Sports', logo: 'https://i.imgur.com/BXnUONl.png', streams: ['http://iptv.deluxeplay.live:80/live/kgmwuozc/k91M8rvhY6/9741.m3u8'] },
+  { id: 2310, name: 'beIN Sports 3 HD',       category: 'Sports', logo: 'https://i.imgur.com/BXnUONl.png', streams: ['http://iptv.deluxeplay.live:80/live/kgmwuozc/k91M8rvhY6/9742.m3u8'] },
+  { id: 2311, name: 'beIN Sports 4 HD',       category: 'Sports', logo: 'https://i.imgur.com/BXnUONl.png', streams: ['http://iptv.deluxeplay.live:80/live/kgmwuozc/k91M8rvhY6/9743.m3u8'] },
+  { id: 2312, name: 'beIN Sports 5 HD',       category: 'Sports', logo: 'https://i.imgur.com/BXnUONl.png', streams: ['http://iptv.deluxeplay.live:80/live/kgmwuozc/k91M8rvhY6/9744.m3u8'] },
+  { id: 2313, name: 'beIN Sports Global HD',  category: 'Sports', logo: 'https://i.imgur.com/BXnUONl.png', streams: ['http://absher-tv.com:8080/live/Ghulam/1111/67541.m3u8'] },
+  { id: 2314, name: 'beIN Sports News HD',    category: 'Sports', logo: 'https://i.imgur.com/BXnUONl.png', streams: ['http://absher-tv.com:8080/live/Ghulam/1111/67540.m3u8'] },
+  { id: 2315, name: 'beIN Sports HD',         category: 'Sports', logo: 'https://i.imgur.com/BXnUONl.png', streams: ['http://absher-tv.com:8080/live/Ghulam/1111/67466.m3u8'] },
+  { id: 2316, name: 'beIN La Liga FHD',       category: 'Sports', logo: 'https://i.imgur.com/BXnUONl.png', streams: ['http://ingrid.ltd:25461/live/frank1/frank/40024.m3u8'] },
+  { id: 2317, name: 'beIN Sport FHD',         category: 'Sports', logo: 'https://i.imgur.com/BXnUONl.png', streams: ['http://ingrid.ltd:25461/live/frank1/frank/40023.m3u8'] },
+  { id: 2318, name: 'beIN Sport HD VIP',      category: 'Sports', logo: 'https://i.imgur.com/BXnUONl.png', streams: ['http://ingrid.ltd:25461/live/frank1/frank/40022.m3u8'] },
+  { id: 2319, name: 'beIN Sport 1 US HD',     category: 'Sports', logo: 'https://i.imgur.com/BXnUONl.png', streams: ['http://iptv-line.com:7899/live/thomasdj19821/vODCWh1y/49291.m3u8'] },
+  { id: 2320, name: 'beIN Sport 2 US HD',     category: 'Sports', logo: 'https://i.imgur.com/BXnUONl.png', streams: ['http://iptv-line.com:7899/live/thomasdj19821/vODCWh1y/49292.m3u8'] },
+  { id: 2321, name: 'beIN Sport 4 US HD',     category: 'Sports', logo: 'https://i.imgur.com/BXnUONl.png', streams: ['http://iptv-line.com:7899/live/thomasdj19821/vODCWh1y/49293.m3u8'] },
+
+
