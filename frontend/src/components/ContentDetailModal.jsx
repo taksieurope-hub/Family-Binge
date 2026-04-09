@@ -45,11 +45,7 @@ export const removeFromWatchHistory = (id, type) => {
 };
 
 const VIDEO_SOURCES = [
-  { name: 'Server 1', getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}` : `https://vidsrc.cc/v2/embed/movie/${id}` },
-  { name: 'Server 2', getUrl: (type, id, s, e) => type === 'series' ? `https://player.videasy.net/tv/${id}/${s}/${e}` : `https://player.videasy.net/movie/${id}` },
-  { name: 'Server 3', getUrl: (type, id, s, e) => type === 'series' ? `https://flicky.host/embed/tv/${id}/${s}/${e}` : `https://flicky.host/embed/movie/${id}` },
-  { name: 'Server 4', getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrcme.su/embed/tv/${id}/${s}/${e}` : `https://vidsrcme.su/embed/movie/${id}` },
-  { name: 'Server 5', getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrc-embed.su/embed/tv/${id}/${s}/${e}` : `https://vidsrc-embed.su/embed/movie/${id}` },
+  { name: 'VidSrc', getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}` : `https://vidsrc.cc/v2/embed/movie/${id}` },
 ];
 
 
@@ -275,7 +271,10 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
 
             <button
               onClick={handleNextSource}
-                        {details?.type === 'series' && (
+              className="flex items-center gap-1 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors text-white text-xs font-medium"
+              
+
+            {details?.type === 'series' && (
               <button
                 onClick={() => {
                   const nextEp = selectedEpisode + 1;
