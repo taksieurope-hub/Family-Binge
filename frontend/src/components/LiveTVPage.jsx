@@ -24,7 +24,7 @@ setInterval(() => {
 const hlsReady = new Promise((resolve) => {
   if (window.Hls) { resolve(); return; }
   const script = document.createElement('script');
-  script.src = 'https://cdn.jsdelivr.net/npm/hls.js@1.5.7/dist/hls.min.js';
+  script.src = 'https://unpkg.com/hls.js@1.5.7/dist/hls.min.js';
   script.onload = resolve;
   document.head.appendChild(script);
 });
