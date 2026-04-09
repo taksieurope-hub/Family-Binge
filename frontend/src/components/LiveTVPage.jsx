@@ -7,7 +7,18 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 
 const PROXY = 'https://family-binge-backend.onrender.com/api/proxy?url=';
+const BACKEND = 'https://family-binge-backend.onrender.com';
 const proxyUrl = (url) => url ? PROXY + encodeURIComponent(url) : url;
+
+// Pre-warm the backend immediately when this module loads
+// Render free tier sleeps after inactivity — this ping wakes it up
+// so it's ready by the time the user clicks a channel
+fetch(`${BACKEND}/api/health`).catch(() => {});
+
+// Keep the backend awake with a ping every 10 minutes
+setInterval(() => {
+  fetch(`${BACKEND}/api/health`).catch(() => {});
+}, 10 * 60 * 1000);
 
 // Load HLS.js once at module level so it's ready before any click
 const hlsReady = new Promise((resolve) => {
