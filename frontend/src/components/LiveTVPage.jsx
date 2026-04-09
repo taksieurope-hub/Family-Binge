@@ -115,7 +115,7 @@ const LiveTVPage = () => {
     if (hlsRef.current) { hlsRef.current.destroy(); hlsRef.current = null; }
 
     if (window.Hls && window.Hls.isSupported()) {
-      const hls = new window.Hls({ enableWorker: true, lowLatencyMode: true, capLevelToPlayerSize: false, autoLevelEnabled: false, startLevel: 0 });
+      const hls = new window.Hls({ enableWorker: true, lowLatencyMode: true, capLevelToPlayerSize: false, autoLevelEnabled: false, startLevel: 0, subtitleDisplay: false, renderTextTracksNatively: false, subtitlePreference: {} });
       hlsRef.current = hls;
       hls.loadSource(url);
       hls.attachMedia(videoRef.current);
