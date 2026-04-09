@@ -428,25 +428,6 @@ export const channels = [
   { id: 2305, name: 'Formula', category: 'Georgian', logo: 'https://i.imgur.com/fsqBn8G.png', streams: ['https://c4635.cdn.xsg.ge/c4635/TVFormula/index.m3u8'], lang: 'georgian' },
   { id: 2306, name: 'Pos TV', category: 'Georgian', logo: 'https://i.imgur.com/UOiXFEW.png', streams: ['https://live.postv.media/stream/index.m3u8'], lang: 'georgian' },
   { id: 2307, name: 'Euronews Georgia', category: 'Georgian', logo: 'https://i.imgur.com/VNJ4soR.png', streams: ['https://live2.tvg.ge/eng/EURONEWSGEORGIA/playlist.m3u8'], lang: 'georgian' },
-];
-const LiveTVSection = ({ onSelectContent }) => {
-  const [search, setSearch] = useState('');
-  const [activeCategory, setActiveCategory] = useState('All');
-  const [liveLang, setLiveLang] = useState('english');
-  const [activeChannel, setActiveChannel] = useState(null);
-  const [streamIndex, setStreamIndex] = useState(0);
-  const videoRef = useRef(null);
-  const hlsRef = useRef(null);
-
-
-  const langChannels = liveLang === 'georgian'
-    ? channels.filter(c => c.lang === 'georgian')
-    : channels.filter(c => c.lang !== 'georgian');
-  const filtered = langChannels.filter(c =>
-    (activeCategory === 'All' || c.category === activeCategory) &&
-    c.name.toLowerCase().includes(search.toLowerCase())
-  );
-  const categories = ['All', ...Array.from(new Set(langChannels.map(c => c.category))).sort()
   { id: 2308, name: 'CBC Toronto',            category: 'Canada', logo: 'https://i.imgur.com/H5yEbxf.png', streams: ['https://bozztv.com/teleyupp1/teleup-ydcl2V1MVC/playlist.m3u8'] },
   { id: 2309, name: 'Citytv',                 category: 'Canada', logo: 'https://i.imgur.com/BlFNlHz.png', streams: ['https://bozztv.com/teleyupp1/teleup-iSykLSKMFr/tracks-v1a1/mono.m3u8'] },
   { id: 2310, name: 'CTV Toronto',            category: 'Canada', logo: 'https://i.imgur.com/qOutOWN.png', streams: ['https://bozztv.com/teleyupp1/teleup-zxsJFt6VvY/playlist.m3u8'] },
@@ -520,6 +501,25 @@ const LiveTVSection = ({ onSelectContent }) => {
   { id: 2359, name: 'FilmRise Movies',        category: 'Movies',    logo: null, streams: ['http://dai2.xumo.com/xumocdn/p=roku/amagi_hls_data_xumo1212A-filmrisefreemovies/CDN/playlist.m3u8'] },
   { id: 2360, name: 'DR1',                    category: 'Denmark',   logo: null, streams: ['https://drlive01texthls.akamaized.net/hls/live/2014186/drlive01text/master.m3u8'] },
   { id: 2361, name: 'DR2',                    category: 'Denmark',   logo: null, streams: ['https://drlive02texthls.akamaized.net/hls/live/2014188/drlive02text/master.m3u8'] },
+];
+const LiveTVSection = ({ onSelectContent }) => {
+  const [search, setSearch] = useState('');
+  const [activeCategory, setActiveCategory] = useState('All');
+  const [liveLang, setLiveLang] = useState('english');
+  const [activeChannel, setActiveChannel] = useState(null);
+  const [streamIndex, setStreamIndex] = useState(0);
+  const videoRef = useRef(null);
+  const hlsRef = useRef(null);
+
+
+  const langChannels = liveLang === 'georgian'
+    ? channels.filter(c => c.lang === 'georgian')
+    : channels.filter(c => c.lang !== 'georgian');
+  const filtered = langChannels.filter(c =>
+    (activeCategory === 'All' || c.category === activeCategory) &&
+    c.name.toLowerCase().includes(search.toLowerCase())
+  );
+  const categories = ['All', ...Array.from(new Set(langChannels.map(c => c.category))).sort()
 ];
 
   useEffect(() => {
