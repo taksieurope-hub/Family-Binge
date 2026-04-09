@@ -23,7 +23,7 @@ const IPTV_PLAYLISTS = [
   { url: 'https://tvpass.org/playlist/m3u', category: 'USA' },
 ];
 
-function parseM3U(text, category) {
+function parseM3U(text, defaultCategory) {
   const lines = text.split('\n');
   const channels = [];
   let current = null;
@@ -32,6 +32,14 @@ function parseM3U(text, category) {
     if (line.startsWith('#EXTINF')) {
       const nameMatch = line.match(/,(.+)$/);
       const logoMatch = line.match(/tvg-logo="([^"]+)"/);
+      const groupMatch = line.match(/group-title="([^"]+)"/);
+      const countryMatch = line.match(/tvg-country="([^"]+)"/);
+      let category = defaultCategory;
+      if (groupMatch && groupMatch[1] && groupMatch[1].trim() !== '') {
+        category = groupMatch[1].trim();
+      } else if (countryMatch && countryMatch[1]) {
+        category = countryMatch[1].trim();
+      }
       current = {
         name: nameMatch ? nameMatch[1].trim() : 'Unknown',
         logo: logoMatch ? logoMatch[1] : null,
