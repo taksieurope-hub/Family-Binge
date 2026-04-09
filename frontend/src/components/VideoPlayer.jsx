@@ -22,7 +22,7 @@ const VideoPlayer = ({ videoId, onClose, season, episode, isTV }) => {
         setStatus('ready');
         return i;
       });
-    }, 12000);
+    }, 20000);
     return () => clearTimeout(errorTimer.current);
   }, [serverIndex, videoId]);
 
@@ -61,8 +61,8 @@ const VideoPlayer = ({ videoId, onClose, season, episode, isTV }) => {
         )}
         <div className="aspect-video rounded-xl overflow-hidden shadow-2xl relative">
           <iframe ref={iframeRef} key={src} src={src} title="Video Player" className="w-full h-full"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-            sandbox="allow-scripts allow-same-origin allow-forms allow-presentation allow-pointer-lock"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen *"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-presentation allow-pointer-lock allow-popups"
             allowFullScreen onLoad={handleLoad} />
           {status === 'loading' && (
             <div className="absolute inset-0 bg-black flex flex-col items-center justify-center gap-3 pointer-events-none">
