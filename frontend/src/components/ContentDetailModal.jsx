@@ -276,11 +276,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
             <button
               onClick={handleNextSource}
               className="flex items-center gap-1 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors text-white text-xs font-medium"
-              title="Try next server"
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Next Server</span>
-            </button>
+              
 
             {details?.type === 'series' && (
               <button
