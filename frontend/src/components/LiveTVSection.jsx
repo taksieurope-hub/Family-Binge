@@ -5,62 +5,6 @@ import { Tv, Radio, Globe, Search } from 'lucide-react';
 const PROXY = 'https://family-binge-backend.onrender.com/api/proxy?url=';
 const proxyUrl = (url) => url ? PROXY + encodeURIComponent(url) : url;
 
-const IPTV_PLAYLISTS = [
-  { url: 'https://iptv-org.github.io/iptv/countries/us.m3u', category: 'USA' },
-  { url: 'https://www.apsattv.com/rok.m3u', category: 'General' },
-  { url: 'https://www.apsattv.com/xumo.m3u', category: 'Movies' },
-  { url: 'https://www.apsattv.com/lg.m3u', category: 'General' },
-  { url: 'https://www.apsattv.com/vizio.m3u', category: 'General' },
-  { url: 'https://www.apsattv.com/firetv.m3u', category: 'General' },
-  { url: 'https://www.apsattv.com/distro.m3u', category: 'General' },
-  { url: 'https://www.apsattv.com/cineverse.m3u', category: 'Movies' },
-];
-
-function parseM3U(text, defaultCategory) {
-  const lines = text.split('\n');
-  const channels = [];
-  let current = null;
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim();
-    if (line.startsWith('#EXTINF')) {
-      const nameMatch = line.match(/,(.+)$/);
-      const logoMatch = line.match(/tvg-logo="([^"]+)"/);
-      const groupMatch = line.match(/group-title="([^"]+)"/);
-      const countryMatch = line.match(/tvg-country="([^"]+)"/);
-      let category = defaultCategory;
-      if (groupMatch && groupMatch[1] && groupMatch[1].trim() !== '') {
-        category = groupMatch[1].trim();
-      } else if (countryMatch && countryMatch[1]) {
-        category = countryMatch[1].trim();
-      }
-      current = {
-        name: nameMatch ? nameMatch[1].trim() : 'Unknown',
-        logo: logoMatch ? logoMatch[1] : null,
-        category,
-      };
-    } else if (line && !line.startsWith('#') && current) {
-      channels.push({ ...current, streams: [line] });
-      current = null;
-    }
-  }
-  return channels;
-}
-
-export async function fetchIPTVChannels() {
-  const results = [];
-  for (const playlist of IPTV_PLAYLISTS) {
-    try {
-      const res = await fetch(PROXY + encodeURIComponent(playlist.url));
-      const text = await res.text();
-      const parsed = parseM3U(text, playlist.category);
-      results.push(...parsed);
-    } catch (e) {
-      console.warn('Failed to load playlist:', playlist.url);
-    }
-  }
-  return results;
-}
-
 export const channels = [
   { id: 1,  name: 'Al Jazeera English',   category: 'News',          logo: null,                                                                                streams: ['https://live-hls-aje-ak.getaj.net/AJE/01.m3u8'] },
   { id: 2,  name: 'TRT World',            category: 'News',          logo: null,                                                                                streams: ['https://tv-trtworld.medya.trt.com.tr/master_1080.m3u8'] },
@@ -421,79 +365,6 @@ export const channels = [
   { id: 2305, name: 'Formula', category: 'Georgian', logo: 'https://i.imgur.com/fsqBn8G.png', streams: ['https://c4635.cdn.xsg.ge/c4635/TVFormula/index.m3u8'], lang: 'georgian' },
   { id: 2306, name: 'Pos TV', category: 'Georgian', logo: 'https://i.imgur.com/UOiXFEW.png', streams: ['https://live.postv.media/stream/index.m3u8'], lang: 'georgian' },
   { id: 2307, name: 'Euronews Georgia', category: 'Georgian', logo: 'https://i.imgur.com/VNJ4soR.png', streams: ['https://live2.tvg.ge/eng/EURONEWSGEORGIA/playlist.m3u8'], lang: 'georgian' },
-  { id: 2308, name: 'CBC Toronto',            category: 'Canada', logo: 'https://i.imgur.com/H5yEbxf.png', streams: ['https://bozztv.com/teleyupp1/teleup-ydcl2V1MVC/playlist.m3u8'] },
-  { id: 2309, name: 'Citytv',                 category: 'Canada', logo: 'https://i.imgur.com/BlFNlHz.png', streams: ['https://bozztv.com/teleyupp1/teleup-iSykLSKMFr/tracks-v1a1/mono.m3u8'] },
-  { id: 2310, name: 'CTV Toronto',            category: 'Canada', logo: 'https://i.imgur.com/qOutOWN.png', streams: ['https://bozztv.com/teleyupp1/teleup-zxsJFt6VvY/playlist.m3u8'] },
-  { id: 2311, name: 'Global Toronto',         category: 'Canada', logo: 'https://i.imgur.com/2CxLO4H.png', streams: ['https://d128o1k7zh3htz.cloudfront.net/out/v1/74a58360a3734f97b74ba439bc678044/index.m3u8'] },
-  { id: 2312, name: 'Global Calgary',         category: 'Canada', logo: 'https://i.imgur.com/2CxLO4H.png', streams: ['https://dfmjr9irb1dl5.cloudfront.net/out/v1/454010ff309e4963a087f5802856e346/index.m3u8'] },
-  { id: 2313, name: 'Global Edmonton',        category: 'Canada', logo: 'https://i.imgur.com/2CxLO4H.png', streams: ['https://da7sdtkzly6qj.cloudfront.net/out/v1/b317f6c10f2e493993bd2b5314df1c7c/index_1.m3u8'] },
-  { id: 2314, name: 'TVO',                    category: 'Canada', logo: 'https://i.imgur.com/PkBPPcL.png', streams: ['https://bozztv.com/teleyupp1/teleup-OMZsmYVUMp/playlist.m3u8'] },
-  { id: 2315, name: 'CBC News',               category: 'Canada', logo: 'https://i.imgur.com/1EqQGKS.png', streams: ['https://cbcnewshd-f.akamaihd.net/i/cbcnews_1@8981/index_2500_av-p.m3u8'] },
-  { id: 2316, name: 'CTV News',               category: 'Canada', logo: 'https://i.imgur.com/T3oBeiX.png', streams: ['https://pe-fa-lp02a.9c9media.com/live/News1Digi/p/hls/00000201/38ef78f479b07aa0/index/0c6a10a2/live/stream/h264/v1/3500000/manifest.m3u8'] },
-  { id: 2317, name: 'Global News',            category: 'Canada', logo: 'https://i.imgur.com/IpfmG93.png', streams: ['https://i.mjh.nz/PlutoTV/62cbef9ebb857100072fc187-alt.m3u8'] },
-  { id: 2318, name: 'CPAC EN',                category: 'Canada', logo: 'https://i.imgur.com/AbdFD0S.png', streams: ['https://d7z3qjdsxbwoq.cloudfront.net/groupa/live/f9809cea-1e07-47cd-a94d-2ddd3e1351db/live.isml/.m3u8'] },
-  { id: 2319, name: 'ICI RDI',                category: 'Canada', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/ICI_RDI_logo.svg/640px-ICI_RDI_logo.svg.png', streams: ['https://rcavlive.akamaized.net/hls/live/704025/xcanrdi/master.m3u8'] },
-  { id: 2320, name: 'ICI Tele HD',            category: 'Canada', logo: 'https://i.imgur.com/HsSi3NV.png', streams: ['https://rcavlive.akamaized.net/hls/live/696615/xcancbft/master.m3u8'] },
-  { id: 2321, name: 'TVA',                    category: 'Canada', logo: 'https://i.imgur.com/1GR8Szn.png', streams: ['https://tvalive.akamaized.net/hls/live/2012413/tva01/master.m3u8'] },
-  { id: 2322, name: 'Tele Quebec',            category: 'Canada', logo: 'https://i.imgur.com/8grBWK9.png', streams: ['https://bcovlive-a.akamaihd.net/575d86160eb143458d51f7ab187a4e68/us-east-1/6101674910001/playlist.m3u8'] },
-  { id: 2323, name: 'Savoir Media',           category: 'Canada', logo: 'https://i.imgur.com/pa4wOVY.png', streams: ['https://hls.savoir.media/live/stream.m3u8'] },
-  { id: 2324, name: 'ICI Montreal',           category: 'Canada', logo: 'https://i.imgur.com/Z1b2TJD.png', streams: ['https://amdici.akamaized.net/hls/live/873426/ICI-Live-Stream/master.m3u8'] },
-  { id: 2325, name: 'Toronto 360 TV',         category: 'Canada', logo: 'https://i.imgur.com/PkWndsv.png', streams: ['http://cdn3.toronto360.tv:8081/toronto360/hd/playlist.m3u8'] },
-
-  { id: 2308, name: 'CBC Toronto',            category: 'Canada',    logo: 'https://i.imgur.com/H5yEbxf.png', streams: ['https://bozztv.com/teleyupp1/teleup-ydcl2V1MVC/playlist.m3u8'] },
-  { id: 2309, name: 'Citytv',                 category: 'Canada',    logo: 'https://i.imgur.com/BlFNlHz.png', streams: ['https://bozztv.com/teleyupp1/teleup-iSykLSKMFr/tracks-v1a1/mono.m3u8'] },
-  { id: 2310, name: 'CTV Toronto',            category: 'Canada',    logo: 'https://i.imgur.com/qOutOWN.png', streams: ['https://bozztv.com/teleyupp1/teleup-zxsJFt6VvY/playlist.m3u8'] },
-  { id: 2311, name: 'Global Toronto',         category: 'Canada',    logo: 'https://i.imgur.com/2CxLO4H.png', streams: ['https://d128o1k7zh3htz.cloudfront.net/out/v1/74a58360a3734f97b74ba439bc678044/index.m3u8'] },
-  { id: 2312, name: 'Global Calgary',         category: 'Canada',    logo: 'https://i.imgur.com/2CxLO4H.png', streams: ['https://dfmjr9irb1dl5.cloudfront.net/out/v1/454010ff309e4963a087f5802856e346/index.m3u8'] },
-  { id: 2313, name: 'CBC News',               category: 'Canada',    logo: 'https://i.imgur.com/1EqQGKS.png', streams: ['https://cbcnewshd-f.akamaihd.net/i/cbcnews_1@8981/index_2500_av-p.m3u8'] },
-  { id: 2314, name: 'CTV News',               category: 'Canada',    logo: 'https://i.imgur.com/T3oBeiX.png', streams: ['https://pe-fa-lp02a.9c9media.com/live/News1Digi/p/hls/00000201/38ef78f479b07aa0/index/0c6a10a2/live/stream/h264/v1/3500000/manifest.m3u8'] },
-  { id: 2315, name: 'ICI RDI',                category: 'Canada',    logo: null, streams: ['https://rcavlive.akamaized.net/hls/live/704025/xcanrdi/master.m3u8'] },
-  { id: 2316, name: 'TVA',                    category: 'Canada',    logo: 'https://i.imgur.com/1GR8Szn.png', streams: ['https://tvalive.akamaized.net/hls/live/2012413/tva01/master.m3u8'] },
-  { id: 2317, name: 'Savoir Media',           category: 'Canada',    logo: null, streams: ['https://hls.savoir.media/live/stream.m3u8'] },
-  { id: 2318, name: 'ABC Australia',          category: 'Australia', logo: null, streams: ['https://c.mjh.nz/101002210221/'] },
-  { id: 2319, name: 'ABC Me',                 category: 'Australia', logo: 'https://i.imgur.com/gBh54wY.png', streams: ['https://c.mjh.nz/101002210224/'] },
-  { id: 2320, name: 'ABC News Australia',     category: 'Australia', logo: null, streams: ['https://abc-iview-mediapackagestreams-2.akamaized.net/out/v1/6e1cc6d25ec0480ea099a5399d73bc4b/index.m3u8'] },
-  { id: 2321, name: 'TVSN',                   category: 'Australia', logo: 'https://i.imgur.com/p3QCBOo.png', streams: ['https://tvsn-i.akamaihd.net/hls/live/261837/tvsn/tvsn_750.m3u8'] },
-  { id: 2322, name: 'Racing.com',             category: 'Australia', logo: 'https://i.imgur.com/pma0OCf.png', streams: ['https://racingvic-i.akamaized.net/hls/live/598695/racingvic/1500.m3u8'] },
-  { id: 2323, name: '9Go!',                   category: 'Australia', logo: 'https://i.imgur.com/1CFGu5O.png', streams: ['https://9now-livestreams.akamaized.net/hls/live/2008312/go-syd/master.m3u8'] },
-  { id: 2324, name: '9Life',                  category: 'Australia', logo: 'https://i.imgur.com/ZCUiqlL.png', streams: ['https://9now-livestreams.akamaized.net/hls/live/2008313/life-syd/master.m3u8'] },
-  { id: 2325, name: '9Rush',                  category: 'Australia', logo: null, streams: ['https://9now-livestreams.akamaized.net/hls/live/2010626/rush-syd/master.m3u8'] },
-  { id: 2326, name: 'BBC One',                category: 'UK',        logo: null, streams: ['https://vs-hls-pushb-uk-live.akamaized.net/x=4/i=urn:bbc:pips:service:bbc_one_yorks/iptv_hd_abr_v1.m3u8'] },
-  { id: 2327, name: 'BBC Two',                category: 'UK',        logo: null, streams: ['https://vs-hls-push-uk-live.akamaized.net/x=4/i=urn:bbc:pips:service:bbc_two_hd/iptv_hd_abr_v1.m3u8'] },
-  { id: 2328, name: 'BBC Three',              category: 'UK',        logo: null, streams: ['https://vs-hls-pushb-uk-live.akamaized.net/x=4/i=urn:bbc:pips:service:bbc_three_hd/iptv_hd_abr_v1.m3u8'] },
-  { id: 2329, name: 'BBC Four',               category: 'UK',        logo: null, streams: ['https://vs-hls-pushb-uk-live.akamaized.net/x=4/i=urn:bbc:pips:service:bbc_four_hd/iptv_hd_abr_v1.m3u8'] },
-  { id: 2330, name: 'CBBC',                   category: 'UK',        logo: null, streams: ['https://vs-hls-pushb-uk-live.akamaized.net/x=4/i=urn:bbc:pips:service:cbbc_hd/t=3840/v=pv14/b=5070016/main.m3u8'] },
-  { id: 2331, name: 'CBeebies',               category: 'Kids',      logo: null, streams: ['https://vs-hls-pushb-uk-live.akamaized.net/x=4/i=urn:bbc:pips:service:cbeebies_hd/t=3840/v=pv14/b=5070016/main.m3u8'] },
-  { id: 2332, name: 'Sky News',               category: 'UK',        logo: null, streams: ['https://linear021-gb-hls1-prd-ak.cdn.skycdp.com/Content/HLS_001_hd/Live/channel(skynews)/index_mob.m3u8'] },
-  { id: 2333, name: 'GB News',                category: 'UK',        logo: null, streams: ['https://live-gbnews.simplestreamcdn.com/live5/gbnews/bitrate1.isml/manifest.m3u8'] },
-  { id: 2334, name: 'TalkTV',                 category: 'UK',        logo: null, streams: ['https://live-talktv-ssai.simplestreamcdn.com/v1/master/82267e84b9e5053b3fd0ade12cb1a146df74169a/talktv-live/index.m3u8'] },
-  { id: 2335, name: 'S4C',                    category: 'UK',        logo: null, streams: ['https://live-uk.s4c-cdn.co.uk/out/v1/a0134f1fd5a2461b9422b574566d4442/live_uk.m3u8'] },
-  { id: 2336, name: 'QVC UK',                 category: 'Shopping',  logo: null, streams: ['https://qvcuk-live.akamaized.net/hls/live/2097112/qvc/3/3.m3u8'] },
-  { id: 2337, name: 'QVC Beauty UK',          category: 'Shopping',  logo: null, streams: ['https://qvcuk-live.akamaized.net/hls/live/2097112/qby/3/3.m3u8'] },
-  { id: 2338, name: 'Bloomberg TV',           category: 'News',      logo: null, streams: ['https://bloomberg.com/media-manifest/streams/eu.m3u8'] },
-  { id: 2339, name: 'NHK World Japan',        category: 'News',      logo: null, streams: ['https://nhkwlive-ojp.akamaized.net/hls/live/2003459/nhkwlive-ojp-en/index_4M.m3u8'] },
-  { id: 2340, name: 'TRT World',              category: 'News',      logo: null, streams: ['https://api.trtworld.com/livestream/v1/WcM3Oa2LHD9iUjWDSRUI335NkMWVTUV351H56dqC/master.m3u8'] },
-  { id: 2341, name: 'Now 70s',                category: 'Music',     logo: null, streams: ['https://lightning-now70s-samsungnz.amagi.tv/playlist.m3u8'] },
-  { id: 2342, name: 'Now 80s',                category: 'Music',     logo: null, streams: ['https://lightning-now80s-samsunguk.amagi.tv/playlist.m3u8'] },
-  { id: 2343, name: 'NRK1',                   category: 'Norway',    logo: null, streams: ['https://nrk-nrk1.akamaized.net/21/0/hls/nrk_1/playlist.m3u8'] },
-  { id: 2344, name: 'NRK2',                   category: 'Norway',    logo: null, streams: ['https://nrk-nrk2.akamaized.net/22/0/hls/nrk_2/playlist.m3u8'] },
-  { id: 2345, name: 'NRK3',                   category: 'Norway',    logo: null, streams: ['https://nrk-nrk3.akamaized.net/23/0/hls/nrk_3/playlist.m3u8'] },
-  { id: 2346, name: 'NRK Super',              category: 'Kids',      logo: null, streams: ['https://nrk-nrksuper.akamaized.net/23/0/hls/nrk_super/playlist.m3u8'] },
-  { id: 2347, name: 'CNN',                    category: 'News',      logo: 'https://i.imgur.com/vyrc1I1.png', streams: ['https://tve-live-lln.warnermediacdn.com/hls/live/586495/cnngo/cnn_slate/VIDEO_0_3564000.m3u8'] },
-  { id: 2348, name: 'ABC News US',            category: 'News',      logo: null, streams: ['https://content.uplynk.com/channel/3324f2467c414329b3b0cc5cd987b6be.m3u8'] },
-  { id: 2349, name: 'CBS News',               category: 'News',      logo: null, streams: ['https://cbsnews.akamaized.net/hls/live/2020607/cbsnlineup_8/master.m3u8'] },
-  { id: 2350, name: 'NASA TV Public',         category: 'General',   logo: null, streams: ['https://ntv1.akamaized.net/hls/live/2014075/NASA-NTV1-HLS/master_2000.m3u8'] },
-  { id: 2351, name: 'Bloomberg US',           category: 'News',      logo: null, streams: ['https://bloomberg.com/media-manifest/streams/us.m3u8'] },
-  { id: 2352, name: 'Pluto TV Action',        category: 'Movies',    logo: null, streams: ['http://service-stitcher.clusters.pluto.tv/stitch/hls/channel/561d7d484dc7c8770484914a/master.m3u8?terminate=false&deviceType=web&deviceMake=web&deviceModel=web&deviceDNT=0'] },
-  { id: 2353, name: 'Pluto TV Comedy',        category: 'Movies',    logo: null, streams: ['http://service-stitcher.clusters.pluto.tv/stitch/hls/channel/5a4d3a00ad95e4718ae8d8db/master.m3u8?terminate=false&deviceType=web&deviceMake=web&deviceModel=web&deviceDNT=0'] },
-  { id: 2354, name: 'Pluto TV Horror',        category: 'Movies',    logo: null, streams: ['http://service-stitcher.clusters.pluto.tv/stitch/hls/channel/569546031a619b8f07ce6e25/master.m3u8?terminate=false&deviceType=web&deviceMake=web&deviceModel=web&deviceDNT=0'] },
-  { id: 2355, name: 'Pluto TV Drama',         category: 'Movies',    logo: null, streams: ['http://service-stitcher.clusters.pluto.tv/stitch/hls/channel/5b4e92e4694c027be6ecece1/master.m3u8?terminate=false&deviceType=web&deviceMake=web&deviceModel=web&deviceDNT=0'] },
-  { id: 2356, name: 'Pluto TV Documentaries', category: 'Documentary',logo: null, streams: ['http://service-stitcher.clusters.pluto.tv/stitch/hls/channel/5b85a7582921777994caea63/master.m3u8?terminate=false&deviceType=web&deviceMake=web&deviceModel=web&deviceDNT=0'] },
-  { id: 2357, name: 'Pluto TV Westerns',      category: 'Movies',    logo: null, streams: ['http://service-stitcher.clusters.pluto.tv/stitch/hls/channel/5b4e94282d4ec87bdcbb87cd/master.m3u8?terminate=false&deviceType=web&deviceMake=web&deviceModel=web&deviceDNT=0'] },
-  { id: 2358, name: 'Classic Movies',         category: 'Movies',    logo: null, streams: ['http://service-stitcher.clusters.pluto.tv/stitch/hls/channel/561c5b0dada51f8004c4d855/master.m3u8?terminate=false&deviceType=web&deviceMake=web&deviceModel=web&deviceDNT=0'] },
-  { id: 2359, name: 'FilmRise Movies',        category: 'Movies',    logo: null, streams: ['http://dai2.xumo.com/xumocdn/p=roku/amagi_hls_data_xumo1212A-filmrisefreemovies/CDN/playlist.m3u8'] },
-  { id: 2360, name: 'DR1',                    category: 'Denmark',   logo: null, streams: ['https://drlive01texthls.akamaized.net/hls/live/2014186/drlive01text/master.m3u8'] },
-  { id: 2361, name: 'DR2',                    category: 'Denmark',   logo: null, streams: ['https://drlive02texthls.akamaized.net/hls/live/2014188/drlive02text/master.m3u8'] },
 ];
 const LiveTVSection = ({ onSelectContent }) => {
   const [search, setSearch] = useState('');
@@ -512,8 +383,7 @@ const LiveTVSection = ({ onSelectContent }) => {
     (activeCategory === 'All' || c.category === activeCategory) &&
     c.name.toLowerCase().includes(search.toLowerCase())
   );
-  const categories = ['All', ...Array.from(new Set(langChannels.map(c => c.category))).sort()
-];
+  const categories = ['All', ...Array.from(new Set(langChannels.map(c => c.category))).sort()];
 
   useEffect(() => {
     if (!activeChannel) return;
