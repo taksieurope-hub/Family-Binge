@@ -45,10 +45,7 @@ export const removeFromWatchHistory = (id, type) => {
 };
 
 const VIDEO_SOURCES = [
-  { name: 'Server 1', getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}` : `https://vidsrc.cc/v2/embed/movie/${id}` },
-  { name: 'Server 2', getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrcme.su/embed/tv/${id}/${s}/${e}` : `https://vidsrcme.su/embed/movie/${id}` },
-  { name: 'Server 3', getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrc-embed.su/embed/tv/${id}/${s}/${e}` : `https://vidsrc-embed.su/embed/movie/${id}` },
-  { name: 'Server 4', getUrl: (type, id, s, e) => type === 'series' ? `https://vsrc.su/embed/tv/${id}/${s}/${e}` : `https://vsrc.su/embed/movie/${id}` },
+  { name: 'VidSrc', getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}` : `https://vidsrc.cc/v2/embed/movie/${id}` },
 ];
 
 
