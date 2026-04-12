@@ -6,7 +6,7 @@ import { useAuth } from '../services/AuthContext';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 
-const PROXY = 'https://family-binge-backend.onrender.com/api/proxy?url=';
+const PROXY = 'https://family-binge-backend.onrender.com/api/content/livetv/proxy?url=';
 const proxyUrl = (url) => url ? PROXY + encodeURIComponent(url) : url;
 
 const LiveTVPage = () => {
