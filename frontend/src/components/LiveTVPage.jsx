@@ -9,30 +9,11 @@ import { db } from '../services/firebase';
 const PROXY = 'https://family-binge-backend.onrender.com/api/proxy?url=';
 const proxyUrl = (url) => url ? PROXY + encodeURIComponent(url) : url;
 
-// Pre-warm the backend immediately when this module loads
-// Render free tier sleeps after inactivity — this ping wakes it up
-// so it's ready by the time the user clicks a channel
-fetch(`${BACKEND}/api/health`).catch(() => {});
-
-// Keep the backend awake with a ping every 10 minutes
-setInterval(() => {
-  fetch(`${BACKEND}/api/health`).catch(() => {});
-}, 10 * 60 * 1000);
-
-// Load HLS.js once at module level so it's ready before any click
-const hlsReady = new Promise((resolve) => {
-  if (window.Hls) { resolve(); return; }
-  const script = document.createElement('script');
-  script.src = 'https://unpkg.com/hls.js@1.5.7/dist/hls.min.js';
-  script.onload = resolve;
-  document.head.appendChild(script);
-});
-
 const LiveTVPage = () => {
   const navigate = useNavigate();
   const videoRef = useRef(null);
   const hlsRef = useRef(null);
-  const pendingChannel = useRef(null);
+  const hlsReadyRef = useRef(false);
   const [activeChannel, setActiveChannel] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -44,6 +25,15 @@ const LiveTVPage = () => {
   const { user } = useAuth();
   const [accessBlocked, setAccessBlocked] = useState(false);
   const [deletedIds, setDeletedIds] = useState([]);
+
+  // Load HLS.js once inside the component, stored in a ref
+  useEffect(() => {
+    if (window.Hls) { hlsReadyRef.current = true; return; }
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/hls.js@1.5.7/dist/hls.min.js';
+    script.onload = () => { hlsReadyRef.current = true; };
+    document.head.appendChild(script);
+  }, []);
 
   useEffect(() => {
     if (!user) { navigate('/login'); return; }
@@ -101,26 +91,35 @@ const LiveTVPage = () => {
     if (user) setDoc(doc(db, 'hidden_channels', user.uid), { ids: [] });
   };
 
-  const loadStream = async (channel, idx = 0) => {
+  const loadStream = (channel, idx = 0) => {
     setLoading(true);
     setError(false);
     const rawUrl = channel.streams[idx];
     if (!rawUrl) { setError(true); setLoading(false); return; }
     const url = proxyUrl(rawUrl);
 
-    // Wait for HLS.js to be ready before doing anything
-    await hlsReady;
+    // If HLS.js not ready yet, wait and retry
+    if (!hlsReadyRef.current || !window.Hls) {
+      setTimeout(() => loadStream(channel, idx), 300);
+      return;
+    }
 
     if (hlsRef.current) { hlsRef.current.destroy(); hlsRef.current = null; }
 
-    if (window.Hls && window.Hls.isSupported()) {
-      const hls = new window.Hls({ enableWorker: true, lowLatencyMode: false, capLevelToPlayerSize: false, autoLevelEnabled: false, startLevel: 0, subtitleDisplay: false, renderTextTracksNatively: false, subtitleStreamController: window.Hls.DefaultConfig.subtitleStreamController, enableWebVTT: false, enableIMSC1: false, enableCEA708Captions: false });
+    if (window.Hls.isSupported()) {
+      const hls = new window.Hls({
+        enableWorker: true,
+        lowLatencyMode: false,
+        enableCEA708Captions: false,
+        enableWebVTT: false,
+        enableIMSC1: false,
+      });
       hlsRef.current = hls;
       hls.loadSource(url);
       hls.attachMedia(videoRef.current);
       hls.on(window.Hls.Events.MANIFEST_PARSED, () => {
         setLoading(false);
-        const v = videoRef.current; if (v) { v.muted = true; v.play().then(() => { v.muted = false; }).catch(() => {}); }
+        videoRef.current?.play().catch(() => {});
       });
       hls.on(window.Hls.Events.ERROR, (_, data) => {
         if (data.fatal) {
@@ -268,7 +267,7 @@ const LiveTVPage = () => {
             </div>
           )}
           {activeChannel && (
-            <video ref={videoRef} style={{ width: '100%', height: '100%', objectFit: 'contain' }} controls playsInline autoPlay muted />
+            <video ref={videoRef} style={{ width: '100%', height: '100%', objectFit: 'contain' }} controls playsInline autoPlay />
           )}
           {loading && (
             <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.85)', gap: 12 }}>
