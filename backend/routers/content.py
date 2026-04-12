@@ -1,4 +1,4 @@
-﻿from fastapi import APIRouter, Query, HTTPException
+from fastapi import APIRouter, Query, HTTPException
 from fastapi.responses import StreamingResponse
 from typing import Optional, List
 from pydantic import BaseModel
@@ -282,7 +282,7 @@ async def proxy_hls_stream(url: str = Query(..., description="HLS stream URL to 
                     }
                 )
             else:
-                # Binary segment (TS, AAC, etc.) â€” stream it directly
+                # Binary segment (TS, AAC, etc.) — stream it directly
                 return StreamingResponse(
                     iter([response.content]),
                     media_type=content_type,
