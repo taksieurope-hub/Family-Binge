@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Tv, Menu, X, Search } from 'lucide-react';
+import { ArrowLeft, Tv, Menu, X, Search, Star, Clock } from 'lucide-react';
 import { channels } from './LiveTVSection';
 import { useAuth } from '../services/AuthContext';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
@@ -23,6 +23,7 @@ const LiveTVPage = () => {
   const { user } = useAuth();
   const [accessBlocked, setAccessBlocked] = useState(false);
   const [deletedIds, setDeletedIds] = useState([]);
+  const [recentIds, setRecentIds] = useState([]);
   useEffect(() => {
     if (window.Hls) { hlsReadyRef.current = true; return; }
     const script = document.createElement('script');
@@ -60,10 +61,23 @@ const LiveTVPage = () => {
         const snap = await getDoc(doc(db, 'hidden_channels', user.uid));
         if (snap.exists()) setDeletedIds(snap.data().ids || []);
       } catch(e) {}
+      try {
+        const snap = await getDoc(doc(db, 'recent_channels', user.uid));
+        if (snap.exists()) setRecentIds(snap.data().ids || []);
+      } catch(e) {}
     };
     load();
   }, [user]);
+  const addToRecent = (channel) => {
+    setRecentIds(prev => {
+      const filtered = prev.filter(id => id !== channel.id);
+      const next = [channel.id, ...filtered].slice(0, 5);
+      if (user) setDoc(doc(db, 'recent_channels', user.uid), { ids: next });
+      return next;
+    });
+  };
   const visibleChannels = channels.filter(c => !deletedIds.includes(c.id));
+  const recentChannels = recentIds.map(id => channels.find(c => c.id === id)).filter(Boolean);
   const categories = ['All', ...Array.from(new Set(visibleChannels.map(c => c.category))).sort()];
   const filtered = visibleChannels.filter(c => {
     const matchCat = activeCategory === 'All' || c.category === activeCategory;
@@ -135,6 +149,7 @@ const LiveTVPage = () => {
   };
   const selectChannel = (ch) => {
     setActiveChannel(ch);
+    addToRecent(ch);
     loadStream(ch, 0);
     if (isMobile) setSidebarOpen(false);
   };
@@ -150,6 +165,29 @@ const LiveTVPage = () => {
     window.addEventListener('resize', handleResize);
     return () => { hlsRef.current?.destroy(); window.removeEventListener('resize', handleResize); };
   }, []);
+  const ChannelRow = ({ ch, showDelete = false }) => {
+    const isActive = activeChannel?.id === ch.id;
+    const isRecent = recentIds.includes(ch.id);
+    return (
+      <div style={{ position: 'relative' }}>
+        <button onClick={() => selectChannel(ch)}
+          style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: isActive ? '#1a2744' : 'transparent', border: 'none', borderBottom: '1px solid #161616', borderLeft: isActive ? '3px solid #3b82f6' : '3px solid transparent', color: isActive ? '#fff' : '#bbb', cursor: 'pointer', textAlign: 'left' }}>
+          <Tv size={12} color={isActive ? '#3b82f6' : '#444'} style={{ flexShrink: 0 }} />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 13, fontWeight: isActive ? 600 : 400, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{ch.name}</div>
+            <div style={{ fontSize: 10, color: '#555', marginTop: 1 }}>CH {ch.id} · {ch.category}</div>
+          </div>
+          {isActive && <span style={{ fontSize: 9, color: '#ef4444', flexShrink: 0 }}>LIVE</span>}
+        </button>
+        {showDelete && deleteMode && (
+          <button onClick={(e) => handleDelete(e, ch.id)}
+            style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: '#dc2626', border: 'none', borderRadius: 4, color: '#fff', cursor: 'pointer', fontSize: 11, padding: '3px 7px', zIndex: 10 }}>
+            Hide
+          </button>
+        )}
+      </div>
+    );
+  };
   if (accessBlocked) return (
     <div className="fixed inset-0 bg-black flex flex-col items-center justify-center p-6 text-center">
       <div className="text-6xl mb-4">??</div>
@@ -214,28 +252,20 @@ const LiveTVPage = () => {
               ))}
             </div>
             <div style={{ flex: 1, overflowY: 'auto' }}>
-              {filtered.map(ch => {
-                const isActive = activeChannel?.id === ch.id;
-                return (
-                  <div key={ch.id} style={{ position: 'relative' }}>
-                    <button onClick={() => selectChannel(ch)}
-                      style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: isActive ? '#1a2744' : 'transparent', border: 'none', borderBottom: '1px solid #161616', borderLeft: isActive ? '3px solid #3b82f6' : '3px solid transparent', color: isActive ? '#fff' : '#bbb', cursor: 'pointer', textAlign: 'left' }}>
-                      <Tv size={12} color={isActive ? '#3b82f6' : '#444'} style={{ flexShrink: 0 }} />
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 13, fontWeight: isActive ? 600 : 400, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{ch.name}</div>
-                        <div style={{ fontSize: 10, color: '#555', marginTop: 1 }}>CH {ch.id} · {ch.category}</div>
-                      </div>
-                      {isActive && <span style={{ fontSize: 9, color: '#ef4444', flexShrink: 0 }}>LIVE</span>}
-                    </button>
-                    {deleteMode && (
-                      <button onClick={(e) => handleDelete(e, ch.id)}
-                        style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: '#dc2626', border: 'none', borderRadius: 4, color: '#fff', cursor: 'pointer', fontSize: 11, padding: '3px 7px', zIndex: 10 }}>
-                        Hide
-                      </button>
-                    )}
+              {recentChannels.length > 0 && !search && (
+                <>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px 4px', borderBottom: '1px solid #1a1a1a' }}>
+                    <Star size={10} color='#f59e0b' />
+                    <span style={{ fontSize: 10, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700 }}>Favourites & Recent</span>
                   </div>
-                );
-              })}
+                  {recentChannels.map(ch => <ChannelRow key={'r-' + ch.id} ch={ch} showDelete={false} />)}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px 4px', borderBottom: '1px solid #1a1a1a', marginTop: 4 }}>
+                    <Tv size={10} color='#6b7280' />
+                    <span style={{ fontSize: 10, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700 }}>All Channels</span>
+                  </div>
+                </>
+              )}
+              {filtered.map(ch => <ChannelRow key={ch.id} ch={ch} showDelete={true} />)}
               {filtered.length === 0 && (
                 <div style={{ textAlign: 'center', padding: 30, color: '#444', fontSize: 13 }}>No channels found</div>
               )}
