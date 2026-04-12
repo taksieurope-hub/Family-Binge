@@ -123,11 +123,19 @@ const LiveTVPage = () => {
       });
       hls.on(window.Hls.Events.ERROR, (_, data) => {
         if (data.fatal) {
-          const next = idx + 1;
-          if (next < channel.streams.length) loadStream(channel, next);
-          else { setError(true); setLoading(false); }
+          if (data.type === window.Hls.ErrorTypes.NETWORK_ERROR) {
+            // Try to recover network errors first
+            hls.startLoad();
+          } else {
+            const next = idx + 1;
+            if (next < channel.streams.length) loadStream(channel, next);
+            else { setError(true); setLoading(false); }
+          }
         }
       });
+      // Auto-recover if video stalls for more than 10 seconds
+      videoRef.current.addEventListener("stalled", () => { hls.startLoad(); });
+      videoRef.current.addEventListener("waiting", () => { setTimeout(() => { if (videoRef.current?.paused) hls.startLoad(); }, 10000); });
     } else if (videoRef.current?.canPlayType('application/vnd.apple.mpegurl')) {
       videoRef.current.src = url;
       videoRef.current.onloadedmetadata = () => { setLoading(false); videoRef.current?.play().catch(() => {}); };
