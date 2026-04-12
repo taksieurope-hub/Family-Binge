@@ -5,10 +5,8 @@ import { channels } from './LiveTVSection';
 import { useAuth } from '../services/AuthContext';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
-
 const PROXY = 'https://family-binge-backend.onrender.com/api/content/livetv/proxy?url=';
 const proxyUrl = (url) => url ? PROXY + encodeURIComponent(url) : url;
-
 const LiveTVPage = () => {
   const navigate = useNavigate();
   const videoRef = useRef(null);
@@ -25,8 +23,6 @@ const LiveTVPage = () => {
   const { user } = useAuth();
   const [accessBlocked, setAccessBlocked] = useState(false);
   const [deletedIds, setDeletedIds] = useState([]);
-
-  // Load HLS.js once inside the component, stored in a ref
   useEffect(() => {
     if (window.Hls) { hlsReadyRef.current = true; return; }
     const script = document.createElement('script');
@@ -34,7 +30,6 @@ const LiveTVPage = () => {
     script.onload = () => { hlsReadyRef.current = true; };
     document.head.appendChild(script);
   }, []);
-
   useEffect(() => {
     if (!user) { navigate('/login'); return; }
     const checkAccess = async () => {
@@ -58,7 +53,6 @@ const LiveTVPage = () => {
     };
     checkAccess();
   }, [user, navigate]);
-
   useEffect(() => {
     if (!user) return;
     const load = async () => {
@@ -69,7 +63,6 @@ const LiveTVPage = () => {
     };
     load();
   }, [user]);
-
   const visibleChannels = channels.filter(c => !deletedIds.includes(c.id));
   const categories = ['All', ...Array.from(new Set(visibleChannels.map(c => c.category))).sort()];
   const filtered = visibleChannels.filter(c => {
@@ -77,7 +70,6 @@ const LiveTVPage = () => {
     const matchSearch = c.name.toLowerCase().includes(search.toLowerCase());
     return matchCat && matchSearch;
   });
-
   const handleDelete = (e, id) => {
     e.stopPropagation();
     if (!window.confirm('Hide this channel?')) return;
@@ -85,34 +77,30 @@ const LiveTVPage = () => {
     setDeletedIds(next);
     if (user) setDoc(doc(db, 'hidden_channels', user.uid), { ids: next });
   };
-
   const handleRestoreAll = () => {
     setDeletedIds([]);
     if (user) setDoc(doc(db, 'hidden_channels', user.uid), { ids: [] });
   };
-
   const loadStream = (channel, idx = 0) => {
     setLoading(true);
     setError(false);
     const rawUrl = channel.streams[idx];
     if (!rawUrl) { setError(true); setLoading(false); return; }
     const url = proxyUrl(rawUrl);
-
-    // If HLS.js not ready yet, wait and retry
     if (!hlsReadyRef.current || !window.Hls) {
       setTimeout(() => loadStream(channel, idx), 300);
       return;
     }
-
     if (!videoRef.current) { setTimeout(() => loadStream(channel, idx), 200); return; }
     if (hlsRef.current) { hlsRef.current.destroy(); hlsRef.current = null; }
-
     if (window.Hls.isSupported()) {
       const hls = new window.Hls({
         enableWorker: true,
         lowLatencyMode: false,
         enableCEA708Captions: false,
         enableWebVTT: false,
+        subtitleDisplay: false,
+        renderNatively: false,
         enableIMSC1: false,
       });
       hlsRef.current = hls;
@@ -125,7 +113,6 @@ const LiveTVPage = () => {
       hls.on(window.Hls.Events.ERROR, (_, data) => {
         if (data.fatal) {
           if (data.type === window.Hls.ErrorTypes.NETWORK_ERROR) {
-            // Try to recover network errors first
             hls.startLoad();
           } else {
             const next = idx + 1;
@@ -134,7 +121,6 @@ const LiveTVPage = () => {
           }
         }
       });
-      // Auto-recover if video stalls for more than 10 seconds
       videoRef.current.addEventListener("stalled", () => { hls.startLoad(); });
       videoRef.current.addEventListener("waiting", () => { setTimeout(() => { if (videoRef.current?.paused) hls.startLoad(); }, 10000); });
     } else if (videoRef.current?.canPlayType('application/vnd.apple.mpegurl')) {
@@ -147,13 +133,11 @@ const LiveTVPage = () => {
       };
     } else { setError(true); setLoading(false); }
   };
-
   const selectChannel = (ch) => {
     setActiveChannel(ch);
     loadStream(ch, 0);
     if (isMobile) setSidebarOpen(false);
   };
-
   useEffect(() => {
     const mobile = window.innerWidth < 768;
     setIsMobile(mobile);
@@ -166,20 +150,17 @@ const LiveTVPage = () => {
     window.addEventListener('resize', handleResize);
     return () => { hlsRef.current?.destroy(); window.removeEventListener('resize', handleResize); };
   }, []);
-
   if (accessBlocked) return (
     <div className="fixed inset-0 bg-black flex flex-col items-center justify-center p-6 text-center">
-      <div className="text-6xl mb-4">🔒</div>
+      <div className="text-6xl mb-4">??</div>
       <h2 className="text-white text-2xl font-bold mb-2">Subscription Required</h2>
       <p className="text-gray-400 mb-6">Your free trial has ended. Subscribe to keep watching Live TV.</p>
       <button onClick={() => navigate('/app#pricing')} className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl transition-colors">View Plans</button>
       <button onClick={() => navigate('/app')} className="mt-3 text-gray-500 hover:text-white text-sm transition-colors">Go Back</button>
     </div>
   );
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#0a0a0a', color: '#fff', fontFamily: 'sans-serif', overflow: 'hidden' }}>
-
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px', borderBottom: '1px solid #222', background: '#111', flexShrink: 0, zIndex: 10 }}>
         <button onClick={() => navigate('/app')} style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'none', border: 'none', color: '#aaa', cursor: 'pointer', fontSize: 13, padding: '4px 8px' }}>
           <ArrowLeft size={15} /> Back
@@ -195,13 +176,10 @@ const LiveTVPage = () => {
           {sidebarOpen ? <X size={14} /> : <Menu size={14} />}
         </button>
       </div>
-
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden', position: 'relative' }}>
-
         {sidebarOpen && isMobile && (
           <div onClick={() => setSidebarOpen(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 20 }} />
         )}
-
         {sidebarOpen && (
           <div style={{ position: isMobile ? 'absolute' : 'relative', top: 0, left: 0, height: '100%', width: 280, background: '#111', borderRight: '1px solid #222', display: 'flex', flexDirection: 'column', flexShrink: 0, zIndex: 30 }}>
             <div style={{ padding: '10px 14px', borderBottom: '1px solid #1e1e1e', flexShrink: 0 }}>
@@ -227,7 +205,6 @@ const LiveTVPage = () => {
                   style={{ width: '100%', background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 6, color: '#fff', fontSize: 12, padding: '6px 8px 6px 26px', outline: 'none', boxSizing: 'border-box' }} />
               </div>
             </div>
-
             <div style={{ display: 'flex', gap: 6, padding: '8px 10px', overflowX: 'auto', flexShrink: 0, borderBottom: '1px solid #1e1e1e' }}>
               {categories.map(cat => (
                 <button key={cat} onClick={() => setActiveCategory(cat)}
@@ -236,7 +213,6 @@ const LiveTVPage = () => {
                 </button>
               ))}
             </div>
-
             <div style={{ flex: 1, overflowY: 'auto' }}>
               {filtered.map(ch => {
                 const isActive = activeChannel?.id === ch.id;
@@ -247,7 +223,7 @@ const LiveTVPage = () => {
                       <Tv size={12} color={isActive ? '#3b82f6' : '#444'} style={{ flexShrink: 0 }} />
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: 13, fontWeight: isActive ? 600 : 400, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{ch.name}</div>
-                        <div style={{ fontSize: 10, color: '#555', marginTop: 1 }}>CH {ch.id} · {ch.category}</div>
+                        <div style={{ fontSize: 10, color: '#555', marginTop: 1 }}>CH {ch.id} � {ch.category}</div>
                       </div>
                       {isActive && <span style={{ fontSize: 9, color: '#ef4444', flexShrink: 0 }}>LIVE</span>}
                     </button>
@@ -266,7 +242,6 @@ const LiveTVPage = () => {
             </div>
           </div>
         )}
-
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#000', position: 'relative', minWidth: 0 }}>
           {!activeChannel && (
             <div style={{ textAlign: 'center', padding: 20 }}>
@@ -298,5 +273,4 @@ const LiveTVPage = () => {
     </div>
   );
 };
-
 export default LiveTVPage;
