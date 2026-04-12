@@ -7,7 +7,6 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 
 const PROXY = 'https://family-binge-backend.onrender.com/api/proxy?url=';
-const BACKEND = 'https://family-binge-backend.onrender.com';
 const proxyUrl = (url) => url ? PROXY + encodeURIComponent(url) : url;
 
 // Pre-warm the backend immediately when this module loads
