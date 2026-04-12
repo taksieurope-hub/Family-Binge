@@ -251,27 +251,41 @@ async def proxy_hls_stream(url: str = Query(..., description="HLS stream URL to 
             base_url = "/".join(url.rsplit("/", 1)[:-1])
 
             if "mpegurl" in content_type.lower() or url.endswith(".m3u8") or url.endswith(".m3u"):
+                import re as _re
                 playlist = response.text
-                lines = playlist.split("\n")
+                lines_in = playlist.split("\n")
                 rewritten = []
-                for line in lines:
-                    stripped = line.strip()
-                    if not stripped:
-                        rewritten.append(line)
+                is_master = "#EXT-X-STREAM-INF" in playlist
+                picked_stream = False
+                i = 0
+                while i < len(lines_in):
+                    s = lines_in[i].strip()
+                    if s.startswith("#EXT-X-MEDIA") and ("TYPE=SUBTITLES" in s or "TYPE=CLOSED-CAPTIONS" in s):
+                        i += 1
                         continue
-                    # Rewrite URI attributes inside EXT-X tags e.g. #EXT-X-MEDIA:URI="..."
-                    if stripped.startswith("#") and 'URI="' in stripped:
-                        import re
-                        def replace_uri(m):
-                            inner = m.group(1)
-                            return f'URI="{make_proxy_url(inner, base_url)}"'
-                        stripped = re.sub(r'URI="([^"]+)"', replace_uri, stripped)
-                        rewritten.append(stripped)
-                    elif stripped.startswith("#"):
-                        rewritten.append(line)
+                    if is_master and s.startswith("#EXT-X-STREAM-INF"):
+                        if picked_stream:
+                            i += 2
+                            continue
+                        rewritten.append(s)
+                        i += 1
+                        if i < len(lines_in) and lines_in[i].strip() and not lines_in[i].strip().startswith("#"):
+                            rewritten.append(make_proxy_url(lines_in[i].strip(), base_url))
+                            picked_stream = True
+                            i += 1
+                        continue
+                    if not s:
+                        rewritten.append(lines_in[i])
+                        i += 1
+                        continue
+                    if s.startswith("#") and 'URI="' in s:
+                        s = _re.sub(r'URI="([^"]+)"', lambda m: f'URI="{make_proxy_url(m.group(1), base_url)}"', s)
+                        rewritten.append(s)
+                    elif s.startswith("#"):
+                        rewritten.append(lines_in[i])
                     else:
-                        # Segment or sub-playlist URL
-                        rewritten.append(make_proxy_url(stripped, base_url))
+                        rewritten.append(make_proxy_url(s, base_url))
+                    i += 1
                 rewritten_playlist = "\n".join(rewritten)
                 return StreamingResponse(
                     iter([rewritten_playlist.encode()]),
