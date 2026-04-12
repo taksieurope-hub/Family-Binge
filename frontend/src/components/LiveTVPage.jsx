@@ -104,6 +104,7 @@ const LiveTVPage = () => {
       return;
     }
 
+    if (!videoRef.current) { setTimeout(() => loadStream(channel, idx), 200); return; }
     if (hlsRef.current) { hlsRef.current.destroy(); hlsRef.current = null; }
 
     if (window.Hls.isSupported()) {
