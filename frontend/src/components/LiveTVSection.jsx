@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Hls from 'hls.js';
 import { Tv, Radio, Globe, Search } from 'lucide-react';
 
-const PROXY = 'https://family-binge-backend.onrender.com/api/proxy?url=';
+const PROXY = 'https://family-binge-backend.onrender.com/api/content/livetv/proxy?url=';
 const proxyUrl = (url) => url ? PROXY + encodeURIComponent(url) : url;
 
 export const channels = [

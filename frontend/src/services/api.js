@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://family-binge-backend.onrender.com";
+const API_BASE_URL = "https://family-binge-backend.onrender.com/api";
 
 // Simple in-memory cache with 5-minute TTL
 const cache = new Map();
