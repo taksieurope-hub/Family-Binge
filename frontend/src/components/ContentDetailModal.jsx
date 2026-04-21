@@ -322,7 +322,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
               src={getStreamUrl()}
               className="w-full h-full border-0"
               allowFullScreen
-              allow="autoplay; fullscreen; picture-in-picture"
+              allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
                             title={details?.title}
 
               onLoad={handleIframeLoad}
