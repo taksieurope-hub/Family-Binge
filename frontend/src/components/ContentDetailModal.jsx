@@ -125,6 +125,8 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
     };
   }, [content]);
 
+  const [showNotice, setShowNotice] = useState(true);
+
   const handleWatchNow = () => {
     if (accessStatus === 'expired') {
       onClose();
@@ -217,6 +219,13 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
   if (isPlaying) {
     return (
       <div ref={playerContainerRef} className="fixed inset-0 z-[100] bg-black flex flex-col">
+        {/* Notice Banner */}
+        {showNotice && (
+          <div className="bg-yellow-500/90 text-black px-4 py-2 flex items-center justify-between text-sm font-medium">
+            <span>?? Please note we are having an issue with our main server and are currently working on it. We are using a temporary server where you may experience an advert upon clicking the screen. Please bear with us while we resolve this issue.</span>
+            <button onClick={() => setShowNotice(false)} className="ml-4 font-bold text-black hover:text-gray-700 flex-shrink-0">?</button>
+          </div>
+        )}
         {/* Minimal Header */}
         <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/95 to-transparent border-b border-white/5">
           <div className="flex items-center gap-3 min-w-0 flex-1">
