@@ -324,7 +324,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
               allowFullScreen
               allow="autoplay; fullscreen; picture-in-picture"
                             title={details?.title}
-sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
+
               onLoad={handleIframeLoad}
             />
           )}
