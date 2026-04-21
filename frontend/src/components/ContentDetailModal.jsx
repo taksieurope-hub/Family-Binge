@@ -185,7 +185,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
       iframeWindow.open = () => null;
     }
   } catch (e) {}
-  setTimeout(() => enterFullscreen(), 300);
+  setTimeout(() => enterFullscreen(), 300); try { iframeRef.current?.contentWindow?.postMessage(`{"event":"command","func":"unMute","args":""}`, "*"); } catch(e) {}
 };
 
   const handleNextSource = () => {
