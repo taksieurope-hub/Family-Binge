@@ -176,11 +176,17 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
   };
 
   const handleIframeLoad = () => {
-    setPlayerReady(true);
-    setIsAutoSwitching(false);
-    if (autoSwitchTimeoutRef.current) clearTimeout(autoSwitchTimeoutRef.current);
-    setTimeout(() => enterFullscreen(), 300);
-  };
+  setPlayerReady(true);
+  setIsAutoSwitching(false);
+  if (autoSwitchTimeoutRef.current) clearTimeout(autoSwitchTimeoutRef.current);
+  try {
+    const iframeWindow = iframeRef.current?.contentWindow;
+    if (iframeWindow) {
+      iframeWindow.open = () => null;
+    }
+  } catch (e) {}
+  setTimeout(() => enterFullscreen(), 300);
+};
 
   const handleNextSource = () => {
     const next = (currentSourceIndex + 1) % VIDEO_SOURCES.length;
@@ -318,6 +324,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
               allowFullScreen
               allow="autoplay; fullscreen; picture-in-picture"
                             title={details?.title}
+sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
               onLoad={handleIframeLoad}
             />
           )}
