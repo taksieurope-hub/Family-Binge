@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://family-binge-backend.onrender.com/api/content",
+  baseURL: "https://family-binge-backend.onrender.com/api",
   timeout: 15000,
 });
 
@@ -79,3 +79,8 @@ export const addToWatchlist = (data) => api.post("/watchlist", data);
 export const removeFromWatchlist = (id) => api.delete(`/watchlist/${id}`);
 
 export default api;
+
+// Keep backend alive
+setInterval(() => {
+  axios.get("https://family-binge-backend.onrender.com/api/health").catch(() => {});
+}, 5 * 60 * 1000);
