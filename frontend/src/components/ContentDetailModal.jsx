@@ -341,6 +341,11 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
               <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '80px', zIndex: 99, cursor: 'default' }} onClick={(e) => e.preventDefault()} />
             </div>
           )}
+        </div>
+      </div>
+    );
+  }
+
 
   // --- DETAILS VIEW ---
   return (
