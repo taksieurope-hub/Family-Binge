@@ -45,8 +45,7 @@ export const removeFromWatchHistory = (id, type) => {
 };
 
 const VIDEO_SOURCES = [
-  { name: 'VidLink', getUrl: (type, id, s, e) => type === 'series' ? `https://vidlink.pro/tv/${id}/${s}/${e}` : `https://vidlink.pro/movie/${id}` },
-  { name: 'VidSrc', getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}` : `https://vidsrc.cc/v2/embed/movie/${id}` },
+  { name: 'VidLink',     getUrl: (type, id, s, e) => type === 'series' ? `https://vidlink.pro/tv/${id}/${s}/${e}` : `https://vidlink.pro/movie/${id}` },
   
 ];
 
@@ -126,8 +125,6 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
     };
   }, [content]);
 
-  const [showNotice, setShowNotice] = useState(true);
-
   const handleWatchNow = () => {
     if (accessStatus === 'expired') {
       onClose();
@@ -188,7 +185,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
       iframeWindow.open = () => null;
     }
   } catch (e) {}
-  setTimeout(() => enterFullscreen(), 300); try { iframeRef.current?.contentWindow?.postMessage(`{"event":"command","func":"unMute","args":""}`, "*"); } catch(e) {}
+  setTimeout(() => enterFullscreen(), 300);
 };
 
   const handleNextSource = () => {
@@ -220,13 +217,6 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
   if (isPlaying) {
     return (
       <div ref={playerContainerRef} className="fixed inset-0 z-[100] bg-black flex flex-col">
-        {/* Notice Banner */}
-        {showNotice && (
-          <div className="bg-yellow-500/90 text-black px-4 py-2 flex items-center justify-between text-sm font-medium">
-            <span>?? Please note we are having an issue with our main server and are currently working on it. We are using a temporary server where you may experience an advert upon clicking the screen. Please bear with us while we resolve this issue.</span>
-            <button onClick={() => setShowNotice(false)} className="ml-4 font-bold text-black hover:text-gray-700 flex-shrink-0">?</button>
-          </div>
-        )}
         {/* Minimal Header */}
         <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/95 to-transparent border-b border-white/5">
           <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -325,12 +315,6 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
             </div>
           )}
 
-          {getStreamUrl() && (
-            <div style={{ position: "relative", width: "100%", height: "100%" }}>
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, zIndex: 10 }} onClick={(e) => { e.preventDefault(); e.stopPropagation(); }} />
-              <div style={{ position: "absolute", top: "10%", left: "10%", right: "10%", bottom: "10%", zIndex: 0 }} onClick={(e) => e.stopPropagation()} />
-            </div>
-          )}
           {getStreamUrl() && (
             <iframe
               ref={iframeRef}
