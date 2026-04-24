@@ -326,38 +326,21 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
           )}
 
           {getStreamUrl() && (
-  <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-    <iframe
-      ref={iframeRef}
-      key={`${details?.id}-${selectedSeason}-${selectedEpisode}-${currentSourceIndex}`}
-      src={getStreamUrl()}
-      className="w-full h-full border-0"
-      allowFullScreen
-      allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
-      title={details?.title}
-      onLoad={handleIframeLoad}
-    />
-    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '80px', zIndex: 99 }} onClick={(e) => e.preventDefault()} />
-    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '80px', zIndex: 99 }} onClick={(e) => e.preventDefault()} />
-  </div>
-)}
-          {getStreamUrl() && (
-            <iframe
-              ref={iframeRef}
-              key={`${details?.id}-${selectedSeason}-${selectedEpisode}-${currentSourceIndex}`}
-              src={getStreamUrl()}
-              className="w-full h-full border-0"
-              allowFullScreen
-              allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
-                            title={details?.title}
-
-              onLoad={handleIframeLoad}
-            />
+            <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+              <iframe
+                ref={iframeRef}
+                key={`${details?.id}-${selectedSeason}-${selectedEpisode}-${currentSourceIndex}`}
+                src={getStreamUrl()}
+                className="w-full h-full border-0"
+                allowFullScreen
+                allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+                title={details?.title}
+                onLoad={handleIframeLoad}
+              />
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '80px', zIndex: 99, cursor: 'default' }} onClick={(e) => e.preventDefault()} />
+              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '80px', zIndex: 99, cursor: 'default' }} onClick={(e) => e.preventDefault()} />
+            </div>
           )}
-        </div>
-      </div>
-    );
-  }
 
   // --- DETAILS VIEW ---
   return (
