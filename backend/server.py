@@ -34,10 +34,12 @@ async def root():
     return {"message": "Family Binge API running"}
 
 from routers.content import router as content_router
+from routers.streams import router as streams_router
 from routers.imovs import router as imovs_router
 from routers.payment import router as payment_router
 app.include_router(payment_router, prefix="/api")
 app.include_router(content_router, prefix="/api")
+app.include_router(streams_router, prefix="/api")
 app.include_router(content_router, prefix="/api/content")
 app.include_router(content_router, prefix="")
 app.include_router(imovs_router, prefix="/api/content")
