@@ -1,33 +1,18 @@
 from fastapi import APIRouter, HTTPException
-import httpx
 
 router = APIRouter(tags=["streams"])
 
-SCRAPERS = [
-    "https://vidsrc.me/embed/{type}/{id}",
-    "https://vidsrc.to/embed/{type}/{id}",
-]
-
-async def check_stream(url: str) -> bool:
-    try:
-        async with httpx.AsyncClient(timeout=5) as client:
-            r = await client.head(url, follow_redirects=True)
-            return r.status_code == 200
-    except:
-        return False
-
 @router.get("/stream/{type}/{id}")
 async def get_stream(type: str, id: str, season: int = 1, episode: int = 1):
-    sources = []
-    for scraper in SCRAPERS:
-        if type == "series":
-            url = scraper.format(type="tv", id=f"{id}/{season}/{episode}")
-        else:
-            url = scraper.format(type="movie", id=id)
-        sources.append({"url": url, "working": await check_stream(url)})
+    if type == "series":
+        sources = [
+            {"name": "VidSrc.me", "url": f"https://vidsrc.me/embed/tv?tmdb={id}&season={season}&episode={episode}"},
+            {"name": "VidSrc.to", "url": f"https://vidsrc.to/embed/tv/{id}/{season}/{episode}"},
+        ]
+    else:
+        sources = [
+            {"name": "VidSrc.me", "url": f"https://vidsrc.me/embed/movie?tmdb={id}"},
+            {"name": "VidSrc.to", "url": f"https://vidsrc.to/embed/movie/{id}"},
+        ]
     
-    working = [s for s in sources if s["working"]]
-    if not working:
-        raise HTTPException(status_code=404, detail="No working streams found")
-    
-    return {"streams": working, "best": working[0]["url"]}
+    return {"streams": sources, "best": sources[0]["url"]}
