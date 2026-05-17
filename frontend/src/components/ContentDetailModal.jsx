@@ -184,6 +184,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
       iframeWindow.open = () => null;
     }
   } catch (e) {}
+  window.open = () => null;
   setTimeout(() => enterFullscreen(), 300);
 };
 
@@ -321,7 +322,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
               src={getStreamUrl()}
               className="w-full h-full border-0"
               allowFullScreen
-              allow="autoplay; fullscreen; picture-in-picture; encrypted-media" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
+              allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
                             title={details?.title}
 
               onLoad={handleIframeLoad}
