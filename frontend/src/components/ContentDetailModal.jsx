@@ -124,6 +124,8 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
     };
   }, [content]);
 
+  window.open = () => null;
+
   const handleWatchNow = () => {
     if (accessStatus === 'expired') {
       onClose();
