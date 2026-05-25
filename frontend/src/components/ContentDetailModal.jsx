@@ -45,7 +45,7 @@ export const removeFromWatchHistory = (id, type) => {
 };
 
 const VIDEO_SOURCES = [
-  { name: 'VidSrc', getUrl: (type, id, s, e) => type === 'series' ? `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}` : `https://vidsrc.cc/v2/embed/movie/${id}` },
+  { name: 'VidLink', getUrl: (type, id, s, e) => type === 'series' ? `https://vidlink.pro/tv/${id}/${s}/${e}` : `https://vidlink.pro/movie/${id}` },
 ];
 
 
@@ -174,16 +174,10 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
     return source.getUrl(details.type, details.id, selectedSeason, selectedEpisode);
   };
 
-  const handleIframeLoad = () => {
+ const handleIframeLoad = () => {
   setPlayerReady(true);
   setIsAutoSwitching(false);
   if (autoSwitchTimeoutRef.current) clearTimeout(autoSwitchTimeoutRef.current);
-  try {
-    const iframeWindow = iframeRef.current?.contentWindow;
-    if (iframeWindow) {
-      iframeWindow.open = () => null;
-    }
-  } catch (e) {}
   window.open = () => null;
   setTimeout(() => enterFullscreen(), 300);
 };
@@ -471,6 +465,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
 };
 
 export default ContentDetailModal;
+
 
 
 
