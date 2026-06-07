@@ -45,7 +45,7 @@ export const removeFromWatchHistory = (id, type) => {
 };
 
 const VIDEO_SOURCES = [
-  { name: 'VidLink', getUrl: (type, id, s, e) => type === 'series' ? `https://vidlink.pro/tv/${id}/${s}/${e}` : `https://vidlink.pro/movie/${id}` },
+  { name: 'SmashyStream', getUrl: (type, id, s, e) => type === 'series' ? `https://embed.smashystream.com/playere.php?tmdb=${id}&season=${s}&episode=${e}` : `https://embed.smashystream.com/playere.php?tmdb=${id}` },
 ];
 
 
@@ -469,6 +469,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
 };
 
 export default ContentDetailModal;
+
 
 
 
