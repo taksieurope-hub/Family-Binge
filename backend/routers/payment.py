@@ -166,3 +166,13 @@ async def remove_device(user_id: str, device_id: str):
     registered = [d for d in user.get("registeredDevices", []) if d["device_id"] != device_id]
     db["users"].update_one({"uid": user_id}, {"$set": {"registeredDevices": registered}})
     return {"success": True}
+
+@router.get("/user/{user_id}")
+async def get_user(user_id: str):
+    db = get_mongo_db()
+    if not db:
+        raise HTTPException(status_code=500, detail="Database not available")
+    user = db["users"].find_one({"uid": user_id}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
