@@ -202,9 +202,9 @@ function MainApp() {
         return;
       }
       try {
-        const snap = await getDoc(doc(db, 'users', user.uid));
-        if (snap.exists()) {
-          const data = snap.data();
+        const res = await fetch(`https://family-binge-backend.onrender.com/api/payment/user/${user.uid}`);
+        if (res.ok) {
+          const data = await res.json();
           setUserData(data);
           const isFreeAccess = data.role === 'admin' || data.role === 'family';
           const now = new Date();
@@ -239,8 +239,15 @@ function MainApp() {
             }
           }
         } else {
-          // User exists in Firebase Auth but no Firestore doc - treat as guest
-          setAccessStatus('guest');
+          // User not in MongoDB yet - create them with trial
+          const now = new Date();
+          const trialEnds = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+          await fetch(`https://family-binge-backend.onrender.com/api/payment/user/${user.uid}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ uid: user.uid, email: user.email, trialEnds: trialEnds.toISOString() })
+          }).catch(() => {});
+          setAccessStatus('trial');
         }
       } catch (e) {
         console.error('Error checking access:', e);
