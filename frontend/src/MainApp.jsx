@@ -254,7 +254,6 @@ function MainApp() {
         console.error('Error checking access:', e);
         setAccessStatus('guest');
       }
-    });
     checkAuth();
   }, []);
 
