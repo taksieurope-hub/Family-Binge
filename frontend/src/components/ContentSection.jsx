@@ -275,18 +275,35 @@ const SERIES_CATEGORIES = [
 
 const ContentSection = ({ type = "movies", onSelectContent, filterMode }) => {
   const categories = type === "movies" ? MOVIE_CATEGORIES : SERIES_CATEGORIES;
+  const [activeCategory, setActiveCategory] = useState(null);
+
+  const scrollToCategory = (key) => {
+    setActiveCategory(key);
+    const el = document.getElementById(`category-${key}`);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   return (
     <section className="py-16 bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Category Jump Bar */}
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-4 mb-8 sticky top-16 z-40 bg-gray-900 pt-2">
+          {categories.map(cat => (
+            <button
+              key={cat.key}
+              onClick={() => scrollToCategory(cat.key)}
+              className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-colors ${activeCategory === cat.key ? 'bg-purple-600 text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20 hover:text-white'}`}
+            >
+              {cat.title}
+            </button>
+          ))}
+        </div>
         {type === "movies" && <ContinueWatchingRow onSelectContent={onSelectContent} />}
         {categories.map(cat => (
-          <CategoryRow
-            key={cat.key}
-            title={cat.title}
-            fetchFn={cat.fn}
+          <div id={`category-${cat.key}`} key={cat.key}>
             onSelectContent={onSelectContent}
           />
+        </div>
         ))}
       </div>
     </section>
