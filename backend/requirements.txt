@@ -1,4 +1,4 @@
-fastapi
+﻿fastapi
 uvicorn[standard]
 httpx
 pymongo
@@ -9,3 +9,4 @@ python-dotenv
 beautifulsoup4
 pymongo[srv]
 httpx 
+PyJWT
