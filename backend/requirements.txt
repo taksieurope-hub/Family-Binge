@@ -1,11 +1,9 @@
-fastapi
+﻿fastapi
 uvicorn[standard]
 httpx
-pymongo
+pymongo==4.6.3
 bcrypt
 python-jose[cryptography]
 firebase-admin
 python-dotenv
 beautifulsoup4
-pymongo[srv]
-httpx 
