@@ -199,3 +199,39 @@ async def create_user(user_id: str, request: CreateUserRequest):
         upsert=True
     )
     return {"success": True}
+
+from routers.mongo_sync import get_mongo_db
+
+class CreateUserRequest(BaseModel):
+    uid: str
+    email: str
+    trialEnds: str
+
+@router.post("/user/{user_id}")
+async def create_user(user_id: str, request: CreateUserRequest):
+    try:
+        db = get_mongo_db()
+        if db is None:
+            return {"success": False}
+        db["users"].update_one(
+            {"uid": user_id},
+            {"$set": {"uid": user_id, "email": request.email, "trialEnds": request.trialEnds, "plan": "free_trial"}},
+            upsert=True
+        )
+        return {"success": True}
+    except Exception as e:
+        print(f"Create user error: {e}")
+        return {"success": False}
+
+@router.get("/user/{user_id}")
+async def get_user(user_id: str):
+    try:
+        db = get_mongo_db()
+        if db is None:
+            return {"error": "db unavailable"}
+        user = db["users"].find_one({"uid": user_id}, {"_id": 0})
+        if not user:
+            return {"error": "not found"}
+        return user
+    except Exception as e:
+        return {"error": str(e)}
