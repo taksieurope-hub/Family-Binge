@@ -74,6 +74,17 @@ const SignupPage = () => {
         sessionAt: null,
       });
 
+// Save to MongoDB
+await fetch(`https://family-binge-backend.onrender.com/api/payment/user/${user.uid}`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    uid: user.uid,
+    email: email,
+    trialEnds: trialEnds.toISOString()
+  })
+}).catch(() => {});
+
       // Handle manual promo code entry
       let referredBy = new URLSearchParams(location.search).get('ref');
       if (!referredBy && promoCode.trim()) {
