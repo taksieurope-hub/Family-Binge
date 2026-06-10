@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 from pymongo import MongoClient
 import os
 
@@ -10,7 +10,7 @@ def get_mongo_db():
         uri = os.environ.get("MONGODB_URI")
         if not uri:
             return None
-        _client = MongoClient(uri)
+        _client = MongoClient(uri, tls=True, tlsAllowInvalidCertificates=True)
     return _client["familybinge"]
 
 def sync_user(user_data: dict):
@@ -36,3 +36,4 @@ def get_all_users():
     except Exception as e:
         print(f"MongoDB get users error: {e}")
         return []
+
