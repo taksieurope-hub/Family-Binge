@@ -176,3 +176,26 @@ async def get_user(user_id: str):
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
+
+class CreateUserRequest(BaseModel):
+    uid: str
+    email: str
+    trialEnds: str
+
+@router.post("/user/{user_id}")
+async def create_user(user_id: str, request: CreateUserRequest):
+    db = get_mongo_db()
+    if not db:
+        raise HTTPException(status_code=500, detail="Database not available")
+    db["users"].update_one(
+        {"uid": user_id},
+        {"$set": {
+            "uid": user_id,
+            "email": request.email,
+            "trialEnds": request.trialEnds,
+            "plan": "free_trial",
+            "role": "user"
+        }},
+        upsert=True
+    )
+    return {"success": True}
