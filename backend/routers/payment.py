@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+﻿from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 import httpx
 import os
@@ -199,3 +199,4 @@ async def create_user(user_id: str, request: CreateUserRequest):
         upsert=True
     )
     return {"success": True}
+
