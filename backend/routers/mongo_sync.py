@@ -16,7 +16,7 @@ def get_mongo_db():
 def sync_user(user_data: dict):
     try:
         db = get_mongo_db()
-        if not db:
+        if db is None:
             return
         users = db["users"]
         users.update_one(
@@ -30,7 +30,7 @@ def sync_user(user_data: dict):
 def get_all_users():
     try:
         db = get_mongo_db()
-        if not db:
+        if db is None:
             return []
         return list(db["users"].find({}, {"_id": 0}))
     except Exception as e:

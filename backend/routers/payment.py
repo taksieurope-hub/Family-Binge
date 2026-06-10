@@ -1,4 +1,4 @@
-﻿from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 import httpx
 import os
@@ -90,7 +90,7 @@ async def activate_plan(request: ActivatePlanRequest):
     if not plan:
         raise HTTPException(status_code=400, detail="Invalid plan")
     db = get_mongo_db()
-    if not db:
+    if db is None:
         raise HTTPException(status_code=500, detail="Database not available")
     now = datetime.utcnow()
     expires = now + timedelta(days=30 * plan["months"])
@@ -113,7 +113,7 @@ async def activate_plan(request: ActivatePlanRequest):
 @router.post("/add-extra-device")
 async def add_extra_device(request: AddDeviceRequest):
     db = get_mongo_db()
-    if not db:
+    if db is None:
         raise HTTPException(status_code=500, detail="Database not available")
     user = db["users"].find_one({"uid": request.user_id})
     if not user:
@@ -127,7 +127,7 @@ async def add_extra_device(request: AddDeviceRequest):
 @router.post("/register-device")
 async def register_device(request: RegisterDeviceRequest):
     db = get_mongo_db()
-    if not db:
+    if db is None:
         raise HTTPException(status_code=500, detail="Database not available")
     user = db["users"].find_one({"uid": request.user_id})
     if not user:
@@ -158,7 +158,7 @@ async def register_device(request: RegisterDeviceRequest):
 @router.delete("/remove-device/{user_id}/{device_id}")
 async def remove_device(user_id: str, device_id: str):
     db = get_mongo_db()
-    if not db:
+    if db is None:
         raise HTTPException(status_code=500, detail="Database not available")
     user = db["users"].find_one({"uid": user_id})
     if not user:
@@ -170,7 +170,7 @@ async def remove_device(user_id: str, device_id: str):
 @router.get("/user/{user_id}")
 async def get_user(user_id: str):
     db = get_mongo_db()
-    if not db:
+    if db is None:
         raise HTTPException(status_code=500, detail="Database not available")
     user = db["users"].find_one({"uid": user_id}, {"_id": 0})
     if not user:
@@ -185,7 +185,7 @@ class CreateUserRequest(BaseModel):
 @router.post("/user/{user_id}")
 async def create_user(user_id: str, request: CreateUserRequest):
     db = get_mongo_db()
-    if not db:
+    if db is None:
         raise HTTPException(status_code=500, detail="Database not available")
     db["users"].update_one(
         {"uid": user_id},
