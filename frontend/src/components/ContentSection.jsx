@@ -301,9 +301,12 @@ const ContentSection = ({ type = "movies", onSelectContent, filterMode }) => {
         {type === "movies" && <ContinueWatchingRow onSelectContent={onSelectContent} />}
         {categories.map(cat => (
           <div id={`category-${cat.key}`} key={cat.key}>
-            onSelectContent={onSelectContent}
-          />
-        </div>
+            <CategoryRow
+              title={cat.title}
+              fetchFn={cat.fn}
+              onSelectContent={onSelectContent}
+            />
+          </div>
         ))}
       </div>
     </section>
