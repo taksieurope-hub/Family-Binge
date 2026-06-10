@@ -195,14 +195,15 @@ function MainApp() {
   };
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        // Not logged in - allow guest browsing but show limited access
+    const checkAuth = async () => {
+      const token = localStorage.getItem('fb_token');
+      const uid = localStorage.getItem('fb_uid');
+      if (!token || !uid) {
         setAccessStatus('guest');
         return;
       }
       try {
-        const res = await fetch(`https://family-binge-backend.onrender.com/api/payment/user/${user.uid}`);
+        const res = await fetch(`https://family-binge-backend.onrender.com/api/auth/me/${uid}`);
         if (res.ok) {
           const data = await res.json();
           setUserData(data);
@@ -254,7 +255,7 @@ function MainApp() {
         setAccessStatus('guest');
       }
     });
-    return unsub;
+    checkAuth();
   }, []);
 
   // Session conflict monitor
