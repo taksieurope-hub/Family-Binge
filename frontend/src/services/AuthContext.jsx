@@ -1,7 +1,4 @@
 ﻿import React, { createContext, useContext, useEffect, useState } from 'react';
-import { auth, db } from '../services/firebase';
-import { onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
 
 const AuthContext = createContext(null);
 
@@ -11,24 +8,28 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
-      setUser(firebaseUser); window.__firebase_auth_uid__ = firebaseUser?.uid || null;
-      if (firebaseUser) {
-        const snap = await getDoc(doc(db, 'users', firebaseUser.uid));
-        if (snap.exists()) setUserData(snap.data());
-        else setUserData(null);
-      } else {
-        setUserData(null);
-      }
+    const token = localStorage.getItem('fb_token');
+    const uid = localStorage.getItem('fb_uid');
+    const email = localStorage.getItem('fb_email');
+    const name = localStorage.getItem('fb_name');
+
+    if (token && uid) {
+      setUser({ uid, email, displayName: name });
+      fetch(`https://family-binge-backend.onrender.com/api/auth/me/${uid}`)
+        .then(res => res.ok ? res.json() : null)
+        .then(data => { if (data) setUserData(data); })
+        .catch(() => {})
+        .finally(() => setLoading(false));
+    } else {
       setLoading(false);
-    });
-    return unsub;
+    }
   }, []);
 
   const refreshUserData = async () => {
-    if (auth.currentUser) {
-      const snap = await getDoc(doc(db, 'users', auth.currentUser.uid));
-      if (snap.exists()) setUserData(snap.data());
+    const uid = localStorage.getItem('fb_uid');
+    if (uid) {
+      const res = await fetch(`https://family-binge-backend.onrender.com/api/auth/me/${uid}`);
+      if (res.ok) setUserData(await res.json());
     }
   };
 
