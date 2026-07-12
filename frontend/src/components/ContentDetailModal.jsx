@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+﻿import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { X, Play, Star, Clock, Calendar, Users, ChevronRight, Loader2, Tv, Film, AlertCircle, RefreshCw, SkipForward, Captions, Share2, Check } from 'lucide-react';
 import { Button } from './ui/button';
 import * as api from '../api';
@@ -45,6 +45,7 @@ export const removeFromWatchHistory = (id, type) => {
 };
 
 const VIDEO_SOURCES = [
+  { name: 'AutoEmbed', getUrl: (type, id, s, e) => type === 'series' ? `https://autoembed.co/tv/tmdb/${id}-${s}-${e}` : `https://autoembed.co/movie/tmdb/${id}` },
   { name: 'Videasy', getUrl: (type, id, s, e) => type === 'series' ? `https://player.videasy.net/tv/${id}/${s}/${e}` : `https://player.videasy.net/movie/${id}` },
   { name: 'SmashyStream', getUrl: (type, id, s, e) => type === 'series' ? `https://embed.smashystream.com/playere.php?tmdb=${id}&season=${s}&episode=${e}` : `https://embed.smashystream.com/playere.php?tmdb=${id}` },
 ];
@@ -229,10 +230,10 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
               <div className="flex items-center gap-2 text-xs text-gray-400">
                 <span>
                   {details?.type === 'series'
-                    ? `Season ${selectedSeason} · Episode ${selectedEpisode}`
+                    ? `Season ${selectedSeason} Â· Episode ${selectedEpisode}`
                     : details?.year}
                 </span>
-                <span className="text-gray-600">·</span>
+                <span className="text-gray-600">Â·</span>
                 <button onClick={handleNextSource} className="flex items-center gap-1 px-3 py-1 bg-purple-600/80 hover:bg-purple-600 rounded-lg text-purple-200 text-xs font-medium transition-colors">{currentSourceName} ?</button>
                 {!playerReady && (
                   <span className="flex items-center gap-1 text-yellow-400">
@@ -240,7 +241,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
                     Connecting...
                   </span>
                 )}
-                {playerReady && <span className="text-green-400">● Playing</span>}
+                {playerReady && <span className="text-green-400">â— Playing</span>}
               </div>
             </div>
           </div>
@@ -472,6 +473,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
 };
 
 export default ContentDetailModal;
+
 
 
 
