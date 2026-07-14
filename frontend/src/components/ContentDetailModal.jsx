@@ -209,7 +209,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
         setPlayerReady(false);
         setIsAutoSwitching(true);
       }
-    }, 10000);
+    }, 20000);
 
     return () => { if (autoSwitchTimeoutRef.current) clearTimeout(autoSwitchTimeoutRef.current); };
   }, [isPlaying, currentSourceIndex, playerReady]);
