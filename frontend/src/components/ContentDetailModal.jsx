@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { X, Play, Star, Clock, Calendar, Users, ChevronRight, Loader2, Tv, Film, AlertCircle, RefreshCw, SkipForward, Captions, Share2, Check } from 'lucide-react';
 import { Button } from './ui/button';
 import * as api from '../api';
@@ -209,7 +209,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
         setPlayerReady(false);
         setIsAutoSwitching(true);
       }
-    }, 7000);
+    }, 10000);
 
     return () => { if (autoSwitchTimeoutRef.current) clearTimeout(autoSwitchTimeoutRef.current); };
   }, [isPlaying, currentSourceIndex, playerReady]);
@@ -230,10 +230,10 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
               <div className="flex items-center gap-2 text-xs text-gray-400">
                 <span>
                   {details?.type === 'series'
-                    ? `Season ${selectedSeason} Â· Episode ${selectedEpisode}`
+                    ? `Season ${selectedSeason} · Episode ${selectedEpisode}`
                     : details?.year}
                 </span>
-                <span className="text-gray-600">Â·</span>
+                <span className="text-gray-600">·</span>
                 <button onClick={handleNextSource} className="flex items-center gap-1 px-3 py-1 bg-purple-600/80 hover:bg-purple-600 rounded-lg text-purple-200 text-xs font-medium transition-colors">{currentSourceName} ?</button>
                 {!playerReady && (
                   <span className="flex items-center gap-1 text-yellow-400">
@@ -241,7 +241,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
                     Connecting...
                   </span>
                 )}
-                {playerReady && <span className="text-green-400">â— Playing</span>}
+                {playerReady && <span className="text-green-400">● Playing</span>}
               </div>
             </div>
           </div>
