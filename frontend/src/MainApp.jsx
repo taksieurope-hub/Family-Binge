@@ -141,7 +141,7 @@ const GuestBanner = ({ onSignup, onLogin, onDismiss }) => {
       <div className="flex items-center gap-3 min-w-0">a
         <Crown className="w-5 h-5 text-white flex-shrink-0" />
         <p className="text-white text-sm font-medium truncate">
-          Sign up for a <span className="font-bold">3-day free trial</span> — Unlimited movies, series & Live TV!
+          Sign up for a <span className="font-bold">7-day free trial</span> — Unlimited movies, series & Live TV!
         </p>
       </div>
       <div className="flex items-center gap-2 flex-shrink-0">
@@ -242,7 +242,7 @@ function MainApp() {
         } else {
           // User not in MongoDB yet - create them with trial
           const now = new Date();
-          const trialEnds = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+          const trialEnds = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
           await fetch(`https://family-binge-backend.onrender.com/api/payment/user/${user.uid}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -361,7 +361,7 @@ function MainApp() {
     const d = val?.toDate ? val.toDate() : new Date(val);
     return Math.max(0, Math.ceil((d - new Date()) / (1000 * 60 * 60 * 24)));
   };
-  // Show banner for all trial users (since trial is only 3 days)
+  // Show banner for all trial users (since trial is only 7 days)
   const showTrialBanner = accessStatus === 'trial' && showBanner;
   const showGuestBanner = accessStatus === 'guest' && showBanner;
 

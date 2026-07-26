@@ -17,7 +17,7 @@ const LandingPage = () => {
           </div>
           <div className="flex gap-4">
             <Button variant="ghost" onClick={() => navigate('/login')}>Login</Button>
-            <Button onClick={() => navigate('/signup')} className="bg-purple-600 hover:bg-purple-700">Start 3-Day Free Trial</Button>
+            <Button onClick={() => navigate('/signup')} className="bg-purple-600 hover:bg-purple-700">Start 7-Day Free Trial</Button>
           </div>
         </div>
       </nav>
@@ -36,7 +36,7 @@ const LandingPage = () => {
             onClick={() => navigate('/signup')}
             className="text-2xl px-12 py-8 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
           >
-            Start 3-Day Free Trial <ArrowRight className="ml-3" />
+            Start 7-Day Free Trial <ArrowRight className="ml-3" />
           </Button>
           
           <p className="text-sm text-gray-500 mt-8">
