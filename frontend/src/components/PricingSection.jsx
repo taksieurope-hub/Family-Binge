@@ -60,16 +60,19 @@ const PricingSection = () => {
       bestValue: true
     }
   ];
-  const createOrder = async (plan) => {
-  const discountedPrice = Math.max(0, plan.price - referralCredit);
-  const res = await fetch('https://family-binge-backend.onrender.com/api/payment/create-order', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ plan: plan.name, amount: discountedPrice, currency: 'USD' })
-  });
-  const data = await
 
-    const onApprove = async (data, actions, plan) => {
+  const createOrder = async (plan) => {
+    const discountedPrice = Math.max(0, plan.price - referralCredit);
+    const res = await fetch('https://family-binge-backend.onrender.com/api/payment/create-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ plan: plan.name, amount: discountedPrice, currency: 'USD' })
+    });
+    const data = await res.json();
+    return data.id;
+  };
+
+  const onApprove = async (data, actions, plan) => {
     const res = await fetch('https://family-binge-backend.onrender.com/api/payment/capture-order/' + data.orderID, {
       method: 'POST'
     });
@@ -82,7 +85,6 @@ const PricingSection = () => {
           body: JSON.stringify({ user_id: user.uid, plan: plan.id, order_id: data.orderID })
         });
       }
-      // Clear used referral credit
       if (referralCredit > 0) {
         const user2 = auth.currentUser;
         if (user2) {
@@ -102,7 +104,7 @@ const PricingSection = () => {
           <h2 className="text-4xl font-bold text-center mb-4">Choose Your Plan</h2>
           {referralCredit > 0 && (
             <div className="max-w-md mx-auto mb-8 bg-green-500/10 border border-green-500/30 rounded-2xl px-6 py-4 text-center">
-              <p className="text-green-400 font-bold text-lg">You have You have ${referralCredit} referral credit!</p>
+              <p className="text-green-400 font-bold text-lg">You have ${referralCredit} referral credit!</p>
               <p className="text-gray-400 text-sm mt-1">This will be automatically deducted from your next payment.</p>
             </div>
           )}
@@ -119,7 +121,7 @@ const PricingSection = () => {
 
                 <h3 className="text-2xl font-semibold">{plan.name}</h3>
                 <div className="mt-4">
-                  <span className="text-6xl font-bold">{referralCredit > 0 ? '$' + Math.max0, plan.price - referralCredit) : plan.billing.split('/')[0]}</span>
+                  <span className="text-6xl font-bold">{referralCredit > 0 ? '$' + Math.max(0, plan.price - referralCredit) : plan.billing.split('/')[0]}</span>
                   {referralCredit > 0 && <span className="ml-2 text-lg text-gray-500 line-through">${plan.price}</span>}
                 </div>
                 <p className="text-gray-400 text-sm">{plan.billing}</p>
@@ -128,7 +130,7 @@ const PricingSection = () => {
                 <div className="my-8 space-y-3 text-sm">
                   <p><strong>Devices:</strong> {plan.devices}</p>
                   <p><strong>Quality:</strong> {plan.quality}</p>
-                  <p className="text-purple-400">+1$/month per extra device</p>
+                  <p className="text-purple-400">+$1/month per extra device</p>
                 </div>
 
                 <PayPalButtons
