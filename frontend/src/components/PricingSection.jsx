@@ -108,7 +108,7 @@ const PricingSection = () => {
               <p className="text-gray-400 text-sm mt-1">This will be automatically deducted from your next payment.</p>
             </div>
           )}
-          <p className="text-center text-gray-400 mb-12">3-day free trial - Cancel anytime</p>
+          <p className="text-center text-gray-400 mb-12">7-day free trial - Cancel anytime</p>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {plans.map(plan => (
