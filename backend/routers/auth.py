@@ -33,7 +33,7 @@ async def signup(request: SignupRequest):
         raise HTTPException(status_code=400, detail="Email already registered")
     hashed = bcrypt.hashpw(request.password.encode(), bcrypt.gensalt()).decode()
     now = datetime.utcnow()
-    trialEnds = now + timedelta(days=3)
+    trialEnds = now + timedelta(days=7)
     import random, string
     referralCode = "FAM-" + "".join(random.choices(string.ascii_uppercase + string.digits, k=5))
     user = {
