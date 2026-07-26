@@ -420,8 +420,12 @@ function MainApp() {
       </div>
       {contentFilter === "english" && (
         <>
-          <ContentSection type="movies" onSelectContent={handleSelectContent} filterMode="english" />
-          <ContentSection type="series" onSelectContent={handleSelectContent} filterMode="english" />
+          <div id="movies-section">
+            <ContentSection type="movies" onSelectContent={handleSelectContent} filterMode="english" />
+          </div>
+          <div id="series">
+            <ContentSection type="series" onSelectContent={handleSelectContent} filterMode="english" />
+          </div>
         </>
       )}
       {contentFilter === "bollywood" && (
