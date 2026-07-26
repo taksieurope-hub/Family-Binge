@@ -25,8 +25,8 @@ const PricingSection = () => {
     {
       id: "basic",
       name: "Basic",
-      price: 99,
-      billing: "R99 / 1 month",
+      price: 5,
+      billing: "$5 / 1 month",
       devices: "1 TV + 1 Phone",
       quality: "HD Quality",
       popular: false
@@ -34,8 +34,8 @@ const PricingSection = () => {
     {
       id: "standard",
       name: "Standard",
-      price: 249,
-      billing: "R249 / 3 months (~ R83/month)",
+      price: 14,
+      billing: "$14 / 3 months (~ $4.67/month)",
       devices: "1 TV + 1 Phone (Upgraded)",
       quality: "Full HD Quality",
       popular: true
@@ -43,8 +43,8 @@ const PricingSection = () => {
     {
       id: "premium",
       name: "Premium (The High Roller)",
-      price: 399,
-      billing: "R399 / 6 months (~ R66/month)",
+      price: 22,
+      billing: "$22 / 6 months (~ $3.67/month)",
       devices: "2 TV + 2 Phones (Upgraded)",
       quality: "4K Quality",
       popular: false
@@ -52,32 +52,22 @@ const PricingSection = () => {
     {
       id: "annual",
       name: "Annual (The Best Value) Family",
-      price: 599,
-      billing: "R599 / 12 months (~ R50/month)",
+      price: 33,
+      billing: "$33 / 12 months (~ $2.75/month)",
       devices: "5 TV + 5 Phones",
       quality: "4K Quality",
       popular: false,
       bestValue: true
     }
   ];
-
   const createOrder = async (plan) => {
-  // Fetch current USD/ZAR rate
-  const rateRes = await fetch('https://open.er-api.com/v6/latest/ZAR');
-  const rateData = await rateRes.json();
-  const zarToUsd = rateData.rates.USD;
-
   const discountedPrice = Math.max(0, plan.price - referralCredit);
-  const usdAmount = (discountedPrice * zarToUsd).toFixed(2);
-
   const res = await fetch('https://family-binge-backend.onrender.com/api/payment/create-order', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ plan: plan.name, amount: usdAmount, currency: 'USD' })
+    body: JSON.stringify({ plan: plan.name, amount: discountedPrice, currency: 'USD' })
   });
-  const data = await res.json();
-  return data.id;
-};
+  const data = await
 
     const onApprove = async (data, actions, plan) => {
     const res = await fetch('https://family-binge-backend.onrender.com/api/payment/capture-order/' + data.orderID, {
@@ -112,7 +102,7 @@ const PricingSection = () => {
           <h2 className="text-4xl font-bold text-center mb-4">Choose Your Plan</h2>
           {referralCredit > 0 && (
             <div className="max-w-md mx-auto mb-8 bg-green-500/10 border border-green-500/30 rounded-2xl px-6 py-4 text-center">
-              <p className="text-green-400 font-bold text-lg">You have R{referralCredit} referral credit!</p>
+              <p className="text-green-400 font-bold text-lg">You have You have ${referralCredit} referral credit!</p>
               <p className="text-gray-400 text-sm mt-1">This will be automatically deducted from your next payment.</p>
             </div>
           )}
@@ -129,16 +119,16 @@ const PricingSection = () => {
 
                 <h3 className="text-2xl font-semibold">{plan.name}</h3>
                 <div className="mt-4">
-                  <span className="text-6xl font-bold">{referralCredit > 0 ? 'R' + Math.max(0, plan.price - referralCredit) : plan.billing.split('/')[0]}</span>
-                  {referralCredit > 0 && <span className="ml-2 text-lg text-gray-500 line-through">R{plan.price}</span>}
+                  <span className="text-6xl font-bold">{referralCredit > 0 ? '$' + Math.max0, plan.price - referralCredit) : plan.billing.split('/')[0]}</span>
+                  {referralCredit > 0 && <span className="ml-2 text-lg text-gray-500 line-through">${plan.price}</span>}
                 </div>
                 <p className="text-gray-400 text-sm">{plan.billing}</p>
-                {referralCredit > 0 && <p className="text-green-400 text-xs mt-1">R{referralCredit} referral discount applied!</p>}
+                {referralCredit > 0 && <p className="text-green-400 text-xs mt-1">${referralCredit} referral discount applied!</p>}
 
                 <div className="my-8 space-y-3 text-sm">
                   <p><strong>Devices:</strong> {plan.devices}</p>
                   <p><strong>Quality:</strong> {plan.quality}</p>
-                  <p className="text-purple-400">+R20/month per extra device</p>
+                  <p className="text-purple-400">+1$/month per extra device</p>
                 </div>
 
                 <PayPalButtons
