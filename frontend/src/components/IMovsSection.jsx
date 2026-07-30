@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Film, Loader2, ChevronLeft, ChevronRight, Play, X } from "lucide-react";
 
-const API_BASE = "https://family-binge-backend.onrender.com";
+const API_BASE = "https://family-binge-backend-2q4n.onrender.com";
 
 const IMovsSection = () => {
   const [movies, setMovies] = useState([]);

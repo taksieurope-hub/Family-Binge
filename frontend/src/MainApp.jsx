@@ -203,7 +203,7 @@ function MainApp() {
         return;
       }
       try {
-        const res = await fetch(`https://family-binge-backend.onrender.com/api/auth/me/${uid}`);
+        const res = await fetch(`https://family-binge-backend-2q4n.onrender.com/api/auth/me/${uid}`);
         if (res.ok) {
           const data = await res.json();
           setUserData(data);
@@ -243,7 +243,7 @@ function MainApp() {
           // User not in MongoDB yet - create them with trial
           const now = new Date();
           const trialEnds = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-          await fetch(`https://family-binge-backend.onrender.com/api/payment/user/${user.uid}`, {
+          await fetch(`https://family-binge-backend-2q4n.onrender.com/api/payment/user/${user.uid}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ uid: user.uid, email: user.email, trialEnds: trialEnds.toISOString() })

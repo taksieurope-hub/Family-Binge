@@ -5,7 +5,7 @@ import { channels } from './LiveTVSection';
 import { useAuth } from '../services/AuthContext';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
-const PROXY = 'https://family-binge-backend.onrender.com/api/content/livetv/proxy?url=';
+const PROXY = 'https://family-binge-backend-2q4n.onrender.com/api/content/livetv/proxy?url=';
 const proxyUrl = (url) => url ? PROXY + encodeURIComponent(url) : url;
 const LiveTVPage = () => {
   const navigate = useNavigate();
@@ -175,7 +175,7 @@ const LiveTVPage = () => {
           <Tv size={12} color={isActive ? '#3b82f6' : '#444'} style={{ flexShrink: 0 }} />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 13, fontWeight: isActive ? 600 : 400, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{ch.name}</div>
-            <div style={{ fontSize: 10, color: '#555', marginTop: 1 }}>CH {ch.id} · {ch.category}</div>
+            <div style={{ fontSize: 10, color: '#555', marginTop: 1 }}>CH {ch.id}  {ch.category}</div>
           </div>
           {isActive && <span style={{ fontSize: 9, color: '#ef4444', flexShrink: 0 }}>LIVE</span>}
         </button>

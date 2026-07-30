@@ -63,7 +63,7 @@ const PricingSection = () => {
 
   const createOrder = async (plan) => {
     const discountedPrice = Math.max(0, plan.price - referralCredit);
-    const res = await fetch('https://family-binge-backend.onrender.com/api/payment/create-order', {
+    const res = await fetch('https://family-binge-backend-2q4n.onrender.com/api/payment/create-order', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ plan: plan.name, amount: discountedPrice, currency: 'USD' })
@@ -73,13 +73,13 @@ const PricingSection = () => {
   };
 
   const onApprove = async (data, actions, plan) => {
-    const res = await fetch('https://family-binge-backend.onrender.com/api/payment/capture-order/' + data.orderID, {
+    const res = await fetch('https://family-binge-backend-2q4n.onrender.com/api/payment/capture-order/' + data.orderID, {
       method: 'POST'
     });
     if (res.ok) {
       const user = auth.currentUser;
       if (user) {
-        await fetch('https://family-binge-backend.onrender.com/api/payment/activate-plan', {
+        await fetch('https://family-binge-backend-2q4n.onrender.com/api/payment/activate-plan', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ user_id: user.uid, plan: plan.id, order_id: data.orderID })

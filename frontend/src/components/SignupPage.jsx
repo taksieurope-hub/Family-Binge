@@ -3,7 +3,7 @@ import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Button } from './ui/button';
 import { AlertTriangle } from 'lucide-react';
 
-const BACKEND = 'https://family-binge-backend.onrender.com';
+const BACKEND = 'https://family-binge-backend-2q4n.onrender.com';
 
 const SignupPage = () => {
   const navigate = useNavigate();
