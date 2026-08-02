@@ -189,7 +189,11 @@ function MainApp() {
   const [deviceType, setDeviceType] = useState(null);
 
   const handleLogout = async () => {
-    await signOut(auth);
+    localStorage.removeItem('fb_token');
+    localStorage.removeItem('fb_uid');
+    localStorage.removeItem('fb_name');
+    localStorage.removeItem('fb_email');
+    try { await signOut(auth); } catch {}
     navigate('/login');
   };
 
@@ -257,31 +261,8 @@ function MainApp() {
     checkAuth();
   }, []);
 
-  // Session conflict monitor
-  useEffect(() => {
-    const user = auth.currentUser;
-    if (!user) return;
-    const localToken = localStorage.getItem('fb_session_token');
-    if (!localToken) return;
-    // Don't kick trial users or family/admin roles
-    const role = userData?.role;
-    const plan = userData?.plan;
-    if (role === 'family' || role === 'admin' || plan === 'free_trial') return;
+  
 
-    const interval = setInterval(async () => {
-      try {
-        const snap = await getDoc(doc(db, 'users', user.uid));
-        if (snap.exists()) {
-          const data = snap.data();
-          if (data.sessionToken && data.sessionToken !== localToken) {
-            setSessionWarning(true);
-          }
-        }
-      } catch (e) {}
-    }, 5 * 60 * 1000); // every 5 minutes
-
-    return () => clearInterval(interval);
-  }, []);
 
   // Countdown timer when warning shown
   useEffect(() => {
