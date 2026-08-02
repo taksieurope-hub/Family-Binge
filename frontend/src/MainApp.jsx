@@ -204,7 +204,13 @@ function MainApp() {
         return;
       }
       try {
-        const res = await fetch(`https://family-binge-backend-2q4n.onrender.com/api/auth/me/${uid}`);
+        // Retry up to 3 times in case backend is waking up
+        let res;
+        for (let attempt = 0; attempt < 3; attempt++) {
+          res = await fetch(`https://family-binge-backend-2q4n.onrender.com/api/auth/me/${uid}`);
+          if (res.ok) break;
+          if (attempt < 2) await new Promise(r => setTimeout(r, 2000));
+        }
         if (res.ok) {
           const data = await res.json();
           setUserData(data);

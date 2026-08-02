@@ -1,4 +1,4 @@
-const CACHE_NAME = 'familybinge-v10';
+const CACHE_NAME = 'familybinge-v5';
 const STATIC_ASSETS = ['/'];
 self.addEventListener('install', event => {
   self.skipWaiting();
