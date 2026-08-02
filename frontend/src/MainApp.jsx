@@ -203,6 +203,23 @@ function MainApp() {
         setAccessStatus('guest');
         return;
       }
+      // Load from cache immediately so user never sees loading screen
+      const cached = localStorage.getItem('fb_userdata');
+      if (cached) {
+        try {
+          const data = JSON.parse(cached);
+          setUserData(data);
+          localStorage.setItem('fb_userdata', JSON.stringify(data));
+          const isFreeAccess = data.role === 'admin' || data.role === 'family';
+          const now = new Date();
+          const trialEnds = new Date(data.trialEnds);
+          const subExpires = data.subscriptionExpires ? new Date(data.subscriptionExpires) : null;
+          const hasPaidSub = data.plan && data.plan !== 'free_trial' && subExpires && subExpires > now;
+          if (isFreeAccess || hasPaidSub) setAccessStatus('full');
+          else if (trialEnds > now) setAccessStatus('trial');
+          else setAccessStatus('expired');
+        } catch {}
+      }
       try {
         // Retry up to 3 times in case backend is waking up
         let res;
@@ -214,6 +231,7 @@ function MainApp() {
         if (res.ok) {
           const data = await res.json();
           setUserData(data);
+          localStorage.setItem('fb_userdata', JSON.stringify(data));
           const isFreeAccess = data.role === 'admin' || data.role === 'family';
           const now = new Date();
           const baseTrialEnds = data.trialEnds?.toDate ? data.trialEnds.toDate() : new Date(data.trialEnds);
