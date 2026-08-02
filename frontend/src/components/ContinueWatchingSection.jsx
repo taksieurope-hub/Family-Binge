@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Play, X, Clock, Film, Tv } from 'lucide-react';
-import { getWatchHistory, removeFromWatchHistory } from './ContentDetailModal';
+import { getWatchHistory, removeFromWatchHistory } from '../services/Watchhistory';
 
 const ContinueWatchingSection = ({ onSelectContent }) => {
   const [watchHistory, setWatchHistory] = useState([]);
 
   useEffect(() => {
-    const loadHistory = () => {
-      const history = getWatchHistory();
+    const loadHistory = async () => {
+      const history = await getWatchHistory();
       setWatchHistory(history);
     };
 
@@ -28,9 +28,9 @@ const ContinueWatchingSection = ({ onSelectContent }) => {
     };
   }, []);
 
-  const handleRemove = (e, id, type) => {
+  const handleRemove = async (e, id, type) => {
     e.stopPropagation();
-    removeFromWatchHistory(id, type);
+    await removeFromWatchHistory(id, type);
     setWatchHistory(prev => prev.filter(h => !(h.id === id && h.type === type)));
   };
 
