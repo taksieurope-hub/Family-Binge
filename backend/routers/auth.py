@@ -88,3 +88,53 @@ async def get_me(uid: str):
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
+
+class WatchHistoryItem(BaseModel):
+    id: int
+    title: str
+    poster: str = None
+    backdrop: str = None
+    type: str
+    year: str = None
+    rating: float = None
+    season: int = 1
+    episode: int = 1
+    progress: float = 0
+    lastWatched: float = 0
+
+@auth_router.post("/watch-history/{uid}")
+async def save_watch_history(uid: str, item: WatchHistoryItem):
+    db = get_mongo_db()
+    if db is None:
+        raise HTTPException(status_code=500, detail="Database not available")
+    item_dict = item.dict()
+    db["users"].update_one(
+        {"uid": uid},
+        {"$pull": {"watchHistory": {"id": item.id, "type": item.type}}}
+    )
+    db["users"].update_one(
+        {"uid": uid},
+        {"$push": {"watchHistory": {"$each": [item_dict], "$position": 0, "$slice": 20}}}
+    )
+    return {"success": True}
+
+@auth_router.get("/watch-history/{uid}")
+async def get_watch_history(uid: str):
+    db = get_mongo_db()
+    if db is None:
+        raise HTTPException(status_code=500, detail="Database not available")
+    user = db["users"].find_one({"uid": uid}, {"watchHistory": 1})
+    if not user:
+        return {"history": []}
+    return {"history": user.get("watchHistory", [])}
+
+@auth_router.delete("/watch-history/{uid}/{content_id}/{content_type}")
+async def remove_watch_history(uid: str, content_id: int, content_type: str):
+    db = get_mongo_db()
+    if db is None:
+        raise HTTPException(status_code=500, detail="Database not available")
+    db["users"].update_one(
+        {"uid": uid},
+        {"$pull": {"watchHistory": {"id": content_id, "type": content_type}}}
+    )
+    return {"success": True}

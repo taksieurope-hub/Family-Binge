@@ -1,56 +1,68 @@
-// src/lib/watchHistory.js
-// Centralized watch history helpers — imported by ContentDetailModal, ContentSection, ContinueWatchingSection
+const BACKEND = 'https://family-binge-backend-2q4n.onrender.com';
 
-const WATCH_HISTORY_KEY = 'familybinge_watch_history';
+const getUid = () => localStorage.getItem('fb_uid');
 
-export const getWatchHistory = () => {
-  try {
-    const history = localStorage.getItem(WATCH_HISTORY_KEY);
-    return history ? JSON.parse(history) : [];
-  } catch {
-    return [];
+export const getWatchHistory = async () => {
+  const uid = getUid();
+  if (uid) {
+    try {
+      const res = await fetch(`${BACKEND}/api/auth/watch-history/${uid}`);
+      if (res.ok) {
+        const data = await res.json();
+        return data.history || [];
+      }
+    } catch {}
   }
+  try {
+    const local = localStorage.getItem('familybinge_watch_history');
+    return local ? JSON.parse(local) : [];
+  } catch { return []; }
 };
 
-export const saveToWatchHistory = (content, season = 1, episode = 1, progress = 0) => {
+export const saveToWatchHistory = async (content, season = 1, episode = 1, progress = 0) => {
+  const uid = getUid();
+  const item = {
+    id: content.id,
+    title: content.title,
+    poster: content.poster || null,
+    backdrop: content.backdrop || null,
+    type: content.type,
+    year: content.year || null,
+    rating: content.rating || null,
+    season,
+    episode,
+    progress,
+    lastWatched: Date.now(),
+  };
+
+  if (uid) {
+    try {
+      await fetch(`${BACKEND}/api/auth/watch-history/${uid}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(item)
+      });
+    } catch {}
+  }
+
   try {
-    const history = getWatchHistory();
-    const existingIndex = history.findIndex(h => h.id === content.id && h.type === content.type);
-
-    const historyItem = {
-      id: content.id,
-      title: content.title,
-      poster: content.poster,
-      backdrop: content.backdrop,
-      type: content.type,
-      year: content.year,
-      rating: content.rating,
-      season,
-      episode,
-      progress,
-      lastWatched: Date.now(),
-    };
-
-    if (existingIndex >= 0) {
-      history[existingIndex] = historyItem;
-    } else {
-      history.unshift(historyItem);
-    }
-
-    const trimmedHistory = history.slice(0, 20);
-    localStorage.setItem(WATCH_HISTORY_KEY, JSON.stringify(trimmedHistory));
+    const history = JSON.parse(localStorage.getItem('familybinge_watch_history') || '[]');
+    const idx = history.findIndex(h => h.id === content.id && h.type === content.type);
+    if (idx >= 0) history[idx] = item; else history.unshift(item);
+    localStorage.setItem('familybinge_watch_history', JSON.stringify(history.slice(0, 20)));
     window.dispatchEvent(new Event('watchHistoryUpdated'));
-  } catch (e) {
-    console.error('Error saving watch history:', e);
-  }
+  } catch {}
 };
 
-export const removeFromWatchHistory = (id, type) => {
-  try {
-    const history = getWatchHistory();
-    const filtered = history.filter(h => !(h.id === id && h.type === type));
-    localStorage.setItem(WATCH_HISTORY_KEY, JSON.stringify(filtered));
-  } catch (e) {
-    console.error('Error removing from watch history:', e);
+export const removeFromWatchHistory = async (id, type) => {
+  const uid = getUid();
+  if (uid) {
+    try {
+      await fetch(`${BACKEND}/api/auth/watch-history/${uid}/${id}/${type}`, { method: 'DELETE' });
+    } catch {}
   }
+  try {
+    const history = JSON.parse(localStorage.getItem('familybinge_watch_history') || '[]');
+    localStorage.setItem('familybinge_watch_history', JSON.stringify(history.filter(h => !(h.id === id && h.type === type))));
+  } catch {}
 };
