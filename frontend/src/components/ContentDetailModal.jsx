@@ -32,6 +32,15 @@ export const saveToWatchHistory = (content, season = 1, episode = 1, progress = 
     const key = getWatchHistoryKey();
     if (!key) return;
     localStorage.setItem(key, JSON.stringify(history.slice(0, 20)));
+    // Also sync to MongoDB
+    const uid = localStorage.getItem('fb_uid');
+    if (uid) {
+      fetch('https://family-binge-backend-2q4n.onrender.com/api/auth/watch-history/' + uid, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(historyItem)
+      }).catch(() => {});
+    }
   } catch (e) { console.error('Error saving watch history:', e); }
 };
 
