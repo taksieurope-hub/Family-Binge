@@ -172,8 +172,6 @@ function MainApp() {
   const filters = [
     { id: "english", label: "English" },
     { id: "bollywood", label: "Hindi / Bollywood" },
-    { id: "georgian", label: "Georgian" },
-    { id: "russian", label: "Russian" },
   ];
   const [activeVideo, setActiveVideo] = useState(null);
   const [selectedContent, setSelectedContent] = useState(null);
@@ -412,18 +410,6 @@ function MainApp() {
         <>
           <ContentSection type="movies" onSelectContent={handleSelectContent} filterMode="bollywood" />
           <ContentSection type="series" onSelectContent={handleSelectContent} filterMode="hindi" />
-        </>
-      )}
-      {contentFilter === "georgian" && (
-        <>
-          <OneTVPlaySection onSelectContent={handleSelectContent} />
-          <KartuliSection onSelectContent={handleSelectContent} filterMode="georgian" />
-        </>
-      )}
-      {contentFilter === "russian" && (
-        <>
-          <OneTVPlaySection onSelectContent={handleSelectContent} />
-          <KartuliSection onSelectContent={handleSelectContent} filterMode="russian" />
         </>
       )}
       <InviteSection />
