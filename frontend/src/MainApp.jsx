@@ -259,7 +259,13 @@ function MainApp() {
         }
       } catch (e) {
         console.error('Error checking access:', e);
-        setAccessStatus('guest');
+        // If backend fails, check if we have cached data
+        const cachedName = localStorage.getItem('fb_name');
+        if (cachedName) {
+          setAccessStatus('trial'); // Give benefit of doubt
+        } else {
+          setAccessStatus('guest');
+        }
       }
     };
     checkAuth();
