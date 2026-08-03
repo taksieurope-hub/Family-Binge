@@ -8,6 +8,7 @@ const SignupPage  = lazy(() => import("./components/SignupPage"));
 const MainApp     = lazy(() => import("./MainApp"));
 const ProfilePage = lazy(() => import("./components/ProfilePage"));
 const LiveTVPage   = lazy(() => import("./components/LiveTVPage"));
+const YouTubePage  = lazy(() => import("./components/YouTubePage"));
 
 function App() {
   // Prefetch content on app load for faster experience
@@ -25,6 +26,7 @@ function App() {
           <Route path="/app"     element={<MainApp />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/livetv"  element={<LiveTVPage />} />
+          <Route path="/youtube" element={<YouTubePage />} />
         </Routes>
       </Suspense>
     </Router>
