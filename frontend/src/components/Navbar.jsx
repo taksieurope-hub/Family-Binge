@@ -13,6 +13,29 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
+  const [searchHistory, setSearchHistory] = useState(() => {
+    const uid = localStorage.getItem('fb_uid') || 'guest';
+    try { return JSON.parse(localStorage.getItem('search_history_' + uid)) || []; } catch { return []; }
+  });
+
+  const saveSearchHistory = (query) => {
+    if (!query || query.trim().length < 2) return;
+    const uid = localStorage.getItem('fb_uid') || 'guest';
+    const key = 'search_history_' + uid;
+    let history = [];
+    try { history = JSON.parse(localStorage.getItem(key)) || []; } catch {}
+    history = history.filter(h => h.toLowerCase() !== query.trim().toLowerCase());
+    history.unshift(query.trim());
+    history = history.slice(0, 10);
+    localStorage.setItem(key, JSON.stringify(history));
+    setSearchHistory(history);
+  };
+
+  const clearSearchHistory = () => {
+    const uid = localStorage.getItem('fb_uid') || 'guest';
+    localStorage.removeItem('search_history_' + uid);
+    setSearchHistory([]);
+  };
   const [showResults, setShowResults] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -70,6 +93,7 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
       try {
         const res = await searchAPI.searchAll(searchQuery);
         setSearchResults(res.data.items || []);
+        if (res.data.items && res.data.items.length > 0) saveSearchHistory(searchQuery);
         setShowResults(true);
       } catch (error) {
         console.error('Search error:', error);
@@ -190,6 +214,22 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
                 <X className="w-4 h-4" />
               </button>
             </div>
+
+            {/* Search History */}
+            {!searchQuery && searchHistory.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-zinc-900 border border-zinc-700 rounded-2xl shadow-2xl z-50 overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-2 border-b border-zinc-800">
+                  <span className="text-gray-400 text-xs font-medium uppercase tracking-wider">Recent Searches</span>
+                  <button onClick={clearSearchHistory} className="text-gray-500 hover:text-white text-xs transition-colors">Clear</button>
+                </div>
+                {searchHistory.map((term, i) => (
+                  <button key={i} onClick={() => setSearchQuery(term)}
+                    className="w-full text-left px-4 py-3 text-white hover:bg-white/5 transition-colors flex items-center gap-3 text-sm">
+                    <span className="text-gray-500">&#128336;</span> {term}
+                  </button>
+                ))}
+              </div>
+            )}
 
             {/* Search Results */}
             {showResults && searchResults.length > 0 && (
