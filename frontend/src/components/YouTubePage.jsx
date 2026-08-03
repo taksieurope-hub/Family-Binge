@@ -14,16 +14,16 @@ const fetchYT = async (endpoint, params) => {
 };
 
 const GENRES = [
-  { id: "music", label: "Music", emoji: "??" },
-  { id: "gaming", label: "Gaming", emoji: "??" },
-  { id: "sport", label: "Sport", emoji: "?" },
-  { id: "comedy", label: "Comedy", emoji: "??" },
-  { id: "news", label: "News", emoji: "??" },
-  { id: "tech", label: "Tech", emoji: "??" },
-  { id: "food", label: "Food", emoji: "??" },
-  { id: "travel", label: "Travel", emoji: "??" },
-  { id: "fitness", label: "Fitness", emoji: "??" },
-  { id: "movies", label: "Movies", emoji: "??" },
+  { id: "music", label: "Music", emoji: "" },
+  { id: "gaming", label: "Gaming", emoji: "" },
+  { id: "sport", label: "Sport", emoji: "" },
+  { id: "comedy", label: "Comedy", emoji: "" },
+  { id: "news", label: "News", emoji: "" },
+  { id: "tech", label: "Tech", emoji: "" },
+  { id: "food", label: "Food", emoji: "" },
+  { id: "travel", label: "Travel", emoji: "" },
+  { id: "fitness", label: "Fitness", emoji: "" },
+  { id: "movies", label: "Movies", emoji: "" },
 ];
 
 const FREE_LIVE_CHANNELS = [
@@ -192,7 +192,7 @@ const YouTubePage = () => {
                 {GENRES.map(g => (
                   <button key={g.id} onClick={() => toggleGenre(g.id)}
                     className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${selectedGenres.includes(g.id) ? "bg-red-600 text-white scale-105" : "bg-zinc-800 text-gray-300 hover:bg-zinc-700"}`}>
-                    {g.emoji} {g.label}
+                    {g.label}
                   </button>
                 ))}
               </div>
