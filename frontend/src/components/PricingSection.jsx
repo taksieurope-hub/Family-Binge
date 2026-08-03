@@ -25,39 +25,32 @@ const PricingSection = () => {
     {
       id: "basic",
       name: "Basic",
-      price: 5,
-      billing: "$5 / 1 month",
-      devices: "1 TV + 1 Phone",
+      price: 7.99,
+      billing: "$7.99 / month",
+      devices: "2 Screens (No Ads)",
       quality: "HD Quality",
-      popular: false
+      popular: false,
+      perks: ["Ad-free experience", "2 simultaneous streams", "HD quality", "Watch on any device"]
     },
     {
       id: "standard",
       name: "Standard",
-      price: 14,
-      billing: "$14 / 3 months (~ $4.67/month)",
-      devices: "1 TV + 1 Phone (Upgraded)",
+      price: 18.99,
+      billing: "$18.99 / month",
+      devices: "4 Screens",
       quality: "Full HD Quality",
-      popular: true
+      popular: true,
+      perks: ["Ad-free experience", "4 simultaneous streams", "Full HD quality", "Watch on any device", "Download on 2 devices"]
     },
     {
       id: "premium",
       name: "Premium (The High Roller)",
-      price: 22,
-      billing: "$22 / 6 months (~ $3.67/month)",
-      devices: "2 TV + 2 Phones (Upgraded)",
-      quality: "4K Quality",
-      popular: false
-    },
-    {
-      id: "annual",
-      name: "Annual (The Best Value) Family",
-      price: 33,
-      billing: "$33 / 12 months (~ $2.75/month)",
-      devices: "5 TV + 5 Phones",
-      quality: "4K Quality",
+      price: 25.99,
+      billing: "$25.99 / month",
+      devices: "6 Screens",
+      quality: "4K Ultra HD Quality",
       popular: false,
-      bestValue: true
+      perks: ["Ad-free experience", "6 simultaneous streams", "4K Ultra HD quality", "Watch on any device", "Uncapped downloads"]
     }
   ];
 
