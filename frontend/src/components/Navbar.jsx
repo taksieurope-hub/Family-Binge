@@ -301,6 +301,12 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
                 ? YouTube
               </button>
               <button
+                onClick={() => { window.location.href = '/youtube'; setMobileMenuOpen(false); }}
+                className="flex items-center gap-3 px-5 py-3.5 text-red-400 hover:text-white hover:bg-red-500/10 transition-colors border-b border-white/5 font-semibold"
+              >
+                ? YouTube
+              </button>
+              <button
                 onClick={async () => { await signOut(auth); window.location.href = "/"; }}
                 className="flex items-center gap-3 px-5 py-3.5 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors"
               >
