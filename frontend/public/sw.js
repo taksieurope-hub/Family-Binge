@@ -4,8 +4,10 @@ self.addEventListener('activate', (e) => {
 });
 self.addEventListener('fetch', (e) => {
   if (e.request.mode === 'navigate') {
-    e.respondWith(fetch('/index.html').catch(() => fetch(e.request)));
+    e.respondWith(
+      fetch(e.request).catch(() => fetch('/index.html'))
+    );
     return;
   }
-  e.respondWith(fetch(e.request));
+  e.respondWith(fetch(e.request).catch(() => new Response('')));
 });
