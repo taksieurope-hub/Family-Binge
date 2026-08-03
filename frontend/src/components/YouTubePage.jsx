@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Search, Tv, Play, ThumbsUp, X, Loader2 } from "lucide-react";
+import { Search, Tv, Play, ThumbsUp, X, Loader2, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const API_KEY = process.env.REACT_APP_YOUTUBE_API_KEY;
 const BASE = "https://www.googleapis.com/youtube/v3";
@@ -58,6 +59,7 @@ const VideoCard = ({ video, onPlay }) => {
 };
 
 const YouTubePage = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
@@ -164,6 +166,9 @@ const YouTubePage = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
+          <button onClick={() => navigate("/app")} className="p-2 bg-zinc-800 hover:bg-zinc-700 rounded-xl transition-colors mr-2">
+            <ArrowLeft className="w-5 h-5 text-white" />
+          </button>
           <div className="bg-red-600 p-3 rounded-xl">
             <Play className="w-6 h-6 text-white fill-white" />
           </div>
