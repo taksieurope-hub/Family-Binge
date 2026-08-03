@@ -12,6 +12,7 @@ if not firebase_admin._apps:
         firebase_admin.initialize_app(credentials.Certificate(_cred_path))
 
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 import os
 
@@ -38,6 +39,20 @@ from routers.streams import router as streams_router
 from routers.imovs import router as imovs_router
 from routers.payment import router as payment_router
 from routers.auth import auth_router
+
+# --- Mount Frontend Static Assets ---
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+FRONTEND_BUILD_DIR = os.path.abspath(os.path.join(BASE_DIR, "../frontend/build"))
+
+if os.path.exists(FRONTEND_BUILD_DIR):
+    # Mount main static assets folder (js, css, media)
+    static_dir = os.path.join(FRONTEND_BUILD_DIR, "static")
+    if os.path.exists(static_dir):
+        app.mount("/static", StaticFiles(directory=static_dir), name="static")
+        
+    # Mount the rest of the build directory at root for general assets (manifest, favicon, sw.js)
+    app.mount("/assets_root", StaticFiles(directory=FRONTEND_BUILD_DIR), name="frontend_root")
+
 app.include_router(payment_router, prefix="/api")
 app.include_router(auth_router, prefix="/api")
 app.include_router(content_router, prefix="/api")
