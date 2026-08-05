@@ -257,7 +257,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
 
           <div className="flex items-center gap-2">
             {details?.type === 'series' && (
-              <div className="hidden sm:flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5">
                 <select value={selectedSeason} onChange={(e) => {
                   const ns = Number(e.target.value);
                   setSelectedSeason(ns);
