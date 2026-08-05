@@ -151,7 +151,7 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
           <div className="flex items-center gap-1 sm:gap-2">
             <button onClick={() => navigate('/youtube')}
               className="hidden md:flex items-center gap-1.5 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl transition-all">
-              ? YouTube
+              YouTube
             </button>
             {!searchOpen && (
               <button onClick={() => setSearchOpen(true)} className="p-2.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-xl transition-all" title="Search">
@@ -298,13 +298,13 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
                 onClick={() => { navigate('/youtube'); setMobileMenuOpen(false); }}
                 className="flex items-center gap-3 px-5 py-3.5 text-red-400 hover:text-white hover:bg-white/5 transition-colors border-b border-white/5 font-semibold"
               >
-                ? YouTube
+                YouTube
               </button>
               <button
                 onClick={() => { window.location.href = '/youtube'; setMobileMenuOpen(false); }}
                 className="flex items-center gap-3 px-5 py-3.5 text-red-400 hover:text-white hover:bg-red-500/10 transition-colors border-b border-white/5 font-semibold"
               >
-                ? YouTube
+                YouTube
               </button>
               <button
                 onClick={async () => { await signOut(auth); window.location.href = "/"; }}
