@@ -395,7 +395,7 @@ function MainApp() {
         />
       )}
 
-      {accessStatus !== "expired" && accessStatus !== "guest" && <ReferralBanner />}
+
       <Navbar
         activeSection={activeSection}
         setActiveSection={setActiveSection}
