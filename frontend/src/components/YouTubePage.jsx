@@ -266,9 +266,26 @@ const YouTubePage = () => {
         {/* Live TV Tab */}
         {activeTab === "live" && (
           <div>
-            <h2 className="text-white font-bold text-xl mb-4">?? Free Live Channels</h2>
-            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide mb-8">
-              {liveChannels.map(v => <VideoCard key={v.id?.videoId} video={v} onPlay={playVideo} />)}
+            <h2 className="text-white font-bold text-xl mb-6">Free Live Channels</h2>
+            {liveChannels.length === 0 && <div className="text-gray-400 text-center py-20">Loading live channels...</div>}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              {liveChannels.map(v => (
+                <div key={v.id?.videoId} onClick={() => playVideo(v.id?.videoId, v.snippet?.title)}
+                  className="cursor-pointer group">
+                  <div className="relative rounded-xl overflow-hidden mb-2">
+                    <img src={v.snippet?.thumbnails?.medium?.url} alt={v.snippet?.title}
+                      className="w-full aspect-video object-cover transition-transform duration-300 group-hover:scale-105" />
+                    <div className="absolute top-2 left-2 bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">LIVE</div>
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                        <Play className="w-5 h-5 text-white fill-white" />
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-white text-xs font-semibold line-clamp-2">{v.snippet?.title}</p>
+                  <p className="text-gray-400 text-xs mt-0.5">{v.snippet?.channelTitle}</p>
+                </div>
+              ))}
             </div>
           </div>
         )}
