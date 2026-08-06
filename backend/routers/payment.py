@@ -56,6 +56,7 @@ class RegisterDeviceRequest(BaseModel):
 @router.post("/create-order")
 async def create_order(request: CreateOrderRequest):
     token = await get_paypal_access_token()
+    print(f"PayPal order: plan={request.plan} amount={request.amount} currency={request.currency} mode={PAYPAL_MODE} url={BASE_URL}")
     async with httpx.AsyncClient() as client:
         response = await client.post(
             f"{BASE_URL}/v2/checkout/orders",
