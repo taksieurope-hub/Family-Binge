@@ -101,7 +101,7 @@ const PricingSection = () => {
   };
 
   return (
-    <PayPalScriptProvider options={{ "client-id": process.env.REACT_APP_PAYPAL_CLIENT_ID }}>
+    <PayPalScriptProvider options={{ "client-id": process.env.REACT_APP_PAYPAL_CLIENT_ID, "currency": "USD", "intent": "capture", "components": "buttons" }}>
       <section id="pricing" className="py-20 bg-zinc-900">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-4xl font-bold text-center mb-4">Choose Your Plan</h2>
