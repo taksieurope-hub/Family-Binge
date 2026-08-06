@@ -108,27 +108,30 @@ const YouTubePage = () => {
   const loadLiveChannels = async () => {
     try {
       const queries = [
-        "BBC News live",
-        "CNN live stream",
-        "Al Jazeera English live",
-        "Sky News live",
-        "DW News live",
-        "France 24 live",
-        "NBC News live",
-        "ABC News live",
-        "lofi hip hop radio live",
-        "NASA TV live",
+        "BBC News live", "CNN live stream", "Al Jazeera English live",
+        "Sky News live", "DW News live", "France 24 live",
+        "NBC News live", "ABC News live", "Fox News live",
+        "MSNBC live", "Bloomberg live stream", "CNBC live",
+        "lofi hip hop radio live", "NASA TV live",
+        "euronews live", "TRT World live", "NHK World live",
+        "CNA live", "Times Now live", "NDTV live",
+        "music live stream free", "jazz live radio",
+        "nature live stream", "space live stream",
+        "sports live stream free", "cricket live stream",
+        "football live stream free", "gaming live stream",
+        "cooking live stream", "meditation live stream",
+        "study with me live", "rain sounds live",
       ];
       const results = await Promise.all(
         queries.map(q => fetchYT("search", {
-          eventType: "live", type: "video", q, maxResults: 2, order: "relevance"
+          eventType: "live", type: "video", q, maxResults: 3, order: "viewCount"
         }))
       );
       const all = results.flatMap(r => r.items || []);
       const seen = new Set();
       const unique = all.filter(v => {
         const id = v.id?.videoId;
-        if (seen.has(id)) return false;
+        if (!id || seen.has(id)) return false;
         seen.add(id);
         return true;
       });
