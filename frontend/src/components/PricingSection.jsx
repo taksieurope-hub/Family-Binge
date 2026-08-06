@@ -80,18 +80,17 @@ const PricingSection = () => {
       method: 'POST'
     });
     if (res.ok) {
-      const user = auth.currentUser;
-      if (user) {
+      const uid = localStorage.getItem('fb_uid');
+      if (uid) {
         await fetch('https://family-binge-backend-2q4n.onrender.com/api/payment/activate-plan', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ user_id: user.uid, plan: plan.id, order_id: data.orderID })
+          body: JSON.stringify({ user_id: uid, plan: plan.id, order_id: data.orderID })
         });
       }
       if (referralCredit > 0) {
-        const user2 = auth.currentUser;
-        if (user2) {
-          await updateDoc(doc(db, 'users', user2.uid), { referralCredit: 0 });
+        const uid2 = localStorage.getItem('fb_uid');
+        if (uid2) {
           setReferralCredit(0);
         }
       }
