@@ -63,7 +63,7 @@ async def create_order(request: CreateOrderRequest):
             json={
                 "intent": "CAPTURE",
                 "purchase_units": [{
-                    "amount": {"currency_code": request.currency, "value": "{:.2f}".format(request.amount)},
+                    "amount": {"currency_code": request.currency, "value": str(round(request.amount, 2))},
                     "description": f"Family Binge - {request.plan} Plan"
                 }]
             }
