@@ -43,6 +43,16 @@ const PricingSection = () => {
       perks: ["Ad-free experience", "4 simultaneous streams", "Full HD quality", "Watch on any device", "Download on 2 devices"]
     },
     {
+      id: "vip",
+      name: "VIP Lifetime",
+      price: 1000,
+      billing: "$1000 / once off",
+      devices: "Unlimited Screens",
+      quality: "4K Ultra HD Quality",
+      popular: false,
+      perks: ["Lifetime access", "Unlimited screens", "4K Ultra HD quality", "All devices", "Uncapped downloads", "Priority support"]
+    },
+    {
       id: "premium",
       name: "Premium (The High Roller)",
       price: 25.99,
