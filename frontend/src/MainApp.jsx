@@ -468,7 +468,7 @@ function MainApp() {
       />
 
       {/* Device Blocked Modal */}
-      {deviceBlocked && (
+      {deviceBlocked && userData?.role !== "family" && userData?.role !== "admin" && (
         <DeviceBlockedModal
           deviceType={deviceType}
           onUnblocked={() => setDeviceBlocked(false)}
