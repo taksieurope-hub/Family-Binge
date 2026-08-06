@@ -256,8 +256,8 @@ function MainApp() {
             setShowPaywall(true);
           }
 
-          // Register device and check limit
-          if (isFreeAccess || hasPaidSub || trialEnds > now) {
+          // Register device and check limit - skip for family/admin
+          if (!isFreeAccess && (hasPaidSub || trialEnds > now)) {
             const result = await registerDevice(uid).catch(() => ({}));
             if (result.status === 'limit_reached') {
               setDeviceBlocked(true);
