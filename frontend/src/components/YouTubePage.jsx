@@ -121,6 +121,12 @@ const YouTubePage = () => {
         "football live stream free", "gaming live stream",
         "cooking live stream", "meditation live stream",
         "study with me live", "rain sounds live",
+        "rugby live stream", "rugby union live",
+        "NFL live stream", "NBA live stream",
+        "tennis live stream", "golf live stream",
+        "boxing live stream", "MMA live stream",
+        "Formula 1 live", "cycling live stream",
+        "athletics live stream", "swimming live",
       ];
       const results = await Promise.all(
         queries.map(q => fetchYT("search", {
