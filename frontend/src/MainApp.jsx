@@ -277,10 +277,22 @@ function MainApp() {
         }
       } catch (e) {
         console.error('Error checking access:', e);
-        // If backend fails, check if we have cached data
-        const cachedName = localStorage.getItem('fb_name');
-        if (cachedName) {
-          setAccessStatus('trial'); // Give benefit of doubt
+        // If backend fails, use cached data - never log user out due to network issues
+        const cachedData = localStorage.getItem('fb_userdata');
+        if (cachedData) {
+          try {
+            const data = JSON.parse(cachedData);
+            const isFreeAccess = data.role === 'admin' || data.role === 'family';
+            const now = new Date();
+            const trialEnds = new Date(data.trialEnds);
+            const subExpires = data.subscriptionExpires ? new Date(data.subscriptionExpires) : null;
+            const hasPaidSub = data.plan && data.plan !== 'free_trial' && subExpires && subExpires > now;
+            if (isFreeAccess || hasPaidSub) setAccessStatus('full');
+            else if (trialEnds > now) setAccessStatus('trial');
+            else setAccessStatus('expired');
+          } catch { setAccessStatus('trial'); }
+        } else if (localStorage.getItem('fb_name')) {
+          setAccessStatus('trial');
         } else {
           setAccessStatus('guest');
         }
