@@ -120,6 +120,9 @@ const LoginPage = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-6 py-4 bg-zinc-800 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500" required />
           <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-6 py-4 bg-zinc-800 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500" required />
+          <div className="text-right mt-1">
+            <Link to="/forgot-password" className="text-purple-400 hover:text-purple-300 text-sm transition-colors">Forgot password?</Link>
+          </div>
           <Button type="submit" disabled={loading} className="w-full py-7 text-lg bg-purple-600 hover:bg-purple-700">
             {loading ? 'Logging in...' : 'Log In'}
           </Button>

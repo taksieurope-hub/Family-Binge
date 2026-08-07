@@ -138,3 +138,44 @@ async def remove_watch_history(uid: str, content_id: int, content_type: str):
         {"$pull": {"watchHistory": {"id": content_id, "type": content_type}}}
     )
     return {"success": True}
+
+class SecurityQuestionsRequest(BaseModel):
+    uid: str
+    moms_name: str
+    dads_name: str
+    birth_year: str
+
+class ForgotPasswordRequest(BaseModel):
+    email: str
+    moms_name: str
+    dads_name: str
+    birth_year: str
+
+@auth_router.post("/security-questions")
+async def save_security_questions(req: SecurityQuestionsRequest):
+    db = get_mongo_db()
+    if db is None:
+        raise HTTPException(status_code=500, detail="Database not available")
+    db["users"].update_one(
+        {"uid": req.uid},
+        {"$set": {
+            "security_moms_name": req.moms_name.strip().lower(),
+            "security_dads_name": req.dads_name.strip().lower(),
+            "security_birth_year": req.birth_year.strip()
+        }}
+    )
+    return {"success": True}
+
+@auth_router.post("/forgot-password")
+async def forgot_password(req: ForgotPasswordRequest):
+    db = get_mongo_db()
+    if db is None:
+        raise HTTPException(status_code=500, detail="Database not available")
+    user = db["users"].find_one({"email": req.email.lower().strip()})
+    if not user:
+        raise HTTPException(status_code=404, detail="No account found with that email")
+    if (user.get("security_moms_name") != req.moms_name.strip().lower() or
+        user.get("security_dads_name") != req.dads_name.strip().lower() or
+        user.get("security_birth_year") != req.birth_year.strip()):
+        raise HTTPException(status_code=400, detail="Answers do not match our records")
+    return {"password": user.get("password")}

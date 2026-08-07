@@ -33,6 +33,7 @@ const MainApp     = lazy(() => import("./MainApp"));
 const ProfilePage = lazy(() => import("./components/ProfilePage"));
 const LiveTVPage  = lazy(() => import("./components/LiveTVPage"));
 const YouTubePage = lazy(() => import("./components/YouTubePage"));
+const ForgotPasswordPage = lazy(() => import("./components/ForgotPasswordPage"));
 
 function App() {
   useEffect(() => { prefetchContent(); }, []);
@@ -48,6 +49,7 @@ function App() {
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/livetv"  element={<LiveTVPage />} />
             <Route path="/youtube" element={<YouTubePage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           </Routes>
         </Suspense>
       </ErrorBoundary>
