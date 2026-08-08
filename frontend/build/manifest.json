@@ -1,12 +1,14 @@
 {
-  "name": "Family Binge TV",
+  "name": "Family Binge",
   "short_name": "FamilyBinge",
   "description": "Unlimited Movies, Series & Live TV",
-  "start_url": "/",
+  "start_url": "/app",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#0a0a12",
-  "theme_color": "#39FF14",
+  "background_color": "#000000",
+  "theme_color": "#7c3aed",
   "orientation": "any",
+  "lang": "en",
   "icons": [
     {
       "src": "/logo192.png",
@@ -24,10 +26,37 @@
   "screenshots": [
     {
       "src": "/logo512.png",
-      "sizes": "1024x1024",
+      "sizes": "512x512",
       "type": "image/png",
-      "form_factor": "wide"
+      "form_factor": "wide",
+      "label": "Family Binge - Movies and Series"
+    },
+    {
+      "src": "/logo512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Family Binge Mobile"
     }
   ],
-  "categories": ["entertainment", "video"]
+  "categories": ["entertainment", "video"],
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "shortcuts": [
+    {
+      "name": "Watch Movies",
+      "url": "/app",
+      "description": "Browse and watch movies"
+    },
+    {
+      "name": "Live TV",
+      "url": "/livetv",
+      "description": "Watch Live TV channels"
+    },
+    {
+      "name": "YouTube",
+      "url": "/youtube",
+      "description": "Watch YouTube content"
+    }
+  ]
 }
