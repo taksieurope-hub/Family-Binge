@@ -13,7 +13,6 @@ const LandingPage = () => {
       navigate('/app');
     }
   }, [navigate]);
-  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-black text-white">
