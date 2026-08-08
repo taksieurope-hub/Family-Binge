@@ -26,28 +26,36 @@ const ProfileSelector = ({ onSelect }) => {
 
   const [saveError, setSaveError] = useState('');
 
+  const [saving, setSaving] = useState(false);
+
   const handleAddProfile = async () => {
     if (!newName.trim()) return;
     setSaveError('');
+    setSaving(true);
     const profile_id = 'profile_' + Date.now();
     const newProfile = { id: profile_id, name: newName.trim(), avatar: selectedAvatar };
-    try {
-      const res = await fetch(`${API}/profiles`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ uid, profile_id, name: newName.trim(), avatar: selectedAvatar })
-      });
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        setSaveError(errData.detail || 'Could not save profile. Please try again.');
-        return;
+    let res = null;
+    for (let attempt = 0; attempt < 5; attempt++) {
+      try {
+        res = await fetch(`${API}/profiles`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ uid, profile_id, name: newName.trim(), avatar: selectedAvatar })
+        });
+        if (res.ok) break;
+      } catch {
+        res = null;
       }
-      setProfiles([...profiles, newProfile]);
-      setNewName('');
-      setAdding(false);
-    } catch {
-      setSaveError('Network error - could not save profile. Please try again.');
+      if (attempt < 4) await new Promise(r => setTimeout(r, 3000));
     }
+    setSaving(false);
+    if (!res || !res.ok) {
+      setSaveError('Could not save profile - please check your connection and try again.');
+      return;
+    }
+    setProfiles([...profiles, newProfile]);
+    setNewName('');
+    setAdding(false);
   };
 
   const handleDelete = async (e, profileId) => {
