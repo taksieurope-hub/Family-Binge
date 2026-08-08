@@ -303,6 +303,16 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
                 YouTube
               </button>
               <button
+                onClick={() => {
+                  localStorage.removeItem('active_profile_id');
+                  localStorage.removeItem('active_profile_name');
+                  window.location.reload();
+                }}
+                className="flex items-center gap-3 px-5 py-3.5 text-purple-400 hover:text-white hover:bg-purple-500/10 transition-colors border-b border-white/5 font-semibold"
+              >
+                Switch Profile
+              </button>
+              <button
                 onClick={() => { window.location.href = '/youtube'; setMobileMenuOpen(false); }}
                 className="flex items-center gap-3 px-5 py-3.5 text-red-400 hover:text-white hover:bg-red-500/10 transition-colors border-b border-white/5 font-semibold"
               >
