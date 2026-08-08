@@ -230,7 +230,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
     return (
       <div ref={playerContainerRef} className="fixed inset-0 z-[100] bg-black flex flex-col">
         {/* Minimal Header */}
-        <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/95 to-transparent border-b border-white/5">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-4 py-3 bg-gradient-to-b from-black/95 to-transparent border-b border-white/5">
           <div className="flex items-center gap-3 min-w-0 flex-1">
             <div className="p-1.5 bg-purple-600/80 rounded-lg flex-shrink-0">
               {details?.type === 'series' ? <Tv className="w-4 h-4 text-white" /> : <Film className="w-4 h-4 text-white" />}
@@ -256,9 +256,9 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             {details?.type === 'series' && (
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 flex-wrap">
                 <select value={selectedSeason} onChange={(e) => {
                   const ns = Number(e.target.value);
                   setSelectedSeason(ns);
