@@ -6,6 +6,14 @@ import { Button } from './ui/button';
 
 const LandingPage = () => {
   const navigate = useNavigate();
+  React.useEffect(() => {
+    const token = localStorage.getItem('fb_token');
+    const uid = localStorage.getItem('fb_uid');
+    if (token && uid) {
+      navigate('/app');
+    }
+  }, [navigate]);
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-black text-white">
