@@ -17,7 +17,7 @@ const ProfileSelector = ({ onSelect }) => {
 
   useEffect(() => {
     if (!uid) return;
-    fetch(`${API}/profiles/${uid}`)
+    fetch(`${API}/auth/profiles/${uid}`)
       .then(res => res.ok ? res.json() : { profiles: [] })
       .then(data => setProfiles(data.profiles || []))
       .catch(() => {})
@@ -37,7 +37,7 @@ const ProfileSelector = ({ onSelect }) => {
     let res = null;
     for (let attempt = 0; attempt < 5; attempt++) {
       try {
-        res = await fetch(`${API}/profiles`, {
+        res = await fetch(`${API}/auth/profiles`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ uid, profile_id, name: newName.trim(), avatar: selectedAvatar })
@@ -60,7 +60,7 @@ const ProfileSelector = ({ onSelect }) => {
 
   const handleDelete = async (e, profileId) => {
     e.stopPropagation();
-    await fetch(`${API}/profiles`, {
+    await fetch(`${API}/auth/profiles`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ uid, profile_id: profileId })
