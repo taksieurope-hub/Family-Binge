@@ -15,13 +15,15 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
   const [searching, setSearching] = useState(false);
   const [searchHistory, setSearchHistory] = useState(() => {
     const uid = localStorage.getItem('fb_uid') || 'guest';
-    try { return JSON.parse(localStorage.getItem('search_history_' + uid)) || []; } catch { return []; }
+    const pid = localStorage.getItem('active_profile_id') || 'main';
+    try { return JSON.parse(localStorage.getItem('search_history_' + uid + '_' + pid)) || []; } catch { return []; }
   });
 
   const saveSearchHistory = (query) => {
     if (!query || query.trim().length < 2) return;
     const uid = localStorage.getItem('fb_uid') || 'guest';
-    const key = 'search_history_' + uid;
+    const pid = localStorage.getItem('active_profile_id') || 'main';
+    const key = 'search_history_' + uid + '_' + pid;
     let history = [];
     try { history = JSON.parse(localStorage.getItem(key)) || []; } catch {}
     history = history.filter(h => h.toLowerCase() !== query.trim().toLowerCase());

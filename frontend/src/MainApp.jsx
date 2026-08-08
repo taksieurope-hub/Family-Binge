@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import ProfileSelector from "./components/ProfileSelector";
 import { useNavigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import HeroSection from "./components/HeroSection";
@@ -373,6 +374,16 @@ function MainApp() {
         <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
+  }
+
+  // Show profile selector if logged in but no profile selected
+  const activeProfile = localStorage.getItem('active_profile_id');
+  if ((accessStatus === 'full' || accessStatus === 'trial') && !activeProfile) {
+    return <ProfileSelector onSelect={(id, name) => {
+      localStorage.setItem('active_profile_id', id);
+      localStorage.setItem('active_profile_name', name);
+      window.location.reload();
+    }} />;
   }
 
   const trialEnds = userData?.trialEnds;

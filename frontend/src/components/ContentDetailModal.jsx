@@ -7,7 +7,8 @@ import * as api from '../api';
 const getWatchHistoryKey = () => {
   const uid = localStorage.getItem('fb_uid');
   if (!uid) return null;
-  return "familybinge_watch_history_" + uid;
+  const profileId = localStorage.getItem('active_profile_id') || 'main';
+  return "familybinge_watch_history_" + uid + "_" + profileId;
 };
 
 export const getWatchHistory = () => {

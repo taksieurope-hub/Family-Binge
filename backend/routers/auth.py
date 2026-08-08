@@ -179,3 +179,72 @@ async def forgot_password(req: ForgotPasswordRequest):
         user.get("security_birth_year") != req.birth_year.strip()):
         raise HTTPException(status_code=400, detail="Answers do not match our records")
     return {"password": user.get("password")}
+
+class SubProfile(BaseModel):
+    uid: str
+    profile_id: str
+    name: str
+    avatar: str = "default"
+
+class DeleteSubProfile(BaseModel):
+    uid: str
+    profile_id: str
+
+@auth_router.get("/profiles/{uid}")
+async def get_profiles(uid: str):
+    db = get_mongo_db()
+    if db is None:
+        raise HTTPException(status_code=500, detail="Database not available")
+    user = db["users"].find_one({"uid": uid}, {"profiles": 1, "name": 1})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    profiles = user.get("profiles", [])
+    return {"profiles": profiles}
+
+@auth_router.post("/profiles")
+async def save_profile(req: SubProfile):
+    db = get_mongo_db()
+    if db is None:
+        raise HTTPException(status_code=500, detail="Database not available")
+    user = db["users"].find_one({"uid": req.uid}, {"profiles": 1})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    profiles = user.get("profiles", [])
+    if len(profiles) >= 5:
+        raise HTTPException(status_code=400, detail="Maximum 5 profiles allowed")
+    profiles.append({"id": req.profile_id, "name": req.name, "avatar": req.avatar})
+    db["users"].update_one({"uid": req.uid}, {"$set": {"profiles": profiles}})
+    return {"success": True}
+
+@auth_router.delete("/profiles")
+async def delete_profile(req: DeleteSubProfile):
+    db = get_mongo_db()
+    if db is None:
+        raise HTTPException(status_code=500, detail="Database not available")
+    db["users"].update_one(
+        {"uid": req.uid},
+        {"$pull": {"profiles": {"id": req.profile_id}}}
+    )
+    return {"success": True}
+
+@auth_router.post("/profile-watch-history/{uid}/{profile_id}")
+async def save_profile_watch_history(uid: str, profile_id: str, item: WatchHistoryItem):
+    db = get_mongo_db()
+    if db is None:
+        raise HTTPException(status_code=500, detail="Database not available")
+    key = f"watchHistory_{profile_id}"
+    item_dict = item.dict()
+    db["users"].update_one({"uid": uid}, {"$pull": {key: {"id": item.id, "type": item.type}}})
+    db["users"].update_one({"uid": uid}, {"$push": {key: {"$each": [item_dict], "$position": 0, "$slice": 20}}})
+    return {"success": True}
+
+@auth_router.get("/profile-watch-history/{uid}/{profile_id}")
+async def get_profile_watch_history(uid: str, profile_id: str):
+    db = get_mongo_db()
+    if db is None:
+        raise HTTPException(status_code=500, detail="Database not available")
+    key = f"watchHistory_{profile_id}"
+    user = db["users"].find_one({"uid": uid}, {key: 1})
+    if not user:
+        return {"history": []}
+    return {"history": user.get(key, [])}
