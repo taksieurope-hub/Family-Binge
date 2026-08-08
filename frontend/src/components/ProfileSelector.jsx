@@ -77,6 +77,20 @@ const ProfileSelector = ({ onSelect }) => {
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-6">
       <div className="max-w-2xl w-full">
+        {localStorage.getItem('previous_profile_id') && (
+          <button
+            onClick={() => {
+              const pid = localStorage.getItem('previous_profile_id');
+              const pname = localStorage.getItem('previous_profile_name');
+              localStorage.removeItem('previous_profile_id');
+              localStorage.removeItem('previous_profile_name');
+              onSelect(pid, pname);
+            }}
+            className="text-gray-400 hover:text-white transition-colors text-sm mb-6 flex items-center gap-1"
+          >
+            {'\u2190'} Back
+          </button>
+        )}
         <h1 className="text-4xl font-bold text-white text-center mb-2">Who's watching?</h1>
         <p className="text-gray-400 text-center mb-12">Select your profile</p>
 

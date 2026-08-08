@@ -185,6 +185,10 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
                   </button>
                   <button
                     onClick={() => {
+                      const pid = localStorage.getItem('active_profile_id');
+                      const pname = localStorage.getItem('active_profile_name');
+                      if (pid) localStorage.setItem('previous_profile_id', pid);
+                      if (pname) localStorage.setItem('previous_profile_name', pname);
                       localStorage.removeItem('active_profile_id');
                       localStorage.removeItem('active_profile_name');
                       window.location.reload();
@@ -322,6 +326,10 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
               </button>
               <button
                 onClick={() => {
+                  const pid = localStorage.getItem('active_profile_id');
+                  const pname = localStorage.getItem('active_profile_name');
+                  if (pid) localStorage.setItem('previous_profile_id', pid);
+                  if (pname) localStorage.setItem('previous_profile_name', pname);
                   localStorage.removeItem('active_profile_id');
                   localStorage.removeItem('active_profile_name');
                   window.location.reload();
