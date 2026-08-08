@@ -183,6 +183,16 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
                   >
                     <User className="w-4 h-4" /> My Profile
                   </button>
+                  <button
+                    onClick={() => {
+                      localStorage.removeItem('active_profile_id');
+                      localStorage.removeItem('active_profile_name');
+                      window.location.reload();
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/10 transition-colors text-sm"
+                  >
+                    <User className="w-4 h-4" /> Switch Profile
+                  </button>
                   <button className="w-full flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/10 transition-colors text-sm">
                     <Settings className="w-4 h-4" /> Settings
                   </button>
