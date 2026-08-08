@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Clock, LogOut, Crown, Calendar, AlertTriangle, Tv, X } from 'lucide-react';
 import { getWatchHistory, removeFromWatchHistory } from './ContentDetailModal';
+import { signOut } from 'firebase/auth';
+import { auth } from '../services/firebase';
 
 const API = 'https://family-binge-backend-2q4n.onrender.com/api';
 
@@ -37,13 +39,14 @@ const ProfilePage = () => {
     setHistory(items);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     if (window.confirm('Log out?')) {
       localStorage.removeItem('fb_token');
       localStorage.removeItem('fb_uid');
       localStorage.removeItem('fb_name');
       localStorage.removeItem('fb_email');
       localStorage.removeItem('fb_userdata');
+      try { await signOut(auth); } catch {}
       navigate('/login');
     }
   };
