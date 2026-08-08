@@ -29,8 +29,9 @@ const LandingPage = () => {
         </div>
       </nav>
 
-      <section className="pt-32 pb-24 px-6 text-center">
-        <div className="max-w-4xl mx-auto">
+      <section className="pt-32 pb-24 px-6 text-center relative" style={{backgroundImage: "url('/hero-bg.png')", backgroundSize: "cover", backgroundPosition: "center"}}>
+        <div className="absolute inset-0 bg-black/70" />
+        <div className="max-w-4xl mx-auto relative z-10">
           <h1 className="text-6xl md:text-7xl font-bold leading-tight mb-6">
             Unlimited Movies,<br />Series &amp; Live TV
           </h1>
