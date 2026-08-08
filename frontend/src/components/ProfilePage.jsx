@@ -82,7 +82,7 @@ const ProfilePage = () => {
       <div className="max-w-4xl mx-auto px-4 py-12">
         {/* Header */}
         <div className="flex items-center justify-between mb-10">
-          <button onClick={() => navigate('/app')} className="text-gray-400 hover:text-white transition-colors text-sm">? Back</button>
+          <button onClick={() => navigate('/app')} className="text-gray-400 hover:text-white transition-colors text-sm">← Back</button>
           <button onClick={handleLogout} className="flex items-center gap-2 text-red-400 hover:text-red-300 transition-colors text-sm">
             <LogOut className="w-4 h-4" /> Log Out
           </button>

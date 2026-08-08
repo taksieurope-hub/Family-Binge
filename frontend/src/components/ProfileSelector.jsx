@@ -3,13 +3,13 @@ import { Plus, X, User } from 'lucide-react';
 
 const API = 'https://family-binge-backend-2q4n.onrender.com/api';
 
-const AVATARS = ['??', '??', '??', '?', '??', '??', '??', '??', '??', '??'];
+const AVATARS = ['😀', '😎', '🤖', '🐱', '🐶', '🦄', '👽', '👻', '🦕', '🦊'];
 
 const ProfileSelector = ({ onSelect }) => {
   const [profiles, setProfiles] = useState([]);
   const [adding, setAdding] = useState(false);
   const [newName, setNewName] = useState('');
-  const [selectedAvatar, setSelectedAvatar] = useState('??');
+  const [selectedAvatar, setSelectedAvatar] = useState('😀');
   const [loading, setLoading] = useState(true);
 
   const uid = localStorage.getItem('fb_uid');
@@ -24,20 +24,30 @@ const ProfileSelector = ({ onSelect }) => {
       .finally(() => setLoading(false));
   }, [uid]);
 
+  const [saveError, setSaveError] = useState('');
+
   const handleAddProfile = async () => {
     if (!newName.trim()) return;
+    setSaveError('');
     const profile_id = 'profile_' + Date.now();
     const newProfile = { id: profile_id, name: newName.trim(), avatar: selectedAvatar };
     try {
-      await fetch(`${API}/profiles`, {
+      const res = await fetch(`${API}/profiles`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ uid, profile_id, name: newName.trim(), avatar: selectedAvatar })
       });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        setSaveError(errData.detail || 'Could not save profile. Please try again.');
+        return;
+      }
       setProfiles([...profiles, newProfile]);
       setNewName('');
       setAdding(false);
-    } catch {}
+    } catch {
+      setSaveError('Network error - could not save profile. Please try again.');
+    }
   };
 
   const handleDelete = async (e, profileId) => {
@@ -108,6 +118,9 @@ const ProfileSelector = ({ onSelect }) => {
               placeholder="Profile name"
               className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 border border-zinc-700 focus:border-purple-500 outline-none mb-4"
               maxLength={20} />
+            {saveError && (
+              <p className="text-red-400 text-sm mb-3 bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-2">{saveError}</p>
+            )}
             <p className="text-gray-400 text-sm mb-3">Choose an avatar:</p>
             <div className="flex flex-wrap gap-2 mb-6">
               {AVATARS.map(a => (
