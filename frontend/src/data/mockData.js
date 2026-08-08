@@ -7,7 +7,7 @@ export const pricingPlans = [
     period: "month",
     devices: "1 TV + 1 Phone",
     features: [
-      "3-day free trial",
+      "7-day free trial",
       "60,000+ Movies & Series",
       "HD Quality",
       "1 TV device + 1 Phone",
@@ -23,7 +23,7 @@ export const pricingPlans = [
     period: "3 months",
     devices: "1 TVs +  Phones",
     features: [
-      "3-day free trial",
+      "7-day free trial",
       "60,000+ Movies & Series",
       "Full HD Quality",
       "2 TV devices + 2 Phones",
@@ -39,7 +39,7 @@ export const pricingPlans = [
     period: "6 months",
     devices: "1 TVs + 1 Phones",
     features: [
-      "3-day free trial",
+      "7-day free trial",
       "60,000+ Movies & Series",
       "4K Quality",
       "4 TV devices + 4 Phones",
@@ -55,7 +55,7 @@ export const pricingPlans = [
     period: "12 months",
     devices: "Unlimited devices",
     features: [
-      "3-day free trial",
+      "7-day free trial",
       "60,000+ Movies & Series",
       "4K Quality",
       "Unlimited devices",
@@ -75,7 +75,7 @@ export const faqData = [
       },
       {
         q: "Is there a free trial?",
-        a: "Yes! We offer a 3-day free trial so you can explore our entire library before subscribing. No credit card required to start."
+        a: "Yes! We offer a 7-day free trial so you can explore our entire library before subscribing. No credit card required to start."
       },
       {
         q: "What devices can I watch on?",

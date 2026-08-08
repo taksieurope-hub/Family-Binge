@@ -36,7 +36,7 @@ const LandingPage = () => {
             Unlimited Movies,<br />Series &amp; Live TV
           </h1>
           <p className="text-2xl text-gray-400 mb-10">
-            3 days free • Then pay for full access
+            7 days free • Then pay for full access
           </p>
           
           <Button 
@@ -55,7 +55,7 @@ const LandingPage = () => {
 
       <div className="py-20 bg-zinc-900 text-center">
         <p className="text-gray-400 text-sm">
-          After 3 days your subscription will automatically continue unless you cancel
+          After 7 days your subscription will automatically continue unless you cancel
         </p>
       </div>
       <InviteSection />
