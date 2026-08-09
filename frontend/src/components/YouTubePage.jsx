@@ -44,7 +44,7 @@ const VideoCard = ({ video, onPlay }) => {
   const { snippet } = video;
   const videoId = video.id?.videoId || video.id;
   return (
-    <div onClick={() => onPlay(videoId, snippet?.title)} className="group cursor-pointer flex-shrink-0 w-64">
+    <div onClick={() => onPlay(videoId, snippet?.title)} className="group cursor-pointer">
       <div className="relative rounded-xl overflow-hidden mb-2">
         <img src={snippet?.thumbnails?.medium?.url} alt={snippet?.title}
           className="w-full h-36 object-cover transition-transform duration-300 group-hover:scale-105" />
@@ -220,7 +220,7 @@ const YouTubePage = () => {
                 className="w-full bg-zinc-800 text-white pl-12 pr-4 py-4 rounded-2xl border border-zinc-700 focus:border-red-500 outline-none text-sm" />
               {loading && <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-red-400 animate-spin" />}
             </div>
-            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {searchResults.map(v => <VideoCard key={v.id?.videoId} video={v} onPlay={playVideo} />)}
             </div>
           </div>
@@ -250,7 +250,7 @@ const YouTubePage = () => {
             {selectedGenres.length > 0 && recommendations.length > 0 && (
               <div className="mb-10">
                 <h2 className="text-white font-bold text-xl mb-4">Recommended for You</h2>
-                <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                   {recommendations.map(v => <VideoCard key={v.id?.videoId} video={v} onPlay={playVideo} />)}
                 </div>
               </div>
@@ -259,7 +259,7 @@ const YouTubePage = () => {
             {/* Trending */}
             <div className="mb-10">
               <h2 className="text-white font-bold text-xl mb-4">?? Trending Now</h2>
-              <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 {trending.map(v => <VideoCard key={v.id} video={v} onPlay={playVideo} />)}
               </div>
             </div>
