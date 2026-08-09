@@ -110,6 +110,7 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-4 sm:p-6">
       <div className="max-w-md w-full bg-zinc-900 rounded-3xl p-6 sm:p-10">
+        <button onClick={() => navigate('/app')} className="text-gray-400 hover:text-white transition-colors text-sm mb-4">{'\u2190'} Back</button>
         <h1 className="text-2xl sm:text-4xl font-bold text-center mb-4 sm:mb-8">Welcome Back</h1>
         {error && (
           <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 mb-6">

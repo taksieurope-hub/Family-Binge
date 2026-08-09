@@ -32,7 +32,7 @@ const LiveTVPage = () => {
     document.head.appendChild(script);
   }, []);
   useEffect(() => {
-    if (!user) { navigate('/login'); return; }
+    if (!user) { return; }
     const checkAccess = async () => {
       try {
         const snap = await getDoc(doc(db, 'users', user.uid));
