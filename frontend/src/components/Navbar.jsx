@@ -97,6 +97,16 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
         setSearchResults(res.data.items || []);
         if (res.data.items && res.data.items.length > 0) saveSearchHistory(searchQuery);
         setShowResults(true);
+        const sid = sessionStorage.getItem('fb_session_id') || 'anon_' + Date.now();
+        fetch('https://family-binge-backend-2q4n.onrender.com/api/auth/analytics/search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            session_id: sid,
+            query: searchQuery,
+            result_count: (res.data.items || []).length
+          })
+        }).catch(() => {});
       } catch (error) {
         console.error('Search error:', error);
       } finally {

@@ -1,6 +1,7 @@
 import React, { lazy, Suspense, useEffect, Component } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { prefetchContent } from "./services/api";
+import { AuthProvider } from "./services/AuthContext";
 
 class ErrorBoundary extends Component {
   state = { hasError: false };
@@ -38,6 +39,7 @@ const ForgotPasswordPage = lazy(() => import("./components/ForgotPasswordPage"))
 function App() {
   useEffect(() => { prefetchContent(); }, []);
   return (
+    <AuthProvider>
     <Router>
       <ErrorBoundary>
         <Suspense fallback={<LoadingScreen />}>
@@ -54,6 +56,7 @@ function App() {
         </Suspense>
       </ErrorBoundary>
     </Router>
+    </AuthProvider>
   );
 }
 export default App;

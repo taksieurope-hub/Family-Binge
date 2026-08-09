@@ -320,3 +320,38 @@ async def analytics_recent(limit: int = 30):
         events.append({"type": "play", "timestamp": p["timestamp"], "detail": p.get("title") or p.get("content_id")})
     events.sort(key=lambda e: e["timestamp"], reverse=True)
     return {"events": events[:limit]}
+
+class SearchEvent(BaseModel):
+    session_id: str
+    query: str
+    result_count: int = 0
+
+@auth_router.post("/analytics/search")
+async def track_search(event: SearchEvent):
+    db = get_mongo_db()
+    if db is None:
+        return {"success": False}
+    db["analytics_searches"].insert_one({
+        "session_id": event.session_id,
+        "query": event.query.strip().lower(),
+        "result_count": event.result_count,
+        "timestamp": datetime.utcnow().isoformat()
+    })
+    return {"success": True}
+
+@auth_router.get("/analytics/top-searches")
+async def top_searches(days: int = 7, limit: int = 20):
+    db = get_mongo_db()
+    if db is None:
+        raise HTTPException(status_code=500, detail="Database not available")
+    since = (datetime.utcnow() - timedelta(days=days)).isoformat()
+    searches = list(db["analytics_searches"].find({"timestamp": {"$gte": since}}))
+    from collections import Counter
+    counts = Counter(s["query"] for s in searches if s.get("query"))
+    zero_result = Counter(s["query"] for s in searches if s.get("query") and s.get("result_count", 0) == 0)
+    return {
+        "days": days,
+        "total_searches": len(searches),
+        "top_searches": [{"query": q, "count": c} for q, c in counts.most_common(limit)],
+        "zero_result_searches": [{"query": q, "count": c} for q, c in zero_result.most_common(limit)]
+    }
