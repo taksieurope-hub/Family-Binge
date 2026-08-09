@@ -255,7 +255,6 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
                     : details?.year}
                 </span>
                 <span className="text-gray-600">·</span>
-                <button onClick={handleNextSource} className="flex items-center gap-1 px-3 py-1 bg-purple-600/80 hover:bg-purple-600 rounded-lg text-purple-200 text-xs font-medium transition-colors">{currentSourceName} ?</button>
                 {!playerReady && (
                   <span className="flex items-center gap-1 text-yellow-400">
                     <Loader2 className="w-3 h-3 animate-spin" />
@@ -326,15 +325,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
           {!playerReady && currentSourceIndex >= 0 && (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-black z-10">
               <Loader2 className="w-14 h-14 text-purple-500 animate-spin" />
-              <p className="text-white mt-5 font-medium">Connecting to {currentSourceName}...</p>
-              <p className="text-gray-500 text-sm mt-2">
-                Server {currentSourceIndex + 1} of {VIDEO_SOURCES.length}
-              </p>
-              <button
-                className="mt-6 flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white text-sm transition-colors"
-              >
-                <RefreshCw className="w-4 h-4" /> Try Next Server
-              </button>
+              <p className="text-white mt-5 font-medium">Loading...</p>
             </div>
           )}
 
