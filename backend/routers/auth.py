@@ -248,3 +248,60 @@ async def get_profile_watch_history(uid: str, profile_id: str):
     if not user:
         return {"history": []}
     return {"history": user.get(key, [])}
+
+class VisitEvent(BaseModel):
+    session_id: str
+    path: str = None
+
+class PlayEvent(BaseModel):
+    session_id: str
+    content_id: str
+    content_type: str
+    title: str = None
+
+@auth_router.post("/analytics/visit")
+async def track_visit(event: VisitEvent):
+    db = get_mongo_db()
+    if db is None:
+        return {"success": False}
+    db["analytics_visits"].insert_one({
+        "session_id": event.session_id,
+        "path": event.path,
+        "timestamp": datetime.utcnow().isoformat()
+    })
+    return {"success": True}
+
+@auth_router.post("/analytics/play")
+async def track_play(event: PlayEvent):
+    db = get_mongo_db()
+    if db is None:
+        return {"success": False}
+    db["analytics_plays"].insert_one({
+        "session_id": event.session_id,
+        "content_id": event.content_id,
+        "content_type": event.content_type,
+        "title": event.title,
+        "timestamp": datetime.utcnow().isoformat()
+    })
+    return {"success": True}
+
+@auth_router.get("/analytics/summary")
+async def analytics_summary(days: int = 7):
+    db = get_mongo_db()
+    if db is None:
+        raise HTTPException(status_code=500, detail="Database not available")
+    since = (datetime.utcnow() - timedelta(days=days)).isoformat()
+    visits = list(db["analytics_visits"].find({"timestamp": {"$gte": since}}))
+    plays = list(db["analytics_plays"].find({"timestamp": {"$gte": since}}))
+    unique_visitors = len(set(v["session_id"] for v in visits))
+    unique_viewers = len(set(p["session_id"] for p in plays))
+    from collections import Counter
+    top_titles = Counter(p.get("title") or p.get("content_id") for p in plays).most_common(10)
+    return {
+        "days": days,
+        "total_visits": len(visits),
+        "unique_visitors": unique_visitors,
+        "total_plays": len(plays),
+        "unique_viewers": unique_viewers,
+        "top_titles": [{"title": t, "plays": c} for t, c in top_titles]
+    }

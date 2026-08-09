@@ -42,7 +42,7 @@ function App() {
       <ErrorBoundary>
         <Suspense fallback={<LoadingScreen />}>
           <Routes>
-            <Route path="/"        element={<LandingPage />} />
+            <Route path="/"        element={<MainApp />} />
             <Route path="/login"   element={<LoginPage />} />
             <Route path="/signup"  element={<SignupPage />} />
             <Route path="/app"     element={<MainApp />} />

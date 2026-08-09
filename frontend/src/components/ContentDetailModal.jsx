@@ -149,6 +149,17 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
     if (details) {
       saveToWatchHistory(details, selectedSeason, selectedEpisode, 0);
       window.dispatchEvent(new Event('watchHistoryUpdated'));
+      const sid = sessionStorage.getItem('fb_session_id') || 'anon_' + Date.now();
+      fetch('https://family-binge-backend-2q4n.onrender.com/api/auth/analytics/play', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_id: sid,
+          content_id: String(details.id),
+          content_type: details.type,
+          title: details.title
+        })
+      }).catch(() => {});
     }
     setWatchCountdown(5);
     let count = 5;

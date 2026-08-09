@@ -305,6 +305,38 @@ function MainApp() {
   
 
 
+  // Track visit once per session (analytics)
+  useEffect(() => {
+    let sid = sessionStorage.getItem('fb_session_id');
+    if (!sid) {
+      sid = 'sess_' + Date.now() + '_' + Math.random().toString(36).slice(2, 10);
+      sessionStorage.setItem('fb_session_id', sid);
+    }
+    if (!sessionStorage.getItem('fb_visit_tracked')) {
+      sessionStorage.setItem('fb_visit_tracked', '1');
+      fetch('https://family-binge-backend-2q4n.onrender.com/api/auth/analytics/visit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: sid, path: window.location.pathname })
+      }).catch(() => {});
+    }
+  }, []);
+  // Track visit once per session (analytics)
+  useEffect(() => {
+    let sid = sessionStorage.getItem('fb_session_id');
+    if (!sid) {
+      sid = 'sess_' + Date.now() + '_' + Math.random().toString(36).slice(2, 10);
+      sessionStorage.setItem('fb_session_id', sid);
+    }
+    if (!sessionStorage.getItem('fb_visit_tracked')) {
+      sessionStorage.setItem('fb_visit_tracked', '1');
+      fetch('https://family-binge-backend-2q4n.onrender.com/api/auth/analytics/visit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: sid, path: window.location.pathname })
+      }).catch(() => {});
+    }
+  }, []);
   // Countdown timer when warning shown
   useEffect(() => {
     if (!sessionWarning) return;
