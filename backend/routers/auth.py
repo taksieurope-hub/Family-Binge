@@ -305,3 +305,18 @@ async def analytics_summary(days: int = 7):
         "unique_viewers": unique_viewers,
         "top_titles": [{"title": t, "plays": c} for t, c in top_titles]
     }
+
+@auth_router.get("/analytics/recent")
+async def analytics_recent(limit: int = 30):
+    db = get_mongo_db()
+    if db is None:
+        raise HTTPException(status_code=500, detail="Database not available")
+    visits = list(db["analytics_visits"].find({}, {"_id": 0}).sort("timestamp", -1).limit(limit))
+    plays = list(db["analytics_plays"].find({}, {"_id": 0}).sort("timestamp", -1).limit(limit))
+    events = []
+    for v in visits:
+        events.append({"type": "visit", "timestamp": v["timestamp"], "detail": v.get("path") or "/"})
+    for p in plays:
+        events.append({"type": "play", "timestamp": p["timestamp"], "detail": p.get("title") or p.get("content_id")})
+    events.sort(key=lambda e: e["timestamp"], reverse=True)
+    return {"events": events[:limit]}
