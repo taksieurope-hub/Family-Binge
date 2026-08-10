@@ -5,7 +5,7 @@ import { getWatchHistory, removeFromWatchHistory } from './ContentDetailModal';
 import { signOut } from 'firebase/auth';
 import { auth } from '../services/firebase';
 
-const API = 'https://family-binge-backend-2q4n.onrender.com/api';
+const API = 'https://family-binge-g5hf.onrender.com/api';
 
 const ProfilePage = () => {
   const navigate = useNavigate();

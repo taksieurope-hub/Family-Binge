@@ -225,7 +225,7 @@ function MainApp() {
         // Retry up to 3 times in case backend is waking up
         let res;
         for (let attempt = 0; attempt < 3; attempt++) {
-          res = await fetch(`https://family-binge-backend-2q4n.onrender.com/api/auth/me/${uid}`);
+          res = await fetch(`https://family-binge-g5hf.onrender.com/api/auth/me/${uid}`);
           if (res.ok) break;
           if (attempt < 2) await new Promise(r => setTimeout(r, 2000));
         }
@@ -269,7 +269,7 @@ function MainApp() {
           // User not in MongoDB yet - create them with trial
           const now = new Date();
           const trialEnds = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-          await fetch(`https://family-binge-backend-2q4n.onrender.com/api/payment/user/${uid}`, {
+          await fetch(`https://family-binge-g5hf.onrender.com/api/payment/user/${uid}`, {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({ uid: uid, email: localStorage.getItem('fb_email') || '', trialEnds: trialEnds.toISOString() })
@@ -314,7 +314,7 @@ function MainApp() {
     }
     if (!sessionStorage.getItem('fb_visit_tracked')) {
       sessionStorage.setItem('fb_visit_tracked', '1');
-      fetch('https://family-binge-backend-2q4n.onrender.com/api/auth/analytics/visit', {
+      fetch('https://family-binge-g5hf.onrender.com/api/auth/analytics/visit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ session_id: sid, path: window.location.pathname })
@@ -330,7 +330,7 @@ function MainApp() {
     }
     if (!sessionStorage.getItem('fb_visit_tracked')) {
       sessionStorage.setItem('fb_visit_tracked', '1');
-      fetch('https://family-binge-backend-2q4n.onrender.com/api/auth/analytics/visit', {
+      fetch('https://family-binge-g5hf.onrender.com/api/auth/analytics/visit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ session_id: sid, path: window.location.pathname })

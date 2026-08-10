@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, X, User } from 'lucide-react';
 
-const API = 'https://family-binge-backend-2q4n.onrender.com/api';
+const API = 'https://family-binge-g5hf.onrender.com/api';
 
 const AVATARS = ['😀', '😎', '🤖', '🐱', '🐶', '🦄', '👽', '👻', '🦕', '🦊'];
 

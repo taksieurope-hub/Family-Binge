@@ -1,4 +1,4 @@
-const API = process.env.REACT_APP_API_URL || "https://family-binge-backend-2q4n.onrender.com/api";
+const API = process.env.REACT_APP_API_URL || "https://family-binge-g5hf.onrender.com/api";
 
 export const getDeviceId = () => {
   try {

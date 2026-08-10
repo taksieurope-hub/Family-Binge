@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertTriangle, Eye } from 'lucide-react';
 
-const BACKEND = 'https://family-binge-backend-2q4n.onrender.com';
+const BACKEND = 'https://family-binge-g5hf.onrender.com';
 
 const ForgotPasswordPage = () => {
   const navigate = useNavigate();
@@ -48,7 +48,7 @@ const ForgotPasswordPage = () => {
         <p className="text-gray-400 text-sm mb-6">Here is your password. Please keep it safe.</p>
         <div className="bg-zinc-800 rounded-2xl p-6 mb-6">
           <p className="text-white text-2xl font-mono font-bold tracking-wider">
-            {showPassword ? password : '••••••••'}
+            {showPassword ? password : 'Â•Â•Â•Â•Â•Â•Â•Â•'}
           </p>
           <button onClick={() => setShowPassword(!showPassword)}
             className="text-purple-400 hover:text-purple-300 text-sm mt-2 transition-colors">

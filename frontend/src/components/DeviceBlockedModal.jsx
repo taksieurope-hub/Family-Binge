@@ -4,7 +4,7 @@ import { auth } from "../services/firebase";
 import { Smartphone, Tv } from "lucide-react";
 import { addExtraDevice, getDeviceId, getDeviceType, getDeviceName } from "../services/deviceService";
 
-const API = process.env.REACT_APP_API_URL || "https://family-binge-backend-2q4n.onrender.com/api";
+const API = process.env.REACT_APP_API_URL || "https://family-binge-g5hf.onrender.com/api";
 
 const DeviceBlockedModal = ({ deviceType, onUnblocked }) => {
   const [paid, setPaid] = useState(false);

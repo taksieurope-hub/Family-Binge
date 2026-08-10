@@ -1,4 +1,4 @@
-const BACKEND = 'https://family-binge-backend-2q4n.onrender.com';
+const BACKEND = 'https://family-binge-g5hf.onrender.com';
 
 const getUid = () => localStorage.getItem('fb_uid');
 
