@@ -330,7 +330,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
           )}
 
           {getStreamUrl() && (
-            <iframe
+            <iframe sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
               ref={iframeRef}
               key={`${details?.id}-${selectedSeason}-${selectedEpisode}-${currentSourceIndex}`}
               src={getStreamUrl()}
