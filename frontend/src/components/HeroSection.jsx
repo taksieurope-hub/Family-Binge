@@ -236,3 +236,4 @@ const HeroSection = ({ setActiveSection, onPlayVideo, onSelectContent }) => {
 };
 
 export default HeroSection;
+

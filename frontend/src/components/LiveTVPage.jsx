@@ -5,7 +5,7 @@ import { channels } from './LiveTVSection';
 import { useAuth } from '../services/AuthContext';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
-const PROXY = 'https://family-binge-g5hf.onrender.com/api/content/livetv/proxy?url=';
+const PROXY = 'https://api.familybinge.com/api/content/livetv/proxy?url=';
 const proxyUrl = (url) => url ? PROXY + encodeURIComponent(url) : url;
 const LiveTVPage = () => {
   const navigate = useNavigate();
@@ -304,3 +304,6 @@ const LiveTVPage = () => {
   );
 };
 export default LiveTVPage;
+
+
+

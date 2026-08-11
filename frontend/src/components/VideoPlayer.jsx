@@ -35,7 +35,7 @@ const VideoPlayer = ({ videoId, onClose, season, episode, isTV }) => {
         <div className="aspect-video rounded-xl overflow-hidden shadow-2xl">
           <iframe key={src} src={src} title="Video Player" className="w-full h-full"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen *"
-            sandbox="allow-scripts allow-same-origin allow-forms allow-presentation allow-pointer-lock allow-popups"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-presentation allow-pointer-lock"
             allowFullScreen />
         </div>
       </div>
@@ -44,3 +44,5 @@ const VideoPlayer = ({ videoId, onClose, season, episode, isTV }) => {
   );
 };
 export default VideoPlayer;
+
+

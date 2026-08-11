@@ -3,7 +3,7 @@ import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Button } from './ui/button';
 import { AlertTriangle } from 'lucide-react';
 
-const BACKEND = 'https://family-binge-g5hf.onrender.com';
+const BACKEND = 'https://api.familybinge.com';
 
 const SignupPage = () => {
   const navigate = useNavigate();
@@ -59,7 +59,7 @@ const SignupPage = () => {
     }
     setLoading(true);
     try {
-      await fetch('https://family-binge-g5hf.onrender.com/api/auth/security-questions', {
+      await fetch('https://api.familybinge.com/api/auth/security-questions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ uid, moms_name: momsName, dads_name: dadsName, birth_year: birthYear })
@@ -138,3 +138,6 @@ const SignupPage = () => {
 };
 
 export default SignupPage;
+
+
+

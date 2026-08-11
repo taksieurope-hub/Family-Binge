@@ -1,4 +1,4 @@
-const API = process.env.REACT_APP_API_URL || "https://family-binge-g5hf.onrender.com/api";
+const API = process.env.REACT_APP_API_URL || "https://api.familybinge.com/api";
 
 export const getDeviceId = () => {
   try {
@@ -75,3 +75,6 @@ export const addExtraDevice = async (userId, deviceType, orderId) => {
     return { success: false };
   }
 };
+
+
+

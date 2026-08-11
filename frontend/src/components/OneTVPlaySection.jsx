@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Film, Loader2, ChevronLeft, ChevronRight, Play } from "lucide-react";
 
-const API_BASE = "https://family-binge-g5hf.onrender.com";
+const API_BASE = "https://api.familybinge.com";
 
 const OneTVPlaySection = ({ onSelectContent }) => {
   const [movies, setMovies] = useState([]);
@@ -114,3 +114,6 @@ const OneTVPlaySection = ({ onSelectContent }) => {
 };
 
 export default OneTVPlaySection;
+
+
+

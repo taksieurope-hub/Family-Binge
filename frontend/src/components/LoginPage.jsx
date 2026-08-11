@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Button } from './ui/button';
 import { AlertTriangle, Crown, Clock } from 'lucide-react';
 
-const BACKEND = 'https://family-binge-g5hf.onrender.com';
+const BACKEND = 'https://api.familybinge.com';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -137,3 +137,6 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+
+
+

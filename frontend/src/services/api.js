@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://family-binge-g5hf.onrender.com";
+const API_BASE_URL = "https://api.familybinge.com";
 
 // Simple in-memory cache with 5-minute TTL
 const cache = new Map();
@@ -119,3 +119,6 @@ export const georgianAPI = {
   getSeries:        (page = 1) => fetchList(`${API_BASE_URL}/api/content/series/georgian/popular?page=${page}`),
   getRussianSeries: (page = 1) => fetchList(`${API_BASE_URL}/api/content/series/russian/popular?page=${page}`),
 };
+
+
+

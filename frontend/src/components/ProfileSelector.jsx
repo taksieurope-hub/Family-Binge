@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, X, User } from 'lucide-react';
 
-const API = 'https://family-binge-g5hf.onrender.com/api';
+const API = 'https://api.familybinge.com/api';
 
 const AVATARS = ['😀', '😎', '🤖', '🐱', '🐶', '🦄', '👽', '👻', '🦕', '🦊'];
 
@@ -170,3 +170,6 @@ const ProfileSelector = ({ onSelect }) => {
 };
 
 export default ProfileSelector;
+
+
+

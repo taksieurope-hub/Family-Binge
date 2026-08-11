@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
 
     if (token && uid) {
       setUser({ uid, email, displayName: name });
-      fetch(`https://family-binge-g5hf.onrender.com/api/auth/me/${uid}`)
+      fetch(`https://api.familybinge.com/api/auth/me/${uid}`)
         .then(res => res.ok ? res.json() : null)
         .then(data => { if (data) setUserData(data); })
         .catch(() => {})
@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
   const refreshUserData = async () => {
     const uid = localStorage.getItem('fb_uid');
     if (uid) {
-      const res = await fetch(`https://family-binge-g5hf.onrender.com/api/auth/me/${uid}`);
+      const res = await fetch(`https://api.familybinge.com/api/auth/me/${uid}`);
       if (res.ok) setUserData(await res.json());
     }
   };
@@ -41,3 +41,6 @@ export const AuthProvider = ({ children }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
+
+
+

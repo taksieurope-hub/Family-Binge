@@ -148,3 +148,4 @@ const ContinueWatchingSection = ({ onSelectContent }) => {
 };
 
 export default ContinueWatchingSection;
+

@@ -98,7 +98,7 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
         if (res.data.items && res.data.items.length > 0) saveSearchHistory(searchQuery);
         setShowResults(true);
         const sid = sessionStorage.getItem('fb_session_id') || 'anon_' + Date.now();
-        fetch('https://family-binge-g5hf.onrender.com/api/auth/analytics/search', {
+        fetch('https://api.familybinge.com/api/auth/analytics/search', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -371,3 +371,6 @@ const Navbar = ({ activeSection, setActiveSection, onSelectContent }) => {
 };
 
 export default Navbar;
+
+
+

@@ -36,7 +36,7 @@ export const saveToWatchHistory = (content, season = 1, episode = 1, progress = 
     // Also sync to MongoDB
     const uid = localStorage.getItem('fb_uid');
     if (uid) {
-      fetch('https://family-binge-g5hf.onrender.com/api/auth/watch-history/' + uid, {
+      fetch('https://api.familybinge.com/api/auth/watch-history/' + uid, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(historyItem)
@@ -150,7 +150,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
       saveToWatchHistory(details, selectedSeason, selectedEpisode, 0);
       window.dispatchEvent(new Event('watchHistoryUpdated'));
       const sid = sessionStorage.getItem('fb_session_id') || 'anon_' + Date.now();
-      fetch('https://family-binge-g5hf.onrender.com/api/auth/analytics/play', {
+      fetch('https://api.familybinge.com/api/auth/analytics/play', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -330,7 +330,7 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
           )}
 
           {getStreamUrl() && (
-            <iframe sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
+            <iframe sandbox="allow-scripts allow-same-origin allow-forms allow-presentation allow-pointer-lock allow-popups"
               ref={iframeRef}
               key={`${details?.id}-${selectedSeason}-${selectedEpisode}-${currentSourceIndex}`}
               src={getStreamUrl()}
@@ -485,6 +485,11 @@ const ContentDetailModal = ({ content, onClose, onPlayVideo, accessStatus, onExp
 };
 
 export default ContentDetailModal;
+
+
+
+
+
 
 
 

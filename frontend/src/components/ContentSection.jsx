@@ -294,3 +294,4 @@ const ContentSection = ({ type = "movies", onSelectContent, filterMode }) => {
 };
 
 export default ContentSection;
+

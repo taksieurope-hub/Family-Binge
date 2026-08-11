@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertTriangle, Eye } from 'lucide-react';
 
-const BACKEND = 'https://family-binge-g5hf.onrender.com';
+const BACKEND = 'https://api.familybinge.com';
 
 const ForgotPasswordPage = () => {
   const navigate = useNavigate();
@@ -113,3 +113,6 @@ const ForgotPasswordPage = () => {
 };
 
 export default ForgotPasswordPage;
+
+
+

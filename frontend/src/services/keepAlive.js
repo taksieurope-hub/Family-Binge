@@ -1,4 +1,4 @@
-const BACKEND = "https://family-binge-g5hf.onrender.com";
+const BACKEND = "https://api.familybinge.com";
 
 export const startKeepAlive = () => {
   const ping = () => {
@@ -8,3 +8,6 @@ export const startKeepAlive = () => {
   ping();
   setInterval(ping, 10 * 60 * 1000); // every 10 minutes
 };
+
+
+

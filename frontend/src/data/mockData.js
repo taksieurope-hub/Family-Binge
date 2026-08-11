@@ -116,3 +116,4 @@ export const faqData = [
 ];
 
 export const categories = ["All", "Movies", "Series", "Action", "Comedy", "Drama", "Horror", "Sci-Fi"];
+

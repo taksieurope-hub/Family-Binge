@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+from fastapi import HTTPException
 from pymongo import MongoClient
 import os
 
 _client = None
+
 
 def get_mongo_db():
     global _client

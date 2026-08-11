@@ -91,3 +91,4 @@ const InviteSection = ({ compact = false }) => {
 };
 
 export default InviteSection;
+

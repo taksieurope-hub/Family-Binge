@@ -1,4 +1,5 @@
-﻿from fastapi import APIRouter, HTTPException
+﻿from fastapi import APIRouter
+from routers.mongo_sync import sync_user, HTTPException
 from pydantic import BaseModel
 import httpx
 import os

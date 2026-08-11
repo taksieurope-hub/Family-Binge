@@ -137,3 +137,4 @@ const KartuliSection = ({ onSelectContent, filterMode }) => {
 };
 
 export default KartuliSection;
+

@@ -1,4 +1,4 @@
-const BACKEND = 'https://family-binge-g5hf.onrender.com';
+const BACKEND = 'https://api.familybinge.com';
 
 const getUid = () => localStorage.getItem('fb_uid');
 
@@ -66,3 +66,6 @@ export const removeFromWatchHistory = async (id, type) => {
     localStorage.setItem('familybinge_watch_history', JSON.stringify(history.filter(h => !(h.id === id && h.type === type))));
   } catch {}
 };
+
+
+
